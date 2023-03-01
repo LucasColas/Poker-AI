@@ -1,5 +1,5 @@
 # Poker-AI
-Library : https://github.com/SirRender00/texasholdem
+Package : https://github.com/SirRender00/texasholdem
 
 Doc texas holdem : https://texasholdem.readthedocs.io/en/0.8/getting_started.html#quickstart
 
