@@ -9,7 +9,9 @@ gui = TextGUI(game=game)
 
 while game.is_game_running():
     game.start_hand()
+
     while game.is_hand_running():
-        action, total = random_agent(game)
-        print(f"Player {game.current_player} {action} {total}")
-        game.take_action(action, total=total)
+        if game.current_player % 2 == 0:
+            game.take_action(*random_agent(game))
+
+        gui.run_step()
