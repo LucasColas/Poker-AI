@@ -16,6 +16,4 @@ nb_cards = 52
 d = Deck()
 cards = d.draw(num=nb_cards) #Every card is created
 print(len(cards))
-
-def range_analysis_preflop():
-    pass
+print(cards)
