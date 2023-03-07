@@ -13,8 +13,9 @@ while game.is_game_running():
     game.start_hand()
     print(game.hands[0]) #Player 0 : AI
     cards = [card for card in cards if card not in game.hands[0]]
-    
+
     while game.is_hand_running():
+        gui.set_visible_players([game.current_player])
         #if game.current_player % 2 == 0:
             #game.take_action(*random_agent(game))
 
