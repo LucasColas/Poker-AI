@@ -9,7 +9,7 @@ max_players = 6
 big_blind = 150
 small_blind = big_blind // 2
 buyin = 1000
-game = TexasHoldEm(buyin=buying, big_blind=big_blind, small_blind=small_blind, max_players=max_players)
+game = TexasHoldEm(buyin=buyin, big_blind=big_blind, small_blind=small_blind, max_players=max_players)
 gui = TextGUI(game=game, visible_players=[])
 
 while game.is_game_running():
