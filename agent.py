@@ -30,8 +30,9 @@ def agent_naif(game: TexasHoldEm) -> Tuple[ActionType, int]:
     #FLOP
     elif len(game.board) != 0:
         rank = evaluate(game.hands[game.current_player],game.board)
+        p_win = get_five_card_rank_percentage(rank)
         p = random.random()
-        if p<rank and (max_raise > min_raise) :
+        if p<p_win and (max_raise > min_raise) :
             print("flop call, p =" ,p)
             action_type = ActionType.CALL
         else:
