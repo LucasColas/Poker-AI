@@ -5,7 +5,7 @@ from texasholdem.evaluator.evaluator import *
 from texasholdem.card.deck import Deck
 from agent import agent_naif
 
-max_players = 6
+max_players = 3
 big_blind = 150
 small_blind = big_blind // 2
 buyin = 1000
