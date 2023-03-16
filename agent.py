@@ -30,8 +30,9 @@ def agent_naif(game: TexasHoldEm) -> Tuple[ActionType, int]:
         coul2 = str(game.hands[game.current_player])[20]
 
         print(nbr1,nbr2)
+        print("couleur : ", coul1, coul2)
         #on joue si on a une paire, deux cartes de la meme couleur ou 2 cartes consecutives
-        # attention l'as peut etre considere comme 1 ou 14 donc on fait attention 
+        # attention l'as peut etre considere comme 1 ou 14 donc on fait attention
         # pour resoudre cela nous allons verifier que la difference entre les 2 cartes est 1 ou 12
 
         if game.players[game.current_player].state == PlayerState.IN:
@@ -58,10 +59,10 @@ def agent_naif(game: TexasHoldEm) -> Tuple[ActionType, int]:
             print("flop check")
             action_type = ActionType.CHECK
         elif (game.players[game.current_player].state == PlayerState.TO_CALL) and (p<p_win) and (max_raise > min_raise) :
-            print("flop call, p =" ,p,p_win)
+            print("call, p =" ,p, "p_win=",p_win)
             action_type = ActionType.CALL
         else:
-            print("flop fold")
+            print("fold, p =", p, " p_win=", p_win)
             action_type = ActionType.FOLD
 
     return action_type, total
