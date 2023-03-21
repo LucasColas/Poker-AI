@@ -15,9 +15,9 @@ while game.is_game_running():
 
     while game.is_hand_running():
         gui.display_state()
-        gui.set_visible_players([game.current_player])
+        
         gui.wait_until_prompted()
-
+        gui.set_visible_players([game.current_player])
         game.take_action(*agent_naif(game))
         gui.display_action()
 
