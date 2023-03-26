@@ -16,4 +16,7 @@ while game.is_game_running():
     game.start_hand()
 
     while game.is_hand_running():
+
+        gui.set_visible_players([game.current_player])
         gui.run_step()
+    gui.display_win()
