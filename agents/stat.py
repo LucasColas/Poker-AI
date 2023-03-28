@@ -3,7 +3,7 @@ from texasholdem.gui.text_gui import TextGUI
 from texasholdem.game.action_type import ActionType
 from texasholdem.game.player_state import PlayerState
 from texasholdem.agents.basic import random_agent
-from agent import agent_naif,agent_allIN
+from agent import agent_naif,agent_Sacha
 from time import sleep
 
 
@@ -32,7 +32,7 @@ while game.is_game_running():
     #print("call:",nbrCall,"check:",nbrCheck,"raise:",nbrRaise,"fold:",nbrFold,"\n",sep="\n")
     while game.is_hand_running():
         
-        action, total = agent_allIN(game,seuil)
+        action, total = agent_Sacha(game,seuil)
         print(f"Player {game.current_player} {action} {total}")
         if (action == ActionType.CALL):
             nbrCall[game.current_player][0]+=1
