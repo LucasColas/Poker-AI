@@ -22,4 +22,5 @@ while game.is_game_running():
         gui.display_action()
         gui.set_visible_players([game.current_player])
 
+    path = game.export_history('./pgns')
     gui.display_win()
