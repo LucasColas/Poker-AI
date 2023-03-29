@@ -10,6 +10,8 @@ small_blind = big_blind // 2
 buyin = 1000
 
 
+cles = ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrWin", "nbrAllin"]
+stats = {cle:{i:0 for i in range(max_players)} for cle in cles}
 nbrCall ={i:0 for i in range(max_players)}
 nbrCheck={i:0 for i in range(max_players)}
 nbrRaise={i:0 for i in range(max_players)}
@@ -39,21 +41,21 @@ while(n<nmax):
 
             #print(f"Player {game.current_player} {action} {total}")
             if (action == ActionType.CALL):
-                nbrCall[game.current_player]+=1
+                stats["nbrCall"][game.current_player]+=1
             elif (action == ActionType.CHECK):
-                nbrCheck[game.current_player]+=1
+                stats["nbrCheck"][game.current_player]+=1
             elif(action == ActionType.RAISE):
-                nbrRaise[game.current_player]+=1
+                stats["nbrRaise"][game.current_player]+=1
             elif(action == ActionType.FOLD):
-                nbrFold[game.current_player]+=1
+                stats["nbrFold"][game.current_player]+=1
             elif(action == ActionType.ALL_IN):
-                nbrAllin[game.current_player]+=1
+                stats["nbrAllin"][game.current_player]+=1
             game.take_action(action, total=total)
 
         gagnant=str(game.hand_history.settle)[7]
-        nbrWin[int(gagnant)]+=1
+        stats["nbrWin"][int(gagnant)]+=1
 
         # print(game.hand_history.settle),"\n\n\n")
     print(n, end="\r")
-print("call:",nbrCall,"check:",nbrCheck,"raise:",nbrRaise,"fold:",nbrFold,"\n",sep="\n")
-print(nbrWin,n)
+print("call:",stats["nbrCall"],"check:",stats["nbrCheck"],"raise:",stats["nbrRaise"],"fold:",stats["nbrFold"],"\n",sep="\n")
+#print(nbrWin,n)
