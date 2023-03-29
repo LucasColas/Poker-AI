@@ -1,4 +1,4 @@
-from texasholdem.game.game import TexasHoldEm 
+from texasholdem.game.game import TexasHoldEm
 from texasholdem.game.action_type import ActionType
 from texasholdem.game.player_state import PlayerState
 from texasholdem.agents.basic import random_agent
@@ -10,12 +10,12 @@ small_blind = big_blind // 2
 buyin = 1000
 
 
-nbrCall ={0:0,1:0,2:0,3:0,4:0,5:0}
-nbrCheck={0:0,1:0,2:0,3:0,4:0,5:0}
-nbrRaise={0:0,1:0,2:0,3:0,4:0,5:0}
-nbrFold ={0:0,1:0,2:0,3:0,4:0,5:0}
-nbrWin  ={0:0,1:0,2:0,3:0,4:0,5:0}
-nbrAllin={0:0,1:0,2:0,3:0,4:0,5:0}
+nbrCall ={i:0 for i in range(max_players)}
+nbrCheck={i:0 for i in range(max_players)}
+nbrRaise={i:0 for i in range(max_players)}
+nbrFold ={i:0 for i in range(max_players)}
+nbrWin  ={i:0 for i in range(max_players)}
+nbrAllin={i:0 for i in range(max_players)}
 
 n=0
 nmax=100000
@@ -43,16 +43,16 @@ while(n<nmax):
             elif (action == ActionType.CHECK):
                 nbrCheck[game.current_player]+=1
             elif(action == ActionType.RAISE):
-                nbrRaise[game.current_player]+=1 
+                nbrRaise[game.current_player]+=1
             elif(action == ActionType.FOLD):
-                nbrFold[game.current_player]+=1 
+                nbrFold[game.current_player]+=1
             elif(action == ActionType.ALL_IN):
                 nbrAllin[game.current_player]+=1
             game.take_action(action, total=total)
 
         gagnant=str(game.hand_history.settle)[7]
         nbrWin[int(gagnant)]+=1
-        
+
         # print(game.hand_history.settle),"\n\n\n")
     print(n, end="\r")
 print("call:",nbrCall,"check:",nbrCheck,"raise:",nbrRaise,"fold:",nbrFold,"\n",sep="\n")
