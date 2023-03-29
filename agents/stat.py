@@ -4,24 +4,31 @@ from texasholdem.game.player_state import PlayerState
 from texasholdem.agents.basic import random_agent
 from agents import agent_naif,agent_Sacha
 
+import matplotlib.pyplot as plt
+
 max_players = 6
 big_blind = 150
 small_blind = big_blind // 2
 buyin = 1000
 
 
+
+
+
 cles = ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrWin", "nbrAllin"]
 stats = {cle:{i:0 for i in range(max_players)} for cle in cles}
-nbrCall ={i:0 for i in range(max_players)}
-nbrCheck={i:0 for i in range(max_players)}
-nbrRaise={i:0 for i in range(max_players)}
-nbrFold ={i:0 for i in range(max_players)}
-nbrWin  ={i:0 for i in range(max_players)}
-nbrAllin={i:0 for i in range(max_players)}
+
+#nbrCall ={i:0 for i in range(max_players)}
+#nbrCheck={i:0 for i in range(max_players)}
+#nbrRaise={i:0 for i in range(max_players)}
+#nbrFold ={i:0 for i in range(max_players)}
+#nbrWin  ={i:0 for i in range(max_players)}
+#nbrAllin={i:0 for i in range(max_players)}
 
 n=0
-nmax=100000
+nmax=10000
 seuil=0.8
+
 
 while(n<nmax):
     game = TexasHoldEm(buyin=buyin, big_blind=big_blind, small_blind=small_blind, max_players=max_players)
@@ -58,4 +65,7 @@ while(n<nmax):
         # print(game.hand_history.settle),"\n\n\n")
     print(n, end="\r")
 print("call:",stats["nbrCall"],"check:",stats["nbrCheck"],"raise:",stats["nbrRaise"],"fold:",stats["nbrFold"],"\n",sep="\n")
-#print(nbrWin,n)
+print(stats["nbrWin"],n)
+
+plt.bar(stats["nbrWin"].keys(), stats["nbrWin"].values(), color='r')
+plt.show()
