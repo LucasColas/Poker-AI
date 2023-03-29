@@ -12,6 +12,7 @@ small_blind = big_blind // 2
 buyin = 1000
 game = TexasHoldEm(buyin=buyin, big_blind=big_blind, small_blind=small_blind, max_players=max_players)
 gui = TextGUI(game=game)
+
 while game.is_game_running():
     game.start_hand()
 

@@ -3,13 +3,31 @@ from typing import Tuple
 
 import random
 
-from texasholdem.game.game import TexasHoldEm
+from texasholdem.game.game import TexasHoldEm, Pot
 from texasholdem.game.action_type import ActionType
 from texasholdem.game.player_state import PlayerState
 from texasholdem.evaluator.evaluator import *
 from texasholdem.gui.text_gui import TextGUI
 
-def conversion(game):
+def obtenir_cote(game: TexasHoldEm):
+    """
+    Fonction permettant d'obtenir la cote actuelle du pot.
+    """
+
+    id_last_pot = -1
+    #print("pot actuel",game.pots[id_last_pot].get_total_amount())
+    pot_actuel = game.pots[id_last_pot].get_total_amount()
+    chips_to_call = game.pots[id_last_pot].chips_to_call(game.current_player)
+    #print("chips to call", chips_to_call)
+    if chips_to_call != 0:
+        #print("cote actuelle : ", pot_actuel / chips_to_call)
+        return round(pot_actuel / chips_to_call, 2)
+    return 1
+def cote_en_pourcentage(cote):
+    return (1/cote)*100
+
+
+def conversion(game: TexasHoldEm):
 
     Conversion = {'1':1, '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9,'T': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14}
     nbr1 = Conversion[str(game.hands[game.current_player])[7]]
@@ -99,11 +117,12 @@ def agent_Sacha(game: TexasHoldEm, seuil:int):
             action_type = ActionType.FOLD
 
     #FLOP Turn River
-    #Strategie : si notre main a un % de chance de gagner > seuil on ALL_IN sinon on FOLD
+    #Strategie : si le pourcentage de mains battu par notre main est supérieur au seuil alors le
+    #bot fait ALL_IN, FOLD sinon.
     elif len(game.board) != 0:
         rank = evaluate(game.hands[game.current_player],game.board)
         p_win = get_five_card_rank_percentage(rank)
-        p = random.random()
+
         if (game.players[game.current_player].state == PlayerState.IN) and (p_win >seuil) and (max_raise > min_raise):
             #print("flop check")
             action_type = ActionType.ALL_IN
