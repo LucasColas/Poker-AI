@@ -67,5 +67,24 @@ while(n<nmax):
 print("call:",stats["nbrCall"],"check:",stats["nbrCheck"],"raise:",stats["nbrRaise"],"fold:",stats["nbrFold"],"\n",sep="\n")
 print(stats["nbrWin"],n)
 
-plt.bar(stats["nbrWin"].keys(), stats["nbrWin"].values(), color='r')
+# Créer un diagramme à barres avec les valeurs de victoires
+plt.bar(stats["nbrWin"].keys(), stats["nbrWin"].values())
+
+# Ajouter des légendes pour chaque barre
+for i, v in enumerate(stats["nbrWin"].values()):
+    plt.text(i, v, str(v), ha='center')
+    # Ajouter des informations supplémentaires
+    if i == 0 or i == 1:
+        plt.annotate("Random", xy=(i, v),xytext=(i, v + 200))
+    elif i == 2 or i == 3:
+        plt.annotate("Naif", xy=(i, v),xytext=(i, v + 200))
+    else:
+        plt.annotate("Allin", xy=(i, v),xytext=(i, v + 200))
+
+# Ajouter un titre et des étiquettes d'axe
+plt.title("Nombre de victoires pour chaque joueur")
+plt.xlabel("Joueur")
+plt.ylabel("Nombre de victoires")
+
+# Afficher le diagramme
 plt.show()
