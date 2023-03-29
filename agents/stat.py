@@ -5,6 +5,7 @@ from texasholdem.agents.basic import random_agent
 from agents import agent_naif,agent_Sacha
 
 import matplotlib.pyplot as plt
+import random
 
 max_players = 6
 big_blind = 150
@@ -18,35 +19,37 @@ buyin = 1000
 cles = ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrWin", "nbrAllin"]
 stats = {cle:{i:0 for i in range(max_players)} for cle in cles}
 
-#nbrCall ={i:0 for i in range(max_players)}
-#nbrCheck={i:0 for i in range(max_players)}
-#nbrRaise={i:0 for i in range(max_players)}
-#nbrFold ={i:0 for i in range(max_players)}
-#nbrWin  ={i:0 for i in range(max_players)}
-#nbrAllin={i:0 for i in range(max_players)}
-
 n=0
 nmax=10000
 seuil=0.8
 
+# Définir les fonctions des bots
+bots = [random_agent, agent_naif, agent_Sacha]
+
+# Initialiser le dictionnaire pour stocker les bots de chaque joueur
+joueurs_bots = {}
+
+# Pour chaque joueur, choisir un bot aléatoire et stocker cette information dans le dictionnaire
+for joueur in range(max_players):
+    bot = random.choice(bots)
+    joueurs_bots[joueur] = bot
 
 while(n<nmax):
     game = TexasHoldEm(buyin=buyin, big_blind=big_blind, small_blind=small_blind, max_players=max_players)
     while game.is_game_running():
         game.start_hand()
         n+=1
-        #le joueur 0 et 1 sont les joueurs random
-        #le joueur 2 et 3 sont les joueurs naif
-        #le joueur 4 et 5 sont les joueurs allIN(seuil)
-        while game.is_hand_running():
-            if(game.current_player in [0,1]):
-                action, total = random_agent(game)
-            elif(game.current_player in [2,3]):
-                action, total = agent_naif(game)
-            else:
-                action, total = agent_Sacha(game,seuil)
 
+        while game.is_hand_running():
+            # Utiliser le bot sélectionné pour le joueur actuel attention au bot agent_Sacha qui a 2 paramètres
+            current_bot = joueurs_bots[game.current_player]
+            if(current_bot==agent_Sacha):
+                action, total =current_bot(game,seuil)
+            else:
+                action, total = current_bot(game)
             #print(f"Player {game.current_player} {action} {total}")
+
+            # Mettre à jour les statistiques
             if (action == ActionType.CALL):
                 stats["nbrCall"][game.current_player]+=1
             elif (action == ActionType.CHECK):
@@ -63,9 +66,13 @@ while(n<nmax):
         stats["nbrWin"][int(gagnant)]+=1
 
         # print(game.hand_history.settle),"\n\n\n")
+    # afficher le nombre de parties jouées
     print(n, end="\r")
+
+# Afficher les statistiques
 print("call:",stats["nbrCall"],"check:",stats["nbrCheck"],"raise:",stats["nbrRaise"],"fold:",stats["nbrFold"],"\n",sep="\n")
 print(stats["nbrWin"],n)
+print(joueurs_bots)
 
 # Créer un diagramme à barres avec les valeurs de victoires
 plt.bar(stats["nbrWin"].keys(), stats["nbrWin"].values())
@@ -74,12 +81,8 @@ plt.bar(stats["nbrWin"].keys(), stats["nbrWin"].values())
 for i, v in enumerate(stats["nbrWin"].values()):
     plt.text(i, v, str(v), ha='center')
     # Ajouter des informations supplémentaires
-    if i == 0 or i == 1:
-        plt.annotate("Random", xy=(i, v),xytext=(i, v + 200))
-    elif i == 2 or i == 3:
-        plt.annotate("Naif", xy=(i, v),xytext=(i, v + 200))
-    else:
-        plt.annotate("Allin", xy=(i, v),xytext=(i, v + 200))
+    plt.annotate(joueurs_bots[i].__name__, xy=(i, v),xytext=(i, v + 200))
+    
 
 # Ajouter un titre et des étiquettes d'axe
 plt.title("Nombre de victoires pour chaque joueur")
