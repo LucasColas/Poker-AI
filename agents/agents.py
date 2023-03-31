@@ -1,6 +1,5 @@
 from time import sleep
 from typing import Tuple
-
 import random
 
 from texasholdem.game.game import TexasHoldEm, Pot
@@ -9,34 +8,8 @@ from texasholdem.game.player_state import PlayerState
 from texasholdem.evaluator.evaluator import *
 from texasholdem.gui.text_gui import TextGUI
 
-def obtenir_cote(game: TexasHoldEm):
-    """
-    Fonction permettant d'obtenir la cote actuelle du pot.
-    """
+from fonctions_auxiliaires import conversion
 
-    id_last_pot = -1
-    #print("pot actuel",game.pots[id_last_pot].get_total_amount())
-    pot_actuel = game.pots[id_last_pot].get_total_amount()
-    chips_to_call = game.pots[id_last_pot].chips_to_call(game.current_player)
-    #print("chips to call", chips_to_call)
-    if chips_to_call != 0:
-        #print("cote actuelle : ", pot_actuel / chips_to_call)
-        return round(pot_actuel / chips_to_call, 2)
-    return 1
-def cote_en_pourcentage(cote):
-    return (1/cote)*100
-
-
-def conversion(game: TexasHoldEm):
-
-    Conversion = {'1':1, '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9,'T': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14}
-    nbr1 = Conversion[str(game.hands[game.current_player])[7]]
-    #str(game.hands[game.current_player])[7].translate(str.maketrans(Conversion))
-    coul1 = str(game.hands[game.current_player])[8]
-    nbr2 = Conversion[str(game.hands[game.current_player])[19]]
-
-    coul2 = str(game.hands[game.current_player])[20]
-    return nbr1, coul1, nbr2, coul2
 
 def agent_naif(game: TexasHoldEm) -> Tuple[ActionType, int]:
 
