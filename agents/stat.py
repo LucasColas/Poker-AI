@@ -3,11 +3,11 @@ from texasholdem.game.action_type import ActionType
 from texasholdem.game.player_state import PlayerState
 from texasholdem.agents.basic import random_agent
 from agents import agent_naif,agent_Sacha
-
+from agent_outs import agent_outs
 import matplotlib.pyplot as plt
 import random
 
-max_players = 6
+max_players = 4
 big_blind = 150
 small_blind = big_blind // 2
 buyin = 1000
@@ -15,25 +15,27 @@ buyin = 1000
 
 
 
-
+#TODO : ajouter profit
 cles = ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrWin", "nbrAllin"]
 stats = {cle:{i:0 for i in range(max_players)} for cle in cles}
 
 n=0
-nmax=10000
+nmax=1000
 seuil=0.8
 
 # Définir les fonctions des bots
-bots = [random_agent, agent_naif, agent_Sacha]
-
+bots = [random_agent, agent_naif, agent_outs, agent_Sacha]
+bots_noms = ["random_agent", "agent_naif", "agent_outs", "agent_Sacha"]
 # Initialiser le dictionnaire pour stocker les bots de chaque joueur
 joueurs_bots = {}
-
+joueurs_bots_noms = {}
 # Pour chaque joueur, choisir un bot aléatoire et stocker cette information dans le dictionnaire
 for joueur in range(max_players):
     bot = random.choice(bots)
-    joueurs_bots[joueur] = bot
+    joueurs_bots[joueur] = bots[joueur]
+    joueurs_bots_noms[joueur] = bots_noms[joueur]
 
+print(joueurs_bots)
 while(n<nmax):
     game = TexasHoldEm(buyin=buyin, big_blind=big_blind, small_blind=small_blind, max_players=max_players)
     while game.is_game_running():
@@ -75,14 +77,14 @@ print(stats["nbrWin"],n)
 print(joueurs_bots)
 
 # Créer un diagramme à barres avec les valeurs de victoires
-plt.bar(stats["nbrWin"].keys(), stats["nbrWin"].values())
-
+plt.bar(joueurs_bots_noms.values(), stats["nbrWin"].values())
+"""
 # Ajouter des légendes pour chaque barre
 for i, v in enumerate(stats["nbrWin"].values()):
     plt.text(i, v, str(v), ha='center')
     # Ajouter des informations supplémentaires
     plt.annotate(joueurs_bots[i].__name__, xy=(i, v),xytext=(i, v + 200))
-    
+"""
 
 # Ajouter un titre et des étiquettes d'axe
 plt.title("Nombre de victoires pour chaque joueur")

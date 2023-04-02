@@ -41,7 +41,7 @@ def agent_outs(game: TexasHoldEm):
 
 
     combinaisons = generer_combinaisons(4, elements)
-    print("elements : ", elements)
+    #print("elements : ", elements)
     info_combi = {}
     best_possible_hand = {9:0}
     for id, combinaison in enumerate(combinaisons):
@@ -58,7 +58,7 @@ def agent_outs(game: TexasHoldEm):
         #print(info_combi[id])
 
     chance = best_possible_hand[list(best_possible_hand.keys())[0]]*2
-    print("chance : ", chance)
+    #print("chance : ", chance)
     pot_odd = cote_en_pourcentage(obtenir_cote(game))
 
     if game.players[game.current_player].state == PlayerState.IN:

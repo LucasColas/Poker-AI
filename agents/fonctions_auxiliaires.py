@@ -73,3 +73,6 @@ def strategie_preflop1(game: TexasHoldEm):
 def generer_combinaisons(k : int, elements : List[Card]):
 
     return list(itertools.combinations(elements, k))
+
+def best_possible_hand():
+    pass
