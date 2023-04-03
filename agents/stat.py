@@ -20,7 +20,7 @@ cles = ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrWin", "nbrAllin"]
 stats = {cle:{i:0 for i in range(max_players)} for cle in cles}
 
 n=0
-nmax=1000
+nmax=10000
 seuil=0.8
 
 # Définir les fonctions des bots
@@ -35,7 +35,7 @@ for joueur in range(max_players):
     joueurs_bots[joueur] = bots[joueur]
     joueurs_bots_noms[joueur] = bots_noms[joueur]
 
-print(joueurs_bots)
+#print(joueurs_bots)
 while(n<nmax):
     game = TexasHoldEm(buyin=buyin, big_blind=big_blind, small_blind=small_blind, max_players=max_players)
     while game.is_game_running():
@@ -74,17 +74,16 @@ while(n<nmax):
 # Afficher les statistiques
 print("call:",stats["nbrCall"],"check:",stats["nbrCheck"],"raise:",stats["nbrRaise"],"fold:",stats["nbrFold"],"\n",sep="\n")
 print(stats["nbrWin"],n)
-print(joueurs_bots)
+#print(joueurs_bots)
 
 # Créer un diagramme à barres avec les valeurs de victoires
 plt.bar(joueurs_bots_noms.values(), stats["nbrWin"].values())
-"""
+
 # Ajouter des légendes pour chaque barre
 for i, v in enumerate(stats["nbrWin"].values()):
-    plt.text(i, v, str(v), ha='center')
+    #plt.text(i, v, str(v), ha='center')
     # Ajouter des informations supplémentaires
-    plt.annotate(joueurs_bots[i].__name__, xy=(i, v),xytext=(i, v + 200))
-"""
+    plt.annotate(joueurs_bots[i].__name__, xy=(i, v), ha='center', va='bottom')
 
 # Ajouter un titre et des étiquettes d'axe
 plt.title("Nombre de victoires pour chaque joueur")
