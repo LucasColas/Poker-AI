@@ -20,7 +20,7 @@ cles = ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrWin", "nbrAllin"]
 stats = {cle:{i:0 for i in range(max_players)} for cle in cles}
 
 n=0
-nmax=100000
+nmax=100
 seuil=0.8
 
 # Définir les fonctions des bots
@@ -83,7 +83,7 @@ plt.bar(joueurs_bots_noms.values(), stats["nbrWin"].values())
 for i, v in enumerate(stats["nbrWin"].values()):
     #plt.text(i, v, str(v), ha='center')
     # Ajouter des informations supplémentaires
-    plt.annotate(joueurs_bots[i].__name__, xy=(i, v), ha='center', va='bottom')
+    plt.annotate(v, xy=(i, v), ha='center', va='bottom')
 
 # Ajouter un titre et des étiquettes d'axe
 plt.title("Nombre de victoires pour chaque joueur")
@@ -91,4 +91,26 @@ plt.xlabel("Joueur")
 plt.ylabel("Nombre de victoires")
 
 # Afficher le diagramme
+plt.show()
+
+
+#plot de bar en fonction des valeurs de stats
+width = 0.35
+fig = plt.figure()
+ax = fig.add_axes([0,0,1,1])
+
+ind = [i for i in range(max_players)]
+ax.bar(ind,list(stats["nbrCall"].values()) , width, color='r')
+ax.bar(ind, list(stats["nbrFold"].values()), width,bottom=list(stats["nbrCall"].values()), color='b')
+ax.bar(ind, list(stats["nbrRaise"].values()), width,bottom=[x + y for x, y in zip(list(stats["nbrCall"].values()), list(stats["nbrFold"].values()))], color='g')
+ax.bar(ind, list(stats["nbrCheck"].values()), width,bottom=[x + y + z for x, y, z in zip(list(stats["nbrCall"].values()), list(stats["nbrFold"].values()), list(stats["nbrRaise"].values()))], color='y')
+ax.bar(ind,list(stats["nbrAllin"].values()), width,bottom=[x + y + z + w for x, y, z, w in zip(list(stats["nbrCall"].values()), list(stats["nbrFold"].values()), list(stats["nbrRaise"].values()), list(stats["nbrCheck"].values()))], color='c')
+
+ax.set_xlabel('Joueur')
+ax.set_ylabel('Nombre de fois')
+ax.set_title('Nombre de fois que chaque joueur a fait une action')
+ax.set_xticks(ind, list(joueurs_bots_noms.values()))
+ax.legend(labels=['nbrCall', 'nbrFold', 'nbrRaise', 'nbrCheck','nbrAllin'])
+
+
 plt.show()
