@@ -7,7 +7,7 @@ from agent_outs import agent_outs
 import matplotlib.pyplot as plt
 import random
 
-max_players = 4
+max_players = 6
 big_blind = 150
 small_blind = big_blind // 2
 buyin = 1000
@@ -20,12 +20,12 @@ cles = ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrWin", "nbrAllin"]
 stats = {cle:{i:0 for i in range(max_players)} for cle in cles}
 
 n=0
-nmax=10000
+nmax=100000
 seuil=0.8
 
 # Définir les fonctions des bots
-bots = [random_agent, agent_naif, agent_outs, agent_Sacha]
-bots_noms = ["random_agent", "agent_naif", "agent_outs", "agent_Sacha"]
+bots = [random_agent, agent_naif, agent_outs, agent_Sacha, random_agent, agent_naif]
+bots_noms = ["random_agent", "agent_naif", "agent_outs", "agent_Sacha", "random_agent", "agent_naif"]
 # Initialiser le dictionnaire pour stocker les bots de chaque joueur
 joueurs_bots = {}
 joueurs_bots_noms = {}
