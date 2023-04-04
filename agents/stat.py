@@ -20,11 +20,12 @@ cles = ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrWin", "nbrAllin"]
 stats = {cle:{i:0 for i in range(max_players)} for cle in cles}
 
 n=0
-nmax=100
+nmax=100000
 seuil=0.8
+Agent = agent_outs()
 
 # Définir les fonctions des bots
-bots = [random_agent, agent_naif, agent_outs, agent_Sacha, random_agent, agent_naif]
+bots = [random_agent, agent_naif, Agent.choix, agent_Sacha, random_agent, agent_naif]
 bots_noms = ["random_agent", "agent_naif", "agent_outs", "agent_Sacha", "random_agent", "agent_naif"]
 # Initialiser le dictionnaire pour stocker les bots de chaque joueur
 joueurs_bots = {}
@@ -44,8 +45,11 @@ while(n<nmax):
 
         while game.is_hand_running():
             # Utiliser le bot sélectionné pour le joueur actuel attention au bot agent_Sacha qui a 2 paramètres
+            Agent.setGame(game)
             current_bot = joueurs_bots[game.current_player]
-            if(current_bot==agent_Sacha):
+            if current_bot == Agent.choix:
+                action, total = current_bot()
+            elif(current_bot==agent_Sacha):
                 action, total =current_bot(game,seuil)
             else:
                 action, total = current_bot(game)
