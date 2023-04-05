@@ -11,17 +11,18 @@ small_blind = big_blind // 2
 buyin = 1000
 game = TexasHoldEm(buyin=buyin, big_blind=big_blind, small_blind=small_blind, max_players=max_players)
 gui = TextGUI(game=game)
-
+agent_outs = agent_outs()
 while game.is_game_running():
     game.start_hand()
 
     while game.is_hand_running():
+        agent_outs.setGame(game)
         gui.display_state()
         #obtenir_cote(game)
 
         gui.wait_until_prompted()
         if game.current_player == 0:
-            game.take_action(*agent_outs(game))
+            game.take_action(*agent_outs.choix())
         if game.current_player % 2 == 0 and game.current_player != 0:
             game.take_action(*agent_naif(game))
         else:

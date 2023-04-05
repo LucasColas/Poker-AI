@@ -82,6 +82,12 @@ class agent_outs:
                 action_type = ActionType.FOLD
 
         else:
+            bet_amount = self.__game.player_bet_amount(self.__game.current_player)
+            chips = self.__game.players[self.__game.current_player].chips
+            min_raise = self.__game.value_to_total(self.__game.min_raise(), self.__game.current_player)
+            max_raise = bet_amount + chips
+            total = None
+            self.__agent_cards = self.__game.hands[self.__game.current_player]
             current_rank = evaluate(self.__agent_cards,self.__game.board)
             rank = self.__rank[rank_to_string(current_rank)]
             good_hand = False
@@ -94,8 +100,18 @@ class agent_outs:
                 #print("call, p =" ,p, "p_win=",p_win)
                 action_type = ActionType.CALL
             else:
-                #print("fold, p =", p, " p_win=", p_win)
-                action_type = ActionType.FOLD
+                rank = evaluate(self.__game.hands[self.__game.current_player],self.__game.board)
+                p_win = get_five_card_rank_percentage(rank)
+                p = random.random()
+                if self.__game.players[self.__game.current_player].state == PlayerState.IN:
+                    #print("flop check")
+                    action_type = ActionType.CHECK
+                elif (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and (p<p_win) and (max_raise > min_raise) :
+                    #print("call, p =" ,p, "p_win=",p_win)
+                    action_type = ActionType.CALL
+                else:
+                    #print("fold, p =", p, " p_win=", p_win)
+                    action_type = ActionType.FOLD
 
 
 

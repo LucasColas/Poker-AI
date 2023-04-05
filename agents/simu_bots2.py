@@ -23,7 +23,7 @@ while game.is_game_running():
             Agent.setGame(game)
             game.take_action(*Agent.choix())
         else:
-            gui.run_step()
+            game.take_action(*random_agent(game))
         gui.display_action()
         #gui.set_visible_players([game.current_player])
 
