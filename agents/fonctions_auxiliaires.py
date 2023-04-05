@@ -58,7 +58,7 @@ def strategie_preflop1(game: TexasHoldEm):
 
     if game.players[game.current_player].state == PlayerState.IN:
         action_type = ActionType.CHECK
-    elif (max_raise > min_raise) and (game.players[game.current_player].state == PlayerState.TO_CALL):
+    elif (game.players[game.current_player].state == PlayerState.TO_CALL):
         if (nbr1==nbr2) or (coul1==coul2) or (abs(nbr1-nbr2)==1) or (abs(nbr1-nbr2)==12):
             action_type = ActionType.CALL
 

@@ -1,7 +1,7 @@
 from texasholdem.game.game import TexasHoldEm
 from texasholdem.gui.text_gui import TextGUI
 from texasholdem.agents.basic import random_agent
-from agents import agent_naif, agent_Sacha
+from agents import agent_naif, agent_allIn
 from agent_outs import agent_outs
 max_players = 2
 big_blind = 150

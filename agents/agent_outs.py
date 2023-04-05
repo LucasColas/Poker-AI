@@ -53,6 +53,11 @@ class agent_outs:
             self.__best_possible_hand = {9:0}
             combinaisons = generer_combinaisons(4, elements)
             #print("elements : ", elements)
+            bet_amount = self.__game.player_bet_amount( self.__game.current_player)
+            chips =  self.__game.players[ self.__game.current_player].chips
+            min_raise =  self.__game.value_to_total( self.__game.min_raise(),  self.__game.current_player)
+            max_raise = bet_amount + chips
+            total = None
 
             for id, combinaison in enumerate(combinaisons):
                 self.__info_combi[id] = defaultdict(int)
@@ -74,7 +79,7 @@ class agent_outs:
             if self.__game.players[self.__game.current_player].state == PlayerState.IN:
                 #print("flop check")
                 action_type = ActionType.CHECK
-            elif (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and chance > pot_odd :
+            elif (max_raise > min_raise) and (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and chance > pot_odd :
                 #print("call, p =" ,p, "p_win=",p_win)
                 action_type = ActionType.CALL
             else:
@@ -106,7 +111,7 @@ class agent_outs:
                 if self.__game.players[self.__game.current_player].state == PlayerState.IN:
                     #print("flop check")
                     action_type = ActionType.CHECK
-                elif (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and (p<p_win) and (max_raise > min_raise) :
+                elif (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and (p<p_win):
                     #print("call, p =" ,p, "p_win=",p_win)
                     action_type = ActionType.CALL
                 else:
