@@ -72,14 +72,14 @@ class agent_outs:
                 self.__info_combi[id] = sorted(self.__info_combi[id].items(), key=lambda item: item[0])
                 #print(self.__info_combi[id])
 
-            chance = self.__best_possible_hand[list(self.__best_possible_hand.keys())[0]]*2
+            chance = self.__best_possible_hand[list(self.__best_possible_hand.keys())[0]]*4
             #print("chance : ", chance)
             pot_odd = cote_en_pourcentage(obtenir_cote(self.__game))
 
             if self.__game.players[self.__game.current_player].state == PlayerState.IN:
                 #print("flop check")
                 action_type = ActionType.CHECK
-            elif (max_raise > min_raise) and (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and chance > pot_odd :
+            elif (max_raise > min_raise) and (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and chance >= pot_odd :
                 #print("call, p =" ,p, "p_win=",p_win)
                 action_type = ActionType.CALL
             else:
