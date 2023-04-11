@@ -2,12 +2,12 @@ from texasholdem.game.game import TexasHoldEm, Pot
 from texasholdem.game.action_type import ActionType
 from texasholdem.game.player_state import PlayerState
 from texasholdem.agents.basic import random_agent
-from agents import agent_naif,agent_allIn
+from agents import agent_naif,agent_allIn, agent_saboteur
 from agent_outs import agent_outs
 import matplotlib.pyplot as plt
 import random
 
-max_players = 6
+max_players = 5
 big_blind = 150
 small_blind = big_blind // 2
 buyin = 1000
@@ -20,14 +20,14 @@ stats = {cle:{i:0 for i in range(max_players)} for cle in cles}
 
 
 n=0
-nmax=500
+nmax=5000
 seuil=0.8
 agent_out = agent_outs()
 
 # Définir les fonctions des bots
-bots = [agent_out.choix, agent_naif, agent_out.choix, agent_allIn, agent_naif, agent_naif]
+bots = [agent_out.choix, agent_naif, agent_allIn, random_agent,agent_saboteur]
 #bot_nom = [i.__name__ for i in bots] sauf pour agent_out.choix devient "agent_out"
-bots_noms = ["agent_out", "agent_naif", "agent_out", "agent_allIn", "agent_naif", "agent_naif"]
+bots_noms = ["agent_out", "agent_naif", "agent_allIn", "random_agent","agent_saboteur"]
 # Initialiser le dictionnaire pour stocker les bots de chaque joueur
 joueurs_bots = {}
 joueurs_bots_noms = {}
@@ -96,7 +96,7 @@ for i, v in enumerate(stats["nbrWin"].values()):
     plt.annotate(f"{joueurs_bots_noms[i]} \n {v}", xy=(i, v), ha='center', va='bottom')
 
 # Ajouter un titre et des étiquettes d'axe
-plt.title("Nombre de victoires pour chaque joueur")
+plt.title(f"Nombre de victoires pour chaque joueur, {n} parties jouées")
 plt.xlabel("Joueurs")
 plt.ylabel("Nombre de victoires")
 
@@ -115,7 +115,7 @@ for a,b in stats.items():
         t= ax.bar(ind,list(b.values()) , width, label=a, bottom=bottom)
         ax.bar_label(t, label_type='center')
         bottom = [x + y for x, y in zip(bottom, list(b.values()))]
-ax.set_title("Nombre d'actions pour chaque joueur")
+ax.set_title(f"Nombre d'actions pour chaque joueur, {n} parties jouées")
 ax.legend()
 
 #plot bar du profit des joueurs
@@ -126,7 +126,7 @@ for i, v in enumerate(stats["profit"].values()):
     plt.annotate(f"{joueurs_bots_noms[i]} \n {v}", xy=(i, v), ha='center', va='bottom')
 
 # Ajouter un titre et des étiquettes d'axe
-plt.title("Profit de chaque joueur")
+plt.title(f"Profit de chaque joueur, {n} parties jouées")
 plt.xlabel("Joueurs")
 plt.ylabel("Profit (en $)")
 
@@ -141,7 +141,7 @@ for i,v in (profit_par_victoire.items()):
     plt.annotate(f"{joueurs_bots_noms[i]} \n {v}", xy=(i, v), ha='center', va='bottom')
 
 # Ajouter un titre et des étiquettes d'axe
-plt.title("Profit par victoire pour chaque joueur")
+plt.title("Profit moyen par victoire pour chaque joueur")
 plt.xlabel("Joueur")
 plt.ylabel("Profit par victoire (en $)")
 
