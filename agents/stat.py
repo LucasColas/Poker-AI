@@ -15,12 +15,12 @@ buyin = 1000
 
 
 # Définir les statistiques à suivre
-cles = ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrWin", "nbrAllin", "profit"]
+cles = ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrWin", "nbrAllin","nbrAction", "profit"]
 stats = {cle:{i:0 for i in range(max_players)} for cle in cles}
 
 
 n=0
-nmax=5000
+nmax=500
 seuil=0.8
 agent_out = agent_outs()
 
@@ -82,6 +82,8 @@ while(n<nmax):
     # afficher le nombre de parties jouées
     print(n, end="\r")
 
+
+stats["nbrAction"]= {i:stats["nbrCall"][i]+stats["nbrCheck"][i]+stats["nbrRaise"][i]+stats["nbrFold"][i]+stats["nbrAllin"][i] for i in range(max_players)}
 stats_moy={cle:{i:stats[cle][i]/n for i in range(max_players)} for cle in cles}
 # Afficher les statistiques
 #print("call:",stats["nbrCall"],"check:",stats["nbrCheck"],"raise:",stats["nbrRaise"],"fold:",stats["nbrFold"],"profit",stats["profit"],"\n",sep="\n")
@@ -111,7 +113,7 @@ ind = [i for i in range(max_players)]
 #afficher les barres
 bottom = [0 for i in range(max_players)]
 for a,b in stats.items():
-    if (a not in ["nbrWin","profit"]):
+    if (a not in ["nbrWin", "profit", "nbrAction"]):
         t= ax.bar(ind,list(b.values()) , width, label=a, bottom=bottom)
         ax.bar_label(t, label_type='center')
         bottom = [x + y for x, y in zip(bottom, list(b.values()))]
@@ -146,3 +148,9 @@ plt.xlabel("Joueur")
 plt.ylabel("Profit par victoire (en $)")
 
 plt.show()
+
+print(stats["nbrCall"])
+print(stats["nbrRaise"])
+print(stats["nbrAction"])
+print(stats["nbrFold"])
+
