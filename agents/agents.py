@@ -115,7 +115,7 @@ def agent_saboteur(game: TexasHoldEm):
             action_type = ActionType.FOLD
 
     #FLOP Turn River
-    #Strategie : joue si il a que moins de 20% de chance de gagner
+    #Strategie : joue si il a que moins de 5% de chance de gagner
     elif len(game.board) != 0:
         rank = evaluate(game.hands[game.current_player],game.board)
         p_win = get_five_card_rank_percentage(rank)
