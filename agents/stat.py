@@ -2,10 +2,16 @@ from texasholdem.game.game import TexasHoldEm, Pot
 from texasholdem.game.action_type import ActionType
 from texasholdem.game.player_state import PlayerState
 from texasholdem.agents.basic import random_agent
-from agents import agent_naif,agent_allIn, agent_saboteur
+#from agents import agent_naif,agent_alln, agent_saboteur
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent.parent))
 from agent_outs import agent_outs
+from agents_bots import agent_naif, agent_allIn, agent_saboteur
 import matplotlib.pyplot as plt
 import random
+
+
 
 max_players = 5
 big_blind = 150
@@ -70,7 +76,7 @@ while(n<nmax):
         mises[game.current_player] += game.player_bet_amount(game.current_player)
 
     gagnant=str(game.hand_history.settle)[7]
-    ## TODO: prendre en compte les blind
+    # TODO: prendre en compte les blind
     gagnant = int(gagnant)
     stats["nbrWin"][gagnant] += 1
     stats["profit"][gagnant]= stats["profit"][gagnant] + game.pots[-1].get_total_amount() - mises[gagnant]
@@ -80,6 +86,7 @@ while(n<nmax):
 
     # print(game.hand_history.settle),"\n\n\n")
     # afficher le nombre de parties jouées
+    path = game.export_history('./res')
     print(n, end="\r")
 
 

@@ -1,9 +1,8 @@
 from texasholdem.game.game import TexasHoldEm
 from texasholdem.gui.text_gui import TextGUI
 from texasholdem.agents.basic import random_agent
-from agents import agent_naif, agent_allIn
-from agent_outs import agent_outs
-from fonctions_auxiliaires import obtenir_cote
+from agents import agents_bots
+
 
 max_players = 6
 big_blind = 150
@@ -20,5 +19,5 @@ while game.is_game_running():
         if game.current_player in [0,1,2,3,4]:
             game.take_action(*random_agent(game))
         gui.run_step()
-        
+
     gui.display_win()

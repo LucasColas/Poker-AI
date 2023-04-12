@@ -3,7 +3,7 @@ from texasholdem.gui.text_gui import TextGUI
 from texasholdem.agents.basic import random_agent, call_agent
 from texasholdem.evaluator.evaluator import *
 from texasholdem.card.deck import Deck
-from agents.agents import agent_naif
+from agents import agent_outs
 
 max_players = 6
 big_blind = 150
