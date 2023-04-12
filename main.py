@@ -1,4 +1,3 @@
-
 from texasholdem.game.game import TexasHoldEm
 from texasholdem.gui.text_gui import TextGUI
 from texasholdem.agents.basic import random_agent, call_agent

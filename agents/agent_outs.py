@@ -27,20 +27,63 @@ class agent_outs:
         self.__info_combi = {}
         self.__best_possible_hand = {9:0}
         self.__agent_cards = None
+        self.__bet_amount = None
+        self.__chips = None
+        self.__min_raise = None
+        self.__max_raise = None
+        self.__total = None
 
 
 
     def setGame(self, g : TexasHoldEm):
         self.__game = g
 
-    def choix(self):
+    def action_river(self, good_hand):
+        self.raise_config()
+        if self.__game.players[self.__game.current_player].state == PlayerState.IN:
+            #print("flop check")
+            action_type = ActionType.CHECK
+        elif (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and good_hand:
+            #print("call, p =" ,p, "p_win=",p_win)
+            action_type = ActionType.CALL
+        else:
+            rank = evaluate(self.__game.hands[self.__game.current_player],self.__game.board)
+            p_win = get_five_card_rank_percentage(rank)
+            p = random.random()
+            if self.__game.players[self.__game.current_player].state == PlayerState.IN:
+                #print("flop check")
+                action_type = ActionType.CHECK
+            elif (self.__max_raise > self.__min_raise) and (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and (p<p_win):
+                #print("call, p =" ,p, "p_win=",p_win)
+                action_type = ActionType.RAISE
+                self.__total = self.__max_raise
+
+            else:
+                #print("fold, p =", p, " p_win=", p_win)
+                action_type = ActionType.FOLD
+
+        return action_type, self.__total
+
+    def raise_config(self):
+        self.__bet_amount = self.__game.player_bet_amount( self.__game.current_player)
+        self.__chips =  self.__game.players[ self.__game.current_player].chips
+        self.__min_raise =  self.__game.value_to_total( self.__game.min_raise(),  self.__game.current_player)
+        self.__max_raise = self.__bet_amount + self.__chips
+        self.__total = None
+
+
+
+    def choix(self, g):
+        self.setGame(g)
         len_cards_game_board = len(self.__game.board)
         nb_cards = 52
+
 
         if len_cards_game_board == 0:
             return strategie_preflop1(self.__game)
 
-        if len_cards_game_board == 3 or len_cards_game_board == 4:
+        elif len_cards_game_board == 3 or len_cards_game_board == 4:
+            self.raise_config()
             self.__agent_cards = self.__game.hands[self.__game.current_player]
             d = Deck()
             cards = d.draw(num=nb_cards)
@@ -53,11 +96,7 @@ class agent_outs:
             self.__best_possible_hand = {9:0}
             combinaisons = generer_combinaisons(4, elements)
             #print("elements : ", elements)
-            bet_amount = self.__game.player_bet_amount( self.__game.current_player)
-            chips =  self.__game.players[ self.__game.current_player].chips
-            min_raise =  self.__game.value_to_total( self.__game.min_raise(),  self.__game.current_player)
-            max_raise = bet_amount + chips
-            total = None
+
 
             for id, combinaison in enumerate(combinaisons):
                 self.__info_combi[id] = defaultdict(int)
@@ -79,130 +118,22 @@ class agent_outs:
             if self.__game.players[self.__game.current_player].state == PlayerState.IN:
                 #print("flop check")
                 action_type = ActionType.CHECK
-            elif (max_raise > min_raise) and (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and chance >= pot_odd :
+            elif (self.__max_raise > self.__min_raise) and (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and chance >= pot_odd :
                 #print("call, p =" ,p, "p_win=",p_win)
-                action_type = ActionType.CALL
+                action_type = ActionType.RAISE
+                self.__total = self.__min_raise
             else:
                 #print("fold, p =", p, " p_win=", p_win)
                 action_type = ActionType.FOLD
 
         else:
-            bet_amount = self.__game.player_bet_amount(self.__game.current_player)
-            chips = self.__game.players[self.__game.current_player].chips
-            min_raise = self.__game.value_to_total(self.__game.min_raise(), self.__game.current_player)
-            max_raise = bet_amount + chips
-            total = None
-            self.__agent_cards = self.__game.hands[self.__game.current_player]
             current_rank = evaluate(self.__agent_cards,self.__game.board)
             rank = self.__rank[rank_to_string(current_rank)]
             good_hand = False
-            if rank <= list(self.__best_possible_hand.keys())[0]:
+            print("rnk : ",rank)
+            print(self.__best_possible_hand.keys())
+            if rank >= list(self.__best_possible_hand.keys())[0]:
                 good_hand = True
-            if self.__game.players[self.__game.current_player].state == PlayerState.IN:
-                #print("flop check")
-                action_type = ActionType.CHECK
-            elif (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and good_hand:
-                #print("call, p =" ,p, "p_win=",p_win)
-                action_type = ActionType.CALL
-            else:
-                rank = evaluate(self.__game.hands[self.__game.current_player],self.__game.board)
-                p_win = get_five_card_rank_percentage(rank)
-                p = random.random()
-                if self.__game.players[self.__game.current_player].state == PlayerState.IN:
-                    #print("flop check")
-                    action_type = ActionType.CHECK
-                elif (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and (p<p_win):
-                    #print("call, p =" ,p, "p_win=",p_win)
-                    action_type = ActionType.CALL
-                else:
-                    #print("fold, p =", p, " p_win=", p_win)
-                    action_type = ActionType.FOLD
+            return self.action_river(good_hand)
 
-
-
-
-        return action_type, None
-
-"""
-def agent_outs(game: TexasHoldEm):
-    len_cards_game_board = len(game.board)
-    if len(game.board) == 0:
-        return strategie_preflop1(game)
-
-
-    elif len_cards_game_board == 3 or len_cards_game_board == 4:
-        player_cards = game.hands[game.current_player]
-        nb_cards = 52
-        board_cards = game.board
-
-
-        #FLOP
-        d = Deck()
-        cards = d.draw(num=nb_cards)
-        other_cards = [card for card in cards if card not in player_cards and card not in board_cards]
-
-        current_rank = evaluate(player_cards,board_cards)
-
-        elements = player_cards + board_cards
-
-        RANK = {
-            "Straight Flush":1,
-            "Four of a Kind":2,
-            "Full House":3,
-            "Flush":4,
-            "Straight":5,
-            "Three of a Kind":6,
-            "Two Pair":7,
-            "Pair":8,
-            "High card":9,
-        }
-
-
-
-
-        combinaisons = generer_combinaisons(4, elements)
-        #print("elements : ", elements)
-        info_combi = {}
-        best_possible_hand = {9:0}
-        for id, combinaison in enumerate(combinaisons):
-            info_combi[id] = defaultdict(int)
-            for card in other_cards:
-                new_hand = combinaison + (card,)
-                rank = evaluate(new_hand[:2], new_hand[2:])
-                rank = RANK[rank_to_string(rank)]
-                info_combi[id][rank] += 1
-                if rank <= list(best_possible_hand.keys())[0]:
-                    best_possible_hand = {rank:info_combi[id][rank]}
-
-            info_combi[id] = sorted(info_combi[id].items(), key=lambda item: item[0])
-            #print(info_combi[id])
-
-        chance = best_possible_hand[list(best_possible_hand.keys())[0]]*2
-        #print("chance : ", chance)
-        pot_odd = cote_en_pourcentage(obtenir_cote(game))
-
-        if game.players[game.current_player].state == PlayerState.IN:
-            #print("flop check")
-            action_type = ActionType.CHECK
-        elif (game.players[game.current_player].state == PlayerState.TO_CALL) and chance > pot_odd :
-            #print("call, p =" ,p, "p_win=",p_win)
-            action_type = ActionType.CALL
-        else:
-            #print("fold, p =", p, " p_win=", p_win)
-            action_type = ActionType.FOLD
-
-    if game.players[game.current_player].state == PlayerState.IN:
-        #print("flop check")
-        action_type = ActionType.CHECK
-    elif (game.players[game.current_player].state == PlayerState.TO_CALL):
-        #print("call, p =" ,p, "p_win=",p_win)
-        action_type = ActionType.CALL
-    else:
-        #print("fold, p =", p, " p_win=", p_win)
-        action_type = ActionType.FOLD
-
-
-
-
-    return action_type, None
-"""
+        return action_type, self.__total

@@ -16,12 +16,12 @@ while game.is_game_running():
     while game.is_hand_running():
         gui.display_state()
         #obtenir_cote(game)
-
+        
         gui.wait_until_prompted()
 
         if game.current_player % 2 == 0:
-            Agent.setGame(game)
-            game.take_action(*Agent.choix())
+            #Agent.setGame(game)
+            game.take_action(*Agent.choix(game))
         else:
             game.take_action(*random_agent(game))
         gui.display_action()

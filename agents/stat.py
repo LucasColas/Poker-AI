@@ -48,7 +48,7 @@ while(n<nmax):
         agent_out.setGame(game)
         current_bot = joueurs_bots[game.current_player]
         if current_bot == agent_out.choix:
-            action, total = current_bot()
+            action, total = current_bot(game)
         elif(current_bot==agent_allIn):
             action, total = current_bot(game,seuil)
         else:
@@ -153,4 +153,3 @@ print(stats["nbrCall"])
 print(stats["nbrRaise"])
 print(stats["nbrAction"])
 print(stats["nbrFold"])
-
