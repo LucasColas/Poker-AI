@@ -11,7 +11,7 @@ from PokerPlus.Agents.agents_bots import agent_naif, agent_allIn, agent_saboteur
 import matplotlib.pyplot as plt
 import random
 
-def get_stat(nmax=500):
+def get_stat(nmax=500, save=False, path='./res'):
 
     max_players = 5
     big_blind = 150
@@ -85,7 +85,8 @@ def get_stat(nmax=500):
 
         # print(game.hand_history.settle),"\n\n\n")
         # afficher le nombre de parties jouées
-        path = game.export_history('./res')
+        if save:
+            path = game.export_history('./res')
         print(n, end="\r")
 
 
