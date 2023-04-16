@@ -5,7 +5,7 @@ from texasholdem.evaluator.evaluator import *
 from texasholdem.gui.text_gui import TextGUI
 from texasholdem.card.deck import Deck
 from texasholdem.evaluator.lookup_table import LOOKUP_TABLE
-from fonctions_auxiliaires import *
+from agents.fonctions_auxiliaires import *
 from collections import defaultdict
 import random
 
