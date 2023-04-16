@@ -73,7 +73,8 @@ class agent_outs:
 
 
 
-    def choix(self, g):
+
+    def choix(self, g: TexasHoldEm):
         self.setGame(g)
         len_cards_game_board = len(self.__game.board)
         nb_cards = 52

@@ -13,7 +13,8 @@ import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent.parent))
 import os
-print(os.getcwd())
+#print(os.getcwd())
+
 
 def agent_naif(game: TexasHoldEm) -> Tuple[ActionType, int]:
     bet_amount = game.player_bet_amount(game.current_player)
@@ -54,7 +55,7 @@ def agent_naif(game: TexasHoldEm) -> Tuple[ActionType, int]:
 
     return action_type, total
 
-def agent_allIn(game: TexasHoldEm, seuil:int):
+def agent_allIn(game: TexasHoldEm, seuil: int = 0.5):
     bet_amount = game.player_bet_amount(game.current_player)
     chips = game.players[game.current_player].chips
     min_raise = game.value_to_total(game.min_raise(), game.current_player)

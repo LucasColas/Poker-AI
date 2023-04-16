@@ -11,7 +11,7 @@ from PokerPlus.Agents.agents_bots import agent_naif, agent_allIn, agent_saboteur
 import matplotlib.pyplot as plt
 import random
 
-def get_stat():
+def get_stat(nmax=500):
 
     max_players = 5
     big_blind = 150
@@ -26,7 +26,6 @@ def get_stat():
 
 
     n=0
-    nmax=500
     seuil=0.8
     agent_out = agent_outs()
 
@@ -51,13 +50,13 @@ def get_stat():
         mises = {i:0 for i in range(max_players)}
         while game.is_hand_running():
             # Utiliser le bot sélectionné pour le joueur actuel attention au bot agent_allIn qui a 2 paramètres
-            agent_out.setGame(game)
+            #agent_out.setGame(game)
             current_bot = joueurs_bots[game.current_player]
-            if current_bot == agent_out.choix:
-                action, total = current_bot(game)
-            elif(current_bot==agent_allIn):
+
+            if(current_bot==agent_allIn):
                 action, total = current_bot(game,seuil)
             else:
+
                 action, total = current_bot(game)
             #print(f"Player {game.current_player} {action} {total}")
 

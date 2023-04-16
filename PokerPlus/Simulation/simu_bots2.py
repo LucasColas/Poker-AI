@@ -1,3 +1,11 @@
+
+"""
+
+Code qui ne devrait plus être utilisée
+
+"""
+
+
 from texasholdem.game.game import TexasHoldEm
 from texasholdem.gui.text_gui import TextGUI
 from texasholdem.agents.basic import random_agent
@@ -20,7 +28,7 @@ def simu2():
             #obtenir_cote(game)
 
             gui.wait_until_prompted()
-            
+
             if game.current_player % 2 == 0:
                 #Agent.setGame(game)
                 game.take_action(*Agent.choix(game))
