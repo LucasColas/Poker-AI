@@ -15,8 +15,8 @@ from PokerPlus.Simulation.simu_bots2 import simu2
 
 
 def main():
-    get_stat()
-    #simu()
+    #get_stat()
+    simu(save=True)
 
 if __name__ == "__main__":
     main()

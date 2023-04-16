@@ -4,7 +4,7 @@ from texasholdem.agents.basic import random_agent
 from PokerPlus.Agents.agents_bots import *
 from PokerPlus.Agents.agent_outs import agent_outs
 
-def simu(max_players = 6, big_blind = 150, small_blind = 150 // 2, buyin = 1000, agents = [random_agent, agent_outs().choix, agent_naif, agent_naif, agent_allIn, agent_saboteur], seuils=[0.7]):
+def simu(max_players = 6, big_blind = 150, small_blind = 150 // 2, buyin = 1000, agents = [random_agent, agent_outs().choix, agent_naif, agent_naif, agent_allIn, agent_saboteur], seuils=[0.7], save=False, path='./res'):
     if len(agents) != max_players:
         raise Exception("Nombre d'agents invalide !")
 
@@ -47,5 +47,8 @@ def simu(max_players = 6, big_blind = 150, small_blind = 150 // 2, buyin = 1000,
 
             game.take_action(action, total=total)
             #gui.run_step()
+
+        if save:
+            path = game.export_history('./res')
 
         gui.display_win()
