@@ -10,20 +10,79 @@ from PokerPlus.Agents.agent_outs import agent_outs
 from PokerPlus.Agents.agents_bots import agent_naif, agent_allIn, agent_saboteur
 import matplotlib.pyplot as plt
 import random
+def plot_stat(stats, n, joueurs_bots_noms, max_players):
+    plt.bar(stats["nbrWin"].keys(), stats["nbrWin"].values())
 
-def get_stat(nmax=500, save=False, path='./res'):
+    # Ajouter des informations quel agent + nombre de victoires
+    for i, v in enumerate(stats["nbrWin"].values()):
+        plt.annotate(f"{joueurs_bots_noms[i]} \n {v}", xy=(i, v), ha='center', va='bottom')
+
+    # Ajouter un titre et des étiquettes d'axe
+    plt.title(f"Nombre de victoires pour chaque joueur, {n} parties jouées")
+    plt.xlabel("Joueurs")
+    plt.ylabel("Nombre de victoires")
+
+
+
+    #plot de bar en fonction des valeurs de stats
+    width = 0.35
+    fig = plt.figure(2)
+    ax = fig.add_axes([0,0,1,1])
+    ind = [i for i in range(max_players)]
+
+    #afficher les barres
+    bottom = [0 for i in range(max_players)]
+    for a,b in stats.items():
+        if (a not in ["nbrWin", "profit", "nbrAction"]):
+            t= ax.bar(ind,list(b.values()) , width, label=a, bottom=bottom)
+            ax.bar_label(t, label_type='center')
+            bottom = [x + y for x, y in zip(bottom, list(b.values()))]
+    ax.set_title(f"Nombre d'actions pour chaque joueur, {n} parties jouées")
+    ax.legend()
+
+    #plot bar du profit des joueurs
+    fig = plt.figure(3)
+    plt.bar(stats["profit"].keys(), stats["profit"].values())
+
+    for i, v in enumerate(stats["profit"].values()):
+        plt.annotate(f"{joueurs_bots_noms[i]} \n {v}", xy=(i, v), ha='center', va='bottom')
+
+    # Ajouter un titre et des étiquettes d'axe
+    plt.title(f"Profit de chaque joueur, {n} parties jouées")
+    plt.xlabel("Joueurs")
+    plt.ylabel("Profit (en $)")
+
+
+    #plot bar du profit des joueurs / nbr de parties gagnées
+    fig = plt.figure(4)
+    #creation d'un dictionnaire avec des 0 pour les joueurs qui n'ont pas gagné et sinon on divise le profit par le nombre de victoires
+    profit_par_victoire = {i:round(stats["profit"][i]/stats["nbrWin"][i],2) if stats["nbrWin"][i]!=0 else 0 for i in range(max_players)}
+    plt.bar(profit_par_victoire.keys(),profit_par_victoire.values() )
+
+    for i,v in (profit_par_victoire.items()):
+        plt.annotate(f"{joueurs_bots_noms[i]} \n {v}", xy=(i, v), ha='center', va='bottom')
+
+    # Ajouter un titre et des étiquettes d'axe
+    plt.title("Profit moyen par victoire pour chaque joueur")
+    plt.xlabel("Joueur")
+    plt.ylabel("Profit par victoire (en $)")
+
+    plt.show()
+
+    print(stats["nbrCall"])
+    print(stats["nbrRaise"])
+    print(stats["nbrAction"])
+    print(stats["nbrFold"])
+
+def get_stat(nmax=500, save=False, cles = ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrWin", "nbrAllin","nbrAction", "profit"], path='./res', plot=False):
 
     max_players = 5
     big_blind = 150
     small_blind = big_blind // 2
     buyin = 1000
-
-
-
     # Définir les statistiques à suivre
-    cles = ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrWin", "nbrAllin","nbrAction", "profit"]
-    stats = {cle:{i:0 for i in range(max_players)} for cle in cles}
 
+    stats = {cle:{i:0 for i in range(max_players)} for cle in cles}
 
     n=0
     seuil=0.8
@@ -87,7 +146,7 @@ def get_stat(nmax=500, save=False, path='./res'):
         # afficher le nombre de parties jouées
         if save:
             path = game.export_history('./res')
-        print(n, end="\r")
+        print("partie : ", n, end="\r")
 
 
     stats["nbrAction"]= {i:stats["nbrCall"][i]+stats["nbrCheck"][i]+stats["nbrRaise"][i]+stats["nbrFold"][i]+stats["nbrAllin"][i] for i in range(max_players)}
@@ -97,66 +156,9 @@ def get_stat(nmax=500, save=False, path='./res'):
     #print(stats["nbrWin"],n)
     #print(stats_moy["profit"],n)
 
+
+    if plot:
+        plot_stat(stats, n, joueurs_bots_noms, max_players)
     # Créer un diagramme à barres avec les valeurs de victoires
-    plt.bar(stats["nbrWin"].keys(), stats["nbrWin"].values())
 
-    # Ajouter des informations quel agent + nombre de victoires
-    for i, v in enumerate(stats["nbrWin"].values()):
-        plt.annotate(f"{joueurs_bots_noms[i]} \n {v}", xy=(i, v), ha='center', va='bottom')
-
-    # Ajouter un titre et des étiquettes d'axe
-    plt.title(f"Nombre de victoires pour chaque joueur, {n} parties jouées")
-    plt.xlabel("Joueurs")
-    plt.ylabel("Nombre de victoires")
-
-
-
-    #plot de bar en fonction des valeurs de stats
-    width = 0.35
-    fig = plt.figure(2)
-    ax = fig.add_axes([0,0,1,1])
-    ind = [i for i in range(max_players)]
-
-    #afficher les barres
-    bottom = [0 for i in range(max_players)]
-    for a,b in stats.items():
-        if (a not in ["nbrWin", "profit", "nbrAction"]):
-            t= ax.bar(ind,list(b.values()) , width, label=a, bottom=bottom)
-            ax.bar_label(t, label_type='center')
-            bottom = [x + y for x, y in zip(bottom, list(b.values()))]
-    ax.set_title(f"Nombre d'actions pour chaque joueur, {n} parties jouées")
-    ax.legend()
-
-    #plot bar du profit des joueurs
-    fig = plt.figure(3)
-    plt.bar(stats["profit"].keys(), stats["profit"].values())
-
-    for i, v in enumerate(stats["profit"].values()):
-        plt.annotate(f"{joueurs_bots_noms[i]} \n {v}", xy=(i, v), ha='center', va='bottom')
-
-    # Ajouter un titre et des étiquettes d'axe
-    plt.title(f"Profit de chaque joueur, {n} parties jouées")
-    plt.xlabel("Joueurs")
-    plt.ylabel("Profit (en $)")
-
-
-    #plot bar du profit des joueurs / nbr de parties gagnées
-    fig = plt.figure(4)
-    #creation d'un dictionnaire avec des 0 pour les joueurs qui n'ont pas gagné et sinon on divise le profit par le nombre de victoires
-    profit_par_victoire = {i:round(stats["profit"][i]/stats["nbrWin"][i],2) if stats["nbrWin"][i]!=0 else 0 for i in range(max_players)}
-    plt.bar(profit_par_victoire.keys(),profit_par_victoire.values() )
-
-    for i,v in (profit_par_victoire.items()):
-        plt.annotate(f"{joueurs_bots_noms[i]} \n {v}", xy=(i, v), ha='center', va='bottom')
-
-    # Ajouter un titre et des étiquettes d'axe
-    plt.title("Profit moyen par victoire pour chaque joueur")
-    plt.xlabel("Joueur")
-    plt.ylabel("Profit par victoire (en $)")
-
-    plt.show()
-
-    print(stats["nbrCall"])
-    print(stats["nbrRaise"])
-    print(stats["nbrAction"])
-    print(stats["nbrFold"])
+    return stats

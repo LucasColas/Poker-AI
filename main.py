@@ -8,15 +8,20 @@ from texasholdem.gui.text_gui import TextGUI
 
 #PokerPlus
 from PokerPlus.Stat.stat import get_stat
+from PokerPlus.Stat.data import get_data
 from PokerPlus.Simulation.simu_bots import simu
-from PokerPlus.Simulation.simu_bots2 import simu2
-
+from PokerPlus.Stat.data import get_data, write_data
 
 
 
 def main():
-    #get_stat()
-    simu(save=True)
+    get_stat(plot=True)
+    #stats_dict = get_data(m=500)
+    #write_data(stats_dict)
+    #print(stats_dict)
+
+
+
 
 if __name__ == "__main__":
     main()
