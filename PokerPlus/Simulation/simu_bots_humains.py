@@ -12,7 +12,7 @@ from texasholdem.agents.basic import random_agent
 from PokerPlus.Agents.agents_bots import agent_naif, agent_allIn
 from PokerPlus.Agents.agent_outs import agent_outs
 
-def simu2():
+def simu_bots_humains():
     max_players = 6
     big_blind = 150
     small_blind = big_blind // 2
@@ -33,7 +33,7 @@ def simu2():
                 #Agent.setGame(game)
                 game.take_action(*Agent.choix(game))
             else:
-                game.take_action(*random_agent(game))
+                gui.run_step()
 
             #game.take_action(*random_agent(game))
             gui.display_action()
