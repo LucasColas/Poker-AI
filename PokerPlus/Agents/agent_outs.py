@@ -46,6 +46,7 @@ class agent_outs:
         elif (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and good_hand:
             #print("call, p =" ,p, "p_win=",p_win)
             action_type = ActionType.CALL
+            self.__total = self.__min_raise
         else:
             rank = evaluate(self.__game.hands[self.__game.current_player],self.__game.board)
             p_win = get_five_card_rank_percentage(rank)
