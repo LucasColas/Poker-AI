@@ -61,44 +61,8 @@ class agent_SA():
             self.pos = "Other"
 
 
-
     def strategie_preflop(self, game: TexasHoldEm):
-        """
-        self.getPosition(game)
-        nbr1, coul1, nbr2, coul2 = conversion(game)
-        bet_amount = game.player_bet_amount(game.current_player)
-        chips = game.players[game.current_player].chips
-        min_raise = game.value_to_total(game.min_raise(), game.current_player)
-        max_raise = chips
-
-        action_type = None
-        total = None
-        if (nbr1 == nbr2 and (nbr1 == 14 or nbr1 == 13 or nbr1 == 12)) or ((nbr1 == 14 or nbr2 == 14) and (nbr1 == 12 or nbr2 == 12)):
-
-            if game.players[game.current_player].state == PlayerState.IN:
-                    #print("flop check")
-                action_type = ActionType.CHECK
-                #print("check")
-                self.last_action = ActionType.FOLD
-                return action_type, total
-            elif (max_raise > min_raise) and (game.players[game.current_player].state == PlayerState.TO_CALL):
-                    #print("call, p =" ,p, "p_win=",p_win)
-                action_type = ActionType.RAISE
-                print("min raise : ",min_raise)
-                total = random.randint(min_raise, max_raise)
-                print("raise : ", total)
-                self.last_action = action_type
-                return action_type, total
-
-            else:
-                print("Fold preflop")
-                self.last_action = ActionType.FOLD
-                return ActionType.FOLD, total
-
-
-        print("Fold preflop")
-        return ActionType.FOLD, total
-        """
+       
         nbr1, coul1, nbr2, coul2 = conversion(game)
         print("strategie preflop")
         bet_amount = game.player_bet_amount(game.current_player)
@@ -110,7 +74,7 @@ class agent_SA():
 
         if game.players[game.current_player].state == PlayerState.IN:
             
-            if (min_raise > max_raise):
+            if (min_raise < max_raise):
                 action_type = ActionType.RAISE
                 total = min_raise
             else:
@@ -118,7 +82,7 @@ class agent_SA():
             return action_type, total
 
         elif (game.players[game.current_player].state == PlayerState.TO_CALL):
-            if (nbr1==nbr2) or (coul1==coul2) or (abs(nbr1-nbr2)==1) or (abs(nbr1-nbr2)==12):
+            if (nbr1==nbr2) or (coul1==coul2) or (abs(nbr1-nbr2)==1) or nbr1==14 or nbr2 == 14:
                 if (min_raise < max_raise):
                     action_type = ActionType.RAISE
                     print("min raise : ",min_raise)
@@ -154,34 +118,22 @@ class agent_SA():
         max_raise = bet_amount + chips
         action_type = None
         total = None
-        if p_win >= self.min or p < self.seuil_random:
-
-
-            if game.players[game.current_player].state == PlayerState.IN:
-                    #print("flop check")
-                
-                action_type = ActionType.CHECK
-                return action_type, total
-
-            elif (max_raise > min_raise) and (game.players[game.current_player].state == PlayerState.TO_CALL):
+        if (max_raise > min_raise) and (game.players[game.current_player].state == PlayerState.TO_CALL):
                     #print("call, p =" ,p, "p_win=",p_win)
-                action_type = ActionType.RAISE
-                print("prend total")
-                total = random.randint(min_raise, max_raise)
-                print("raise", total)
-                print("flop turn ou river : ", action_type, total)
+                action_type = ActionType.CALL
+                #print("prend total")
+                #total = random.randint(min_raise, max_raise)
+                #print("raise", total)
+                #print("flop turn ou river : ", action_type, total)
                 self.last_action = action_type
                 return action_type, total
 
-            else:
-                self.last_action = ActionType.FOLD
-                return ActionType.FOLD, total
+        else:
+            self.last_action = ActionType.FOLD
+            return ActionType.FOLD, total
 
         self.last_action = ActionType.FOLD
         return ActionType.FOLD, total
-
-
-
 
     def strategie_turn(game: TexasHoldEm):
         pass
