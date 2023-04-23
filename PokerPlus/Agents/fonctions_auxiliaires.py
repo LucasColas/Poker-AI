@@ -12,7 +12,7 @@ def conversion(game: TexasHoldEm):
 
     Conversion = {'1':1, '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9,'T': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14}
     nbr1 = Conversion[str(game.hands[game.current_player])[7]]
-    #str(game.hands[game.current_player])[7].translate(str.maketrans(Conversion))
+    
     coul1 = str(game.hands[game.current_player])[8]
     nbr2 = Conversion[str(game.hands[game.current_player])[19]]
 

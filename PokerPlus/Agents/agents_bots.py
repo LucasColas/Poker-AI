@@ -55,7 +55,7 @@ def agent_naif(game: TexasHoldEm) -> Tuple[ActionType, int]:
 
     return action_type, total
 
-def agent_allIn(game: TexasHoldEm, seuil: int = 0.5):
+def agent_allIn(game: TexasHoldEm, seuil: int = 0.1):
     bet_amount = game.player_bet_amount(game.current_player)
     chips = game.players[game.current_player].chips
     min_raise = game.value_to_total(game.min_raise(), game.current_player)
@@ -92,7 +92,7 @@ def agent_allIn(game: TexasHoldEm, seuil: int = 0.5):
             action_type = ActionType.ALL_IN
         else:
             action_type = ActionType.FOLD
-    if(action_type == ActionType.ALL_IN):
+    if (action_type == ActionType.ALL_IN):
         total = max_raise
     return action_type, total
 

@@ -46,7 +46,7 @@ class agent_outs:
         elif (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and good_hand:
             #print("call, p =" ,p, "p_win=",p_win)
             action_type = ActionType.CALL
-            self.__total = self.__min_raise
+            self.__total = self.__max_raise
         else:
             rank = evaluate(self.__game.hands[self.__game.current_player],self.__game.board)
             p_win = get_five_card_rank_percentage(rank)
@@ -113,7 +113,7 @@ class agent_outs:
                 self.__info_combi[id] = sorted(self.__info_combi[id].items(), key=lambda item: item[0])
                 #print(self.__info_combi[id])
 
-            chance = self.__best_possible_hand[list(self.__best_possible_hand.keys())[0]]*4
+            chance = self.__best_possible_hand[list(self.__best_possible_hand.keys())[0]]*2
             #print("chance : ", chance)
             pot_odd = cote_en_pourcentage(obtenir_cote(self.__game))
 
@@ -123,7 +123,7 @@ class agent_outs:
             elif (self.__max_raise > self.__min_raise) and (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and chance >= pot_odd :
                 #print("call, p =" ,p, "p_win=",p_win)
                 action_type = ActionType.RAISE
-                self.__total = self.__min_raise
+                self.__total = self.__max_raise
             else:
                 #print("fold, p =", p, " p_win=", p_win)
                 action_type = ActionType.FOLD

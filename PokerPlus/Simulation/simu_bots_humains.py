@@ -25,6 +25,10 @@ def simu_bots_humains():
 
         while game.is_hand_running():
             gui.display_state()
+            #print([player. player_id for player in game.players])
+            #print("Button", game.btn_loc)
+            #print("SB", game.sb_loc)
+            #print("BB", game.bb_loc)
             #obtenir_cote(game)
 
             gui.wait_until_prompted()

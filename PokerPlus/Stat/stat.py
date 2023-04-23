@@ -5,9 +5,10 @@ from texasholdem.agents.basic import random_agent
 #from agents import agent_naif,agent_alln, agent_saboteur
 import sys
 from pathlib import Path
-sys.path.append(str(Path(__file__).parent.parent.parent))
+#sys.path.append(str(Path(__file__).parent.parent.parent))
 from PokerPlus.Agents.agent_outs import agent_outs
 from PokerPlus.Agents.agents_bots import agent_naif, agent_allIn, agent_saboteur
+from PokerPlus.Agents.Good_Agents import agent_SA
 import matplotlib.pyplot as plt
 import random
 def plot_stat(stats, n, joueurs_bots_noms, max_players):
@@ -87,11 +88,12 @@ def get_stat(nmax=500, save=False, cles = ["nbrCall", "nbrCheck", "nbrRaise", "n
     n=0
     seuil=0.8
     agent_out = agent_outs()
+    agent_serre_agressif = agent_SA()
 
     # Définir les fonctions des bots
-    bots = [agent_out.choix, agent_naif, agent_allIn, random_agent,agent_saboteur]
+    bots = [agent_out.choix, agent_serre_agressif.action, agent_allIn, random_agent,agent_saboteur]
     #bot_nom = [i.__name__ for i in bots] sauf pour agent_out.choix devient "agent_out"
-    bots_noms = ["agent_out", "agent_naif", "agent_allIn", "random_agent","agent_saboteur"]
+    bots_noms = ["agent_out", "agent_serre_agressif", "agent_allIn", "random_agent","agent_saboteur"]
     # Initialiser le dictionnaire pour stocker les bots de chaque joueur
     joueurs_bots = {}
     joueurs_bots_noms = {}
@@ -115,7 +117,7 @@ def get_stat(nmax=500, save=False, cles = ["nbrCall", "nbrCheck", "nbrRaise", "n
             if(current_bot==agent_allIn):
                 action, total = current_bot(game,seuil)
             else:
-
+                #print(current_bot(game), current_bot)
                 action, total = current_bot(game)
             #print(f"Player {game.current_player} {action} {total}")
 
