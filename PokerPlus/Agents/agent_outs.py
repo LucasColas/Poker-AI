@@ -82,7 +82,7 @@ class agent_outs:
 
 
         if len_cards_game_board == 0:
-            return strategie_preflop1(self.__game)
+            return strategie_preflop_raise(self.__game)
 
         elif len_cards_game_board == 3 or len_cards_game_board == 4:
             self.raise_config()
@@ -122,7 +122,7 @@ class agent_outs:
                 action_type = ActionType.CHECK
             elif (self.__max_raise > self.__min_raise) and (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and chance >= pot_odd :
                 #print("call, p =" ,p, "p_win=",p_win)
-                action_type = ActionType.RAISE
+                action_type = ActionType.ALL_IN
                 self.__total = self.__max_raise
             else:
                 #print("fold, p =", p, " p_win=", p_win)

@@ -72,10 +72,14 @@ def agent_allIn(game: TexasHoldEm, seuil: int = 0.1):
         if game.players[game.current_player].state == PlayerState.IN:
             action_type = ActionType.CHECK
         elif (max_raise > min_raise) and (game.players[game.current_player].state == PlayerState.TO_CALL):
+            """
+            
             if (nbr1==nbr2) or (coul1==coul2) or (abs(nbr1-nbr2)==1) or (abs(nbr1-nbr2)==12):
                 action_type = ActionType.ALL_IN
             else:
                 action_type = ActionType.FOLD
+            """
+            action_type = ActionType.ALL_IN
         else :
             action_type = ActionType.FOLD
 

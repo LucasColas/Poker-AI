@@ -69,6 +69,35 @@ def strategie_preflop1(game: TexasHoldEm):
 
     return (action_type, total)
 
+def strategie_preflop_raise(game: TexasHoldEm):
+    """
+    Fonction qui implémente la première stratégie preflop :
+    continuer à jouer uniquement si on a un début de mains.
+    """
+    nbr1, coul1, nbr2, coul2 = conversion(game)
+
+    bet_amount = game.player_bet_amount(game.current_player)
+    chips = game.players[game.current_player].chips
+    min_raise = game.value_to_total(game.min_raise(), game.current_player)
+    max_raise = bet_amount + chips
+    total = None
+
+    if game.players[game.current_player].state == PlayerState.IN:
+        action_type = ActionType.CHECK
+    elif (game.players[game.current_player].state == PlayerState.TO_CALL):
+        if (nbr1==nbr2) or (coul1==coul2) or (abs(nbr1-nbr2)==1) or (abs(nbr1-nbr2)==12):
+            if (max_raise > min_raise):
+                action_type = ActionType.RAISE
+                total = min_raise
+            else:
+                action_type = ActionType.CALL
+
+        else:
+            action_type = ActionType.FOLD
+    else :
+        action_type = ActionType.FOLD
+
+    return (action_type, total)
 
 def generer_combinaisons(k : int, elements : List[Card]):
 
