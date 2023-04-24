@@ -6,11 +6,12 @@ from texasholdem.agents.basic import random_agent
 import sys
 from pathlib import Path
 #sys.path.append(str(Path(__file__).parent.parent.parent))
-from PokerPlus.Agents.agent_outs import agent_outs
 from PokerPlus.Agents.agents_bots import agent_naif, agent_allIn, agent_saboteur
+from PokerPlus.Agents.agent_outs import agent_outs
 from PokerPlus.Agents.Good_Agents import agent_SA
 import matplotlib.pyplot as plt
 import random
+
 def plot_stat(stats, n, joueurs_bots_noms, max_players):
     plt.bar(stats["nbrWin"].keys(), stats["nbrWin"].values())
 
@@ -58,7 +59,7 @@ def plot_stat(stats, n, joueurs_bots_noms, max_players):
     fig = plt.figure(4)
     #creation d'un dictionnaire avec des 0 pour les joueurs qui n'ont pas gagné et sinon on divise le profit par le nombre de victoires
     profit_par_victoire = {i:round(stats["profit"][i]/stats["nbrWin"][i],2) if stats["nbrWin"][i]!=0 else 0 for i in range(max_players)}
-    plt.bar(profit_par_victoire.keys(),profit_par_victoire.values() )
+    plt.bar(profit_par_victoire.keys(),profit_par_victoire.values() ) # type: ignore
 
     for i,v in (profit_par_victoire.items()):
         plt.annotate(f"{joueurs_bots_noms[i]} \n {v}", xy=(i, v), ha='center', va='bottom')
@@ -75,7 +76,42 @@ def plot_stat(stats, n, joueurs_bots_noms, max_players):
     print(stats["nbrAction"])
     print(stats["nbrFold"])
 
-def get_stat(nmax=500, save=False, cles = ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrWin", "nbrAllin","nbrAction", "profit"], path='./res', plot=False):
+def plot_stat_tournois(stats, n, joueurs_bots_noms):
+    plt.bar(stats["nbrWin"].keys(), stats["nbrWin"].values())
+
+    for i, v in enumerate(stats["nbrWin"].values()):
+        plt.annotate(f"{joueurs_bots_noms[i]} \n {v}", xy=(i, v), ha='center', va='bottom')
+
+    # Ajouter un titre et des étiquettes d'axe
+    plt.title(f"Nombre de tournois gagné pour chaque joueur, {n} tournois jouées")
+    plt.xlabel("Joueurs")
+    plt.ylabel("Nombre de tournois gagné ")
+
+    plt.show()
+    print(stats["nbrWin"])
+
+
+
+def pool_random(max_players, bots = [agent_outs().choix,agent_SA().action, agent_naif, agent_allIn, random_agent,agent_saboteur], bots_noms = ["agent_out", "agent_serre_agressif", "agent_naif", "agent_allIn", "random_agent","agent_saboteur"]):
+    
+    joueurs_bots = {}
+    joueurs_bots_noms = {}
+    for joueur in range(max_players): 
+        num = random.randint(0,len(bots)-1)
+        joueurs_bots[joueur] = bots[num]
+        joueurs_bots_noms[joueur] = bots_noms[num]
+    return joueurs_bots, joueurs_bots_noms
+
+def pool_1(max_players, bots = [agent_outs().choix,agent_SA().action, agent_naif, agent_allIn, random_agent,agent_saboteur], bots_noms = ["agent_out", "agent_serre_agressif", "agent_naif", "agent_allIn", "random_agent","agent_saboteur"]):
+    #pour chaque joueur, on lui attribue le bot avec le numéro de joueur
+    joueurs_bots = {}
+    joueurs_bots_noms = {}
+    for joueur in range(max_players): 
+        joueurs_bots[joueur] = bots[joueur]
+        joueurs_bots_noms[joueur] = bots_noms[joueur]
+    return joueurs_bots, joueurs_bots_noms
+
+def get_stat(nmax=500, save=False, cles = ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrWin", "nbrAllin","nbrAction", "profit"], path='./res', plot=False, poolrandom = False):
 
     max_players = 5
     big_blind = 150
@@ -86,23 +122,12 @@ def get_stat(nmax=500, save=False, cles = ["nbrCall", "nbrCheck", "nbrRaise", "n
     stats = {cle:{i:0 for i in range(max_players)} for cle in cles}
 
     n=0
-    seuil=0.8
-    agent_out = agent_outs()
-    agent_serre_agressif = agent_SA()
-
-    # Définir les fonctions des bots
-    bots = [agent_out.choix, agent_serre_agressif.action, agent_allIn, random_agent,agent_saboteur]
-    #bot_nom = [i.__name__ for i in bots] sauf pour agent_out.choix devient "agent_out"
-    bots_noms = ["agent_out", "agent_serre_agressif", "agent_allIn", "random_agent","agent_saboteur"]
-    # Initialiser le dictionnaire pour stocker les bots de chaque joueur
-    joueurs_bots = {}
-    joueurs_bots_noms = {}
-    # Pour chaque joueur, choisir un bot aléatoire et stocker cette information dans le dictionnaire
-    for joueur in range(max_players):
-        bot = random.choice(bots)
-        joueurs_bots[joueur] = bots[joueur]
-        joueurs_bots_noms[joueur] = bots_noms[joueur]
-
+    seuil = 0.8
+    if(poolrandom):
+        joueurs_bots, joueurs_bots_noms = pool_random(max_players)
+    else:
+        joueurs_bots, joueurs_bots_noms = pool_1(max_players)
+        
     #print(joueurs_bots)
     while(n<nmax):
         game = TexasHoldEm(buyin=buyin, big_blind=big_blind, small_blind=small_blind, max_players=max_players)
@@ -110,10 +135,8 @@ def get_stat(nmax=500, save=False, cles = ["nbrCall", "nbrCheck", "nbrRaise", "n
         n+=1
         mises = {i:0 for i in range(max_players)}
         while game.is_hand_running():
-            # Utiliser le bot sélectionné pour le joueur actuel attention au bot agent_allIn qui a 2 paramètres
-            #agent_out.setGame(game)
+            # Utiliser le bot sélectionné pour le joueur actuel
             current_bot = joueurs_bots[game.current_player]
-
             if(current_bot==agent_allIn):
                 action, total = current_bot(game,seuil)
             else:
@@ -132,6 +155,7 @@ def get_stat(nmax=500, save=False, cles = ["nbrCall", "nbrCheck", "nbrRaise", "n
                 stats["nbrFold"][game.current_player]+=1
             elif(action == ActionType.ALL_IN):
                 stats["nbrAllin"][game.current_player]+=1
+            
             game.take_action(action, total=total)
             mises[game.current_player] += game.player_bet_amount(game.current_player)
 
@@ -144,7 +168,7 @@ def get_stat(nmax=500, save=False, cles = ["nbrCall", "nbrCheck", "nbrRaise", "n
             if k != gagnant:
                 stats["profit"][k] -= mises[k]
 
-        # print(game.hand_history.settle),"\n\n\n")
+        # print(game.hand_history.settle,"\n\n\n")
         # afficher le nombre de parties jouées
         if save:
             path = game.export_history('./res')
@@ -162,5 +186,50 @@ def get_stat(nmax=500, save=False, cles = ["nbrCall", "nbrCheck", "nbrRaise", "n
     if plot:
         plot_stat(stats, n, joueurs_bots_noms, max_players)
     # Créer un diagramme à barres avec les valeurs de victoires
+
+    return stats
+
+def get_stat_tournoi(nmax = 200, save=False, cles = ["nbrWin"], path='./res', plot=False, poolrandom = False):
+    max_players = 5
+    big_blind = 150
+    small_blind = big_blind // 2
+    buyin = 1000 
+
+
+    seuil = 0.8
+    if(poolrandom):
+        joueurs_bots, joueurs_bots_noms = pool_random(max_players)
+    else:
+        joueurs_bots, joueurs_bots_noms = pool_1(max_players) 
+        #joueurs_bots, joueurs_bots_noms = pool_1(max_players,bots = [agent_outs().choix, agent_naif, agent_allIn, random_agent,agent_saboteur], bots_noms = ["agent_out", "agent_naif", "agent_allIn", "random_agent","agent_saboteur"])
+    
+    print(joueurs_bots_noms)
+    stats = {cle:{i:0 for i in range(max_players)} for cle in cles}
+    n=0
+    while(n<nmax):
+        game = TexasHoldEm(buyin=buyin, big_blind=big_blind, small_blind=small_blind, max_players=max_players)
+        n+=1
+        nbr_partie=0
+        while game.is_game_running():
+            game.start_hand()
+            nbr_partie+=1
+            while game.is_hand_running():
+
+                current_bot = joueurs_bots[game.current_player]
+                if(current_bot==agent_allIn):
+                    action, total = current_bot(game,seuil)
+                else:
+                    action, total = current_bot(game)
+                #print(f"Player {game.current_player}({joueurs_bots_noms[game.current_player]}) {action} {total}")
+                game.take_action(action, total=total)
+
+            #print(f"{nbr_partie}:{game.hand_history.settle}\n")
+            last_gagnant=str(game.hand_history.settle)[7]
+            last_gagnant = int(last_gagnant)
+        stats["nbrWin"][last_gagnant] += 1
+        print(f"tournoi {n} de {nbr_partie} parties gagné par joueur{last_gagnant} ({joueurs_bots_noms[last_gagnant]})")
+    
+    if plot:
+        plot_stat_tournois(stats, n, joueurs_bots_noms)
 
     return stats

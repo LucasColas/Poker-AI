@@ -75,7 +75,7 @@ class agent_SA():
 
         if game.players[game.current_player].state == PlayerState.IN:
             
-            if (min_raise > max_raise):
+            if (min_raise < max_raise):
                 action_type = ActionType.RAISE
                 total = min_raise
             else:

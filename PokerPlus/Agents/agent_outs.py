@@ -82,7 +82,7 @@ class agent_outs:
 
 
         if len_cards_game_board == 0:
-            return strategie_preflop_raise(self.__game)
+            return strategie_preflop1(self.__game)
 
         elif len_cards_game_board == 3 or len_cards_game_board == 4:
             self.raise_config()
