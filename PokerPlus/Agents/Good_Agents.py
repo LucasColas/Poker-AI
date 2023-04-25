@@ -21,9 +21,9 @@ class agent_SA():
     Si la main n'est pas bonne, autoriser de temps en temps à jouer.
     """
 
-    def __init__(self, min=0.5, seuil_random=0.15):
+    def __init__(self, min=0.3, seuil_random=0.15):
         self.pos = None
-        self.min = min
+        self._min = min
         self.max = 1.0
         #Plus l'entier associé est grand meilleure est la position
         self.rank_pos = {
@@ -32,6 +32,17 @@ class agent_SA():
                         "Cut Off":2,
                         "Button":3,
                         "Other":1
+        }
+        self.__rank = {
+            "Straight Flush":1,
+            "Four of a Kind":2,
+            "Full House":3,
+            "Flush":4,
+            "Straight":5,
+            "Three of a Kind":6,
+            "Two Pair":7,
+            "Pair":8,
+            "High card":9,
         }
         self.last_action = None
         self.seuil_random = seuil_random
@@ -80,6 +91,7 @@ class agent_SA():
                 total = min_raise
             else:
                 action_type = ActionType.CHECK
+            #print(action_type, total)
             return action_type, total
 
         elif (game.players[game.current_player].state == PlayerState.TO_CALL):
@@ -93,19 +105,14 @@ class agent_SA():
                     return action_type, total
                 else:
                     action_type = ActionType.FOLD
+                #print(action_type, total)
                 return action_type, total
 
             else:
                 p = random.random()
                 if p < self.seuil_random:
                     action_type = ActionType.CALL
-                else:
-                    action_type = ActionType.FOLD
-                return action_type, total
-        else :
-            action_type = ActionType.FOLD
-
-        self.last_action = action_type
+                
         return action_type, total
 
 
@@ -119,18 +126,21 @@ class agent_SA():
         max_raise = bet_amount + chips
         action_type = None
         total = None
-        if p_win >= self.min or p < self.seuil_random:
+        if p_win >= self._min or p < self.seuil_random:
 
 
             if game.players[game.current_player].state == PlayerState.IN:
                     #print("flop check")
                 
-                action_type = ActionType.CHECK
+                action_type = ActionType.RAISE
+                #print("flop raise")
+                total = min_raise
                 return action_type, total
 
             elif (max_raise > min_raise) and (game.players[game.current_player].state == PlayerState.TO_CALL):
                     #print("call, p =" ,p, "p_win=",p_win)
                 action_type = ActionType.CALL
+                #print("flop call")
                 return action_type, total
 
             else:
@@ -150,7 +160,7 @@ class agent_SA():
         max_raise = bet_amount + chips
         action_type = None
         total = None
-        if p_win >= self.min or p < self.seuil_random:
+        if p_win >= self._min or p < self.seuil_random:
 
 
             if game.players[game.current_player].state == PlayerState.IN:

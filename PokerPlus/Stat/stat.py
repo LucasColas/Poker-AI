@@ -190,7 +190,7 @@ def get_stat(nmax=500, save=False, cles = ["nbrCall", "nbrCheck", "nbrRaise", "n
     return stats
 
 def get_stat_tournoi(nmax = 200, save=False, cles = ["nbrWin"], path='./res', plot=False, poolrandom = False):
-    max_players = 5
+    max_players = 6
     big_blind = 150
     small_blind = big_blind // 2
     buyin = 1000 
@@ -207,6 +207,7 @@ def get_stat_tournoi(nmax = 200, save=False, cles = ["nbrWin"], path='./res', pl
     stats = {cle:{i:0 for i in range(max_players)} for cle in cles}
     n=0
     while(n<nmax):
+        print("nouveau tournoi")
         game = TexasHoldEm(buyin=buyin, big_blind=big_blind, small_blind=small_blind, max_players=max_players)
         n+=1
         nbr_partie=0
@@ -220,14 +221,21 @@ def get_stat_tournoi(nmax = 200, save=False, cles = ["nbrWin"], path='./res', pl
                     action, total = current_bot(game,seuil)
                 else:
                     action, total = current_bot(game)
-                #print(f"Player {game.current_player}({joueurs_bots_noms[game.current_player]}) {action} {total}")
-                game.take_action(action, total=total)
+                print(f"Player {game.current_player}({joueurs_bots_noms[game.current_player]}) {action} {total}")
+                    #print()
+                #print("action")
+                try:
+                    #print(current_bot, action, total)
+                    game.take_action(action, total=total)
+                except:
+                    print(current_bot, action, total)
+                    game.take_action(ActionType.FOLD, total=None)
 
             #print(f"{nbr_partie}:{game.hand_history.settle}\n")
             last_gagnant=str(game.hand_history.settle)[7]
             last_gagnant = int(last_gagnant)
         stats["nbrWin"][last_gagnant] += 1
-        print(f"tournoi {n} de {nbr_partie} parties gagné par joueur{last_gagnant} ({joueurs_bots_noms[last_gagnant]})")
+        #print(f"tournoi {n} de {nbr_partie} parties gagné par joueur{last_gagnant} ({joueurs_bots_noms[last_gagnant]})")
     
     if plot:
         plot_stat_tournois(stats, n, joueurs_bots_noms)
