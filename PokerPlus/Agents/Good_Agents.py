@@ -21,7 +21,7 @@ class agent_SA():
     Si la main n'est pas bonne, autoriser de temps en temps à jouer.
     """
 
-    def __init__(self, min=0.3, seuil_random=0.15):
+    def __init__(self, min=0.25, seuil_random=0.15):
         self.pos = None
         self._min = min
         self.max = 1.0
@@ -125,31 +125,17 @@ class agent_SA():
         chips = game.players[game.current_player].chips
         min_raise = game.value_to_total(game.min_raise(), game.current_player)
         max_raise = bet_amount + chips
-        action_type = None
+        action_type = ActionType.FOLD
         total = None
-        if p_win >= self._min or p < self.seuil_random:
-
-
-            if game.players[game.current_player].state == PlayerState.IN:
-                    #print("flop check")
-                
-                action_type = ActionType.RAISE
-                #print("flop raise")
-                total = min_raise
-                return action_type, total
-
-            elif (max_raise > min_raise) and (game.players[game.current_player].state == PlayerState.TO_CALL):
-                    #print("call, p =" ,p, "p_win=",p_win)
-                action_type = ActionType.CALL
-                #print("flop call")
-                return action_type, total
-
-            else:
-                self.last_action = ActionType.FOLD
-                return ActionType.FOLD, total
-
-        self.last_action = ActionType.FOLD
-        return ActionType.FOLD, total
+        
+        rank = self.__rank[rank_to_string(rank)]
+        if rank >= 5 and min_raise < max_raise:
+            action_type = ActionType.RAISE
+            total = random.randint(min_raise, max_raise)
+        
+            
+        
+        return action_type, total
 
     def strategie_turn(self, game: TexasHoldEm):
         rank = evaluate(game.hands[game.current_player], game.board)
@@ -195,11 +181,10 @@ class agent_SA():
         if len(game.board) == 0:
             return self.strategie_preflop(game)
 
-        elif len(game.board) == 3:
+        else:
             return self.strategie_flop(game)
     
-        else:
-            return self.strategie_turn(game)
+        
 
     def __str__(self):
         print("Agent Serré Agressif")
