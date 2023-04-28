@@ -225,14 +225,17 @@ def get_stat_tournoi(nmax = 200, save=False, path='./res', plot=False, poolrando
     print(joueurs_bots_noms)
 
     stats={}
-    stats["nbrWin tournoi"] ={i:0 for i in range(max_players)}
+    stats["nbrWin tournoi"] ={i:0 for i in range(max_players)} #Nombre de tournois gagnés par chaque joueur
 
-    stats["nbrWin partie"] ={f"tournoi {k}":{i:0 for i in range(max_players)} for k in range(nmax)}
+    #Nombre de parties gagnées par chaque joueur à chaque tournoi
+    stats["nbrWin partie"] ={f"tournoi {k}":{i:0 for i in range(max_players)} for k in range(nmax)} 
 
+    #Nombre de call, check, fold fait à chaque tournoi
     stats["nbrCall"] ={f"tournoi {k}":{i:0 for i in range(max_players)} for k in range(nmax)}
     stats["nbrCheck"] ={f"tournoi {k}":{i:0 for i in range(max_players)} for k in range(nmax)}
     stats["nbrFold"] ={f"tournoi {k}":{i:0 for i in range(max_players)} for k in range(nmax)}
 
+    #Raise fait par chaque joueur 
     stats["raise"] = {f"tournoi {k}":{i:[] for i in range(max_players)} for k in range(nmax)}
     
     stats["position"] = {f"tournoi {k}":{} for k in range(nmax)}
