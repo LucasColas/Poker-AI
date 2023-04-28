@@ -103,7 +103,7 @@ def plot_stat_tournois(stats, n, joueurs_bots_noms):
         print(f"nbrCheck tournoi {i} :{stats['nbrCheck'][f'tournoi {i}']}")
         print(f"nbrFold tournoi {i} :{stats['nbrFold'][f'tournoi {i}']}")
 
-        print(f"Les raises de la partie {i}:\n{stats['raise'][f'tournoi {i}']}\n")
+        print(f"Les raises du tournois {i}:\n{stats['raise'][f'tournoi {i}']}\n")
         indices_p = random.sample(range(len(stats['position'][f'tournoi {i}'])),3)
         for k in indices_p:
             print(f"Position partie {k}:{stats['position'][f'tournoi {i}'][f'partie {k}']}")
@@ -236,6 +236,8 @@ def get_stat_tournoi(nmax = 200, save=False, path='./res', plot=False, poolrando
     stats["raise"] = {f"tournoi {k}":{i:[] for i in range(max_players)} for k in range(nmax)}
     
     stats["position"] = {f"tournoi {k}":{} for k in range(nmax)}
+
+    stats["elimine"] =  {f"tournoi {k}":{i:0 for i in range(max_players)} for k in range(nmax)}
     #stats {
     #     "nbrWin tournoi":{0:0,1:0,2:0,3:0,4:0,5:0}
     #     "nbrcall":{tournoi 1:{0:0,1:0,2:0,3:0,4:0,5:0} tournoi_2:{0:0,1:0,2:0,3:0,4:0,5:0} ...}
@@ -247,20 +249,37 @@ def get_stat_tournoi(nmax = 200, save=False, path='./res', plot=False, poolrando
     while(nbr_tournoi<nmax):
         game = TexasHoldEm(buyin=buyin, big_blind=big_blind, small_blind=small_blind, max_players=max_players)
         nbr_partie=0
+        pos_avant=[]
+        num_eliminé = 0
+
         while game.is_game_running():
             game.start_hand()
             nbr_partie+=1
-
-            # les personnes dans le tournois restant
             
-            #for i in game.in_pot_iter():
-            #   print(f"{i}",end='')
-            #print()
-            
+            # les personnes dans le tournois 
             pos =[]
             for i in game.in_pot_iter():
                 pos.append(i)
+
+            if pos_avant:
+                if(len(pos_avant)!= len(pos)):
+                    for k in pos:
+                        pos_avant.remove(k)
+                    elimine = pos_avant[0]
+                    num_eliminé += 1
+                    stats["elimine"][f"tournoi {nbr_tournoi}"][elimine]+=num_eliminé
+                    print(f"    le joueur {elimine} est éliminé")
+                    
+
+            
+            if[nbr_partie != 1]:
+                pos_avant = pos
+            #print(pos, pos_avant)  
+
+
             stats["position"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]=pos
+            
+                
             while game.is_hand_running():
 
                 current_bot = joueurs_bots[game.current_player]
@@ -290,13 +309,14 @@ def get_stat_tournoi(nmax = 200, save=False, path='./res', plot=False, poolrando
                     stats["nbrFold"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
                 elif action == ActionType.RAISE:
                     stats["raise"][f"tournoi {nbr_tournoi}"][game.current_player].append(total)
-
+            
             last_gagnant=str(game.hand_history.settle)[7]
             last_gagnant = int(last_gagnant)
             stats["nbrWin partie"][f"tournoi {nbr_tournoi}"][last_gagnant] += 1
 
         stats["nbrWin tournoi"][last_gagnant] += 1
         print(f"tournoi {nbr_tournoi} de {nbr_partie} parties gagné par joueur{last_gagnant} ({joueurs_bots_noms[last_gagnant]})")
+        print(f"eliminé : {stats['elimine'][f'tournoi {nbr_tournoi}']}\n")
         nbr_tournoi+=1
 
     if plot:

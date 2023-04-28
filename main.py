@@ -18,7 +18,7 @@ def main():
     #stats_dict = get_data(m=500)
     #get_stat_tournoi(nmax=500,poolrandom=True,plot=True)
 
-    stats_tournoi = get_stat_tournoi(nmax=2,poolrandom=True,plot=True)
+    stats_tournoi = get_stat_tournoi(nmax=5,poolrandom=True,plot=True)
 
     #write_data(stats_dict)
     #simu_bots_humains()
