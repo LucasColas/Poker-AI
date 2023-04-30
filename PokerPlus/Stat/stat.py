@@ -42,7 +42,7 @@ def plot_stat(stats, n, joueurs_bots_noms, max_players):
             t= ax.bar(ind,list(b.values()) , width, label=a, bottom=bottom)
             ax.bar_label(t, label_type='center')
             bottom = [x + y for x, y in zip(bottom, list(b.values()))]
-    ax.set_title(f"Nombre d'actions pour chaque joueur, {n} parties jouées")
+    ax.set_title(f"Nombre d'actions pour chaque joueur, {n} parties joués")
     ax.legend()
 
     #plot bar du profit des joueurs
@@ -86,7 +86,7 @@ def plot_stat_tournois(stats, n, joueurs_bots_noms):
         plt.annotate(f"{joueurs_bots_noms[i]} \n {v}", xy=(i, v), ha='center', va='bottom')
 
     # Ajouter un titre et des étiquettes d'axe
-    plt.title(f"Nombre de tournois gagné pour chaque joueur, {n} tournois jouées")
+    plt.title(f"Nombre de tournois gagné pour chaque joueur, {n} tournois joués")
     plt.xlabel("Joueurs")
     plt.ylabel("Nombre de tournois gagné ")
 

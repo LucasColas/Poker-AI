@@ -5,6 +5,7 @@ from texasholdem.game.game import TexasHoldEm
 from PokerPlus.Agents.fonctions_auxiliaires import *
 import random
 
+
 class agent_SA():
     """
     Stratégie :
@@ -96,7 +97,7 @@ class agent_SA():
             return action_type, total
 
         elif (game.players[game.current_player].state == PlayerState.TO_CALL):
-            if (nbr1==nbr2) and (nbr1 == 14 or nbr1 == 13 or nbr1 == 12):
+            if (nbr1==nbr2) and (nbr1 == 14 or nbr1 == 13 or nbr1 == 12) or (nbr1 >= 10 and nbr2 >= 10):
                 if (min_raise < max_raise):
                     action_type = ActionType.RAISE
                     #print("min raise : ",min_raise)
