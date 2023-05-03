@@ -129,7 +129,7 @@ def pool_random(max_players, bots = [agent_outs().choix,agent_SA().action, agent
 
     return joueurs_bots, joueurs_bots_noms
 
-def pool_1(max_players, bots = [agent_outs().choix,agent_SA().action, agent_naif, agent_allIn, random_agent,agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif], bots_noms = ["agent_out", "agent_serre_agressif", "agent_naif", "agent_allIn", "random_agent","agent_saboteur", "agent_serre_non_agressif", "agent_large_non_agressif"]):
+def pool_1(max_players, bots = [random_agent, agent_outs().choix, random_agent, random_agent, random_agent, agent_outs().choix], bots_noms = ["random_agent", "agent_out","random_agent", "random_agent", "random_agent", "random_agent"]):
     #pour chaque joueur, on lui attribue le bot avec le numéro de joueur
     joueurs_bots = {}
     joueurs_bots_noms = {}

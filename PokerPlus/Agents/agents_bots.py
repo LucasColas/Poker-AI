@@ -79,7 +79,6 @@ def agent_serre_non_agressif(game: TexasHoldEm, seuil: int=0.4):
             action_type = ActionType.FOLD
 
     #FLOP Turn River
-    #Strategie : joue si il a que moins de 5% de chance de gagner
     elif len(game.board) != 0:
         rank = evaluate(game.hands[game.current_player],game.board)
         p_win = get_five_card_rank_percentage(rank)
