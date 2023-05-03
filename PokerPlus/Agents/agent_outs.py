@@ -43,10 +43,12 @@ class agent_outs:
         if self.__game.players[self.__game.current_player].state == PlayerState.IN:
             #print("flop check")
             action_type = ActionType.CHECK
-        elif (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and good_hand:
+        elif (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and good_hand and (self.__min_raise < self.__max_raise):
             #print("call, p =" ,p, "p_win=",p_win)
-            action_type = ActionType.CALL
+            action_type = ActionType.RAISE
             self.__total = self.__max_raise
+        elif (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and good_hand:
+            action_type = ActionType.CALL
         else:
             rank = evaluate(self.__game.hands[self.__game.current_player],self.__game.board)
             p_win = get_five_card_rank_percentage(rank)

@@ -13,7 +13,7 @@ from PokerPlus.Agents.agents_bots import agent_naif, agent_allIn
 from PokerPlus.Agents.agent_outs import agent_outs
 
 def simu_bots_humains():
-    max_players = 6
+    max_players = 3
     big_blind = 150
     small_blind = big_blind // 2
     buyin = 1000

@@ -1,12 +1,13 @@
 #un joueur sera considéré comme agressif s'il son nombre de call et de raise est grand par rapport au nombre d'action jouer
 
 #vpip Voluntarily Put In Pot,tracks the percentage of hands in which a particular player voluntarily puts money into the pot
-def vpip(nbr_call : dict,nbr_raise : dict, nbr_action : dict , max_player: int) -> dict:
+def vpip(nbr_call : dict,nbr_raise : dict, nbr_action : dict, nbr_fold : dict, max_player: int) -> dict:
     """retourne un dictionnaire avec le joueur comme clé et le vpip comme valeur"""
     vpip={}
     for i in range(max_player):
-        if (nbr_action[i]!=0):
-            vpip[i]=round((nbr_call[i]+nbr_raise[i])/nbr_action[i],2)
+        if ((nbr_action[i]-nbr_fold[i]) !=0):
+
+            vpip[i]=round((nbr_call[i]+nbr_raise[i])/(nbr_action[i]-nbr_fold[i]),2)
         else:
             vpip[i]=0
     return vpip
@@ -27,7 +28,13 @@ def list_agressif_vpip(nbr_call : dict, nbr_raise : dict, nbr_action: dict, max_
     return agressif
 
 def ratio_large(nbr_fold : dict, nbr_action: dict, max_player: int):
-    return {i:round((1-nbr_fold[i]/nbr_action[i]), 3) for i in range(max_player)}
+    ratio = {}
+    for i in range(max_player):
+        if nbr_action[i] != 0:
+            ratio[i] = round((1-(nbr_fold[i]/nbr_action[i])), 2)
+        else:
+            ratio[i] = 0 
+    return ratio
 
 #un joueur sera considéré comme large si son nombre de fold est petit par rapport au nombre d'action jouer
 def list_large(nbr_fold : dict, nbr_action: dict, max_player: int, seuil : int=0.5) -> dict:

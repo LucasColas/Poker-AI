@@ -55,7 +55,49 @@ def agent_naif(game: TexasHoldEm) -> Tuple[ActionType, int]:
 
     return action_type, total
 
-def agent_allIn(game: TexasHoldEm, seuil: int = 0.1):
+
+def agent_serre_non_agressif(game: TexasHoldEm, seuil: int=0.4):
+    bet_amount = game.player_bet_amount(game.current_player)
+    chips = game.players[game.current_player].chips
+    min_raise = game.value_to_total(game.min_raise(), game.current_player)
+    max_raise = bet_amount + chips
+    total = None
+    #pre-flop
+    #Strategie : on CHECK si on peut, on fold si on a un début de main et sinon on call
+    if len(game.board) == 0:
+        nbr1, coul1, nbr2, coul2 = conversion(game)
+
+        if game.players[game.current_player].state == PlayerState.IN:
+            action_type = ActionType.CHECK
+        elif (max_raise > min_raise) and (game.players[game.current_player].state == PlayerState.TO_CALL):
+            if (nbr1==nbr2) and (nbr1 >= 10):
+                action_type = ActionType.CALL
+            else:
+                action_type = ActionType.FOLD
+
+        else :
+            action_type = ActionType.FOLD
+
+    #FLOP Turn River
+    #Strategie : joue si il a que moins de 5% de chance de gagner
+    elif len(game.board) != 0:
+        rank = evaluate(game.hands[game.current_player],game.board)
+        p_win = get_five_card_rank_percentage(rank)
+
+
+        if (game.players[game.current_player].state == PlayerState.IN) and (p_win > seuil) and (max_raise > min_raise):
+        
+            action_type = ActionType.CALL
+
+        else:
+            action_type = ActionType.FOLD
+    return action_type, total
+
+
+def agent_large_non_agressif(game: TexasHoldEm, seuil: int=0.1):
+    return agent_serre_non_agressif(game, seuil)
+
+def agent_allIn(game: TexasHoldEm, seuil: int = 0.1): #Agressif et large
     bet_amount = game.player_bet_amount(game.current_player)
     chips = game.players[game.current_player].chips
     min_raise = game.value_to_total(game.min_raise(), game.current_player)
@@ -69,8 +111,9 @@ def agent_allIn(game: TexasHoldEm, seuil: int = 0.1):
         #on joue si on a une paire, deux cartes de la meme couleur ou 2 cartes consecutives
         # attention l'as peut etre considere comme 1 ou 14 donc on fait attention
 
-        if game.players[game.current_player].state == PlayerState.IN:
-            action_type = ActionType.CHECK
+        if game.players[game.current_player].state == PlayerState.IN and (max_raise > min_raise):
+            action_type = ActionType.ALL_IN
+        
         elif (max_raise > min_raise) and (game.players[game.current_player].state == PlayerState.TO_CALL):
             """
             
@@ -91,7 +134,7 @@ def agent_allIn(game: TexasHoldEm, seuil: int = 0.1):
         p_win = get_five_card_rank_percentage(rank)
 
         if (game.players[game.current_player].state == PlayerState.IN) and (p_win >seuil) and (max_raise > min_raise):
-            action_type = ActionType.ALL_IN
+            action_type = ActionType.CHECK
         elif (game.players[game.current_player].state == PlayerState.TO_CALL) and (p_win >seuil) and (max_raise > min_raise) :
             action_type = ActionType.ALL_IN
         else:
@@ -99,6 +142,7 @@ def agent_allIn(game: TexasHoldEm, seuil: int = 0.1):
     if (action_type == ActionType.ALL_IN):
         total = max_raise
     return action_type, total
+
 
 
 def agent_saboteur(game: TexasHoldEm):
