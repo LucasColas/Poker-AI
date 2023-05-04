@@ -32,6 +32,7 @@ class agent_outs:
         self.__min_raise = None
         self.__max_raise = None
         self.__total = None
+        self.__nb_check_consecutifs = 0
 
 
 
@@ -42,28 +43,33 @@ class agent_outs:
         self.raise_config()
         if self.__game.players[self.__game.current_player].state == PlayerState.IN:
             #print("flop check")
+            """
+            p = random.random()
+            if p > 0.5 and self.__min_raise < self.__max_raise:
+                action_type = ActionType.CALL
+            else:
+                action_type = ActionType.CHECK
+            """
             action_type = ActionType.CHECK
+            self.__nb_check_consecutifs += 1
+            
+
         elif (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and good_hand and (self.__min_raise < self.__max_raise):
             #print("call, p =" ,p, "p_win=",p_win)
             action_type = ActionType.RAISE
             self.__total = self.__max_raise
-        elif (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and good_hand:
-            action_type = ActionType.CALL
-        else:
+        elif (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and (self.__min_raise < self.__max_raise):
             rank = evaluate(self.__game.hands[self.__game.current_player],self.__game.board)
             p_win = get_five_card_rank_percentage(rank)
             p = random.random()
-            if self.__game.players[self.__game.current_player].state == PlayerState.IN:
-                #print("flop check")
-                action_type = ActionType.CHECK
-            elif (self.__max_raise > self.__min_raise) and (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and (p<p_win):
+            
+            if (self.__max_raise > self.__min_raise) and (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and (p<p_win):
                 #print("call, p =" ,p, "p_win=",p_win)
                 action_type = ActionType.RAISE
-                self.__total = self.__max_raise
-
-            else:
-                #print("fold, p =", p, " p_win=", p_win)
-                action_type = ActionType.FOLD
+                self.__total = random.randint(self.__min_raise, self.__max_raise)
+        else:
+            #print("fold, p =", p, " p_win=", p_win)
+            action_type = ActionType.FOLD
 
         return action_type, self.__total
 

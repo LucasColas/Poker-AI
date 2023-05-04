@@ -14,17 +14,16 @@ from PokerPlus.Simulation.simu_bots_humains import simu_bots_humains
 
 
 def main():
+    m = 40
     #get_stat(plot=True)
     
-    get_stat_tournoi(nmax=100,poolrandom=False,plot=True)
 
-    #stats_tournoi = get_stat_tournoi(nmax=100,poolrandom=True,plot=True)
-    #print(stats_tournoi)
-    m = 40
-    #stats_dict = get_data(m=m)
-    #write_data(m=m,data_dict=stats_dict)
-    #simu_bots_humains()
-    #print(stats_dict)
+    
+    #get_stat_tournoi(nmax=5000,poolrandom=False,plot=True)
+
+
+    simu_bots_humains()
+
 
 
 

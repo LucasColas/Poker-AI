@@ -129,7 +129,7 @@ def pool_random(max_players, bots = [agent_outs().choix,agent_SA().action, agent
 
     return joueurs_bots, joueurs_bots_noms
 
-def pool_1(max_players, bots = [random_agent, agent_outs().choix, random_agent, random_agent, random_agent, agent_outs().choix], bots_noms = ["random_agent", "agent_out","random_agent", "random_agent", "random_agent", "random_agent"]):
+def pool_1(max_players, bots = [random_agent, random_agent, random_agent, random_agent, random_agent, agent_outs().choix], bots_noms = ["random_agent", "random_agent", "random_agent", "random_agent", "random_agent", "agent outs"]):
     #pour chaque joueur, on lui attribue le bot avec le numéro de joueur
     joueurs_bots = {}
     joueurs_bots_noms = {}
@@ -216,7 +216,7 @@ def get_stat(nmax=500, save=False, cles = ["nbrCall", "nbrCheck", "nbrRaise", "n
 
     return stats
 
-def get_stat_tournoi(nmax = 1, save=False, path='./res', plot=False, poolrandom = False, max_players=6):
+def get_stat_tournoi(nmax = 1, save=False, path='./res', plot=False, poolrandom = False, max_players=6, verbose=False):
     max_players = max_players
     big_blind = 150
     small_blind = big_blind // 2
@@ -283,7 +283,8 @@ def get_stat_tournoi(nmax = 1, save=False, path='./res', plot=False, poolrandom 
                     elimine = pos_avant[0]
                     num_eliminé += 1
                     stats["elimine"][f"tournoi {nbr_tournoi}"][elimine]+=num_eliminé
-                    print(f"    le joueur {elimine} est éliminé")
+                    if verbose:
+                        print(f"    le joueur {elimine} est éliminé")
                     
 
             
@@ -342,8 +343,10 @@ def get_stat_tournoi(nmax = 1, save=False, path='./res', plot=False, poolrandom 
             stats["nbrWin partie"][f"tournoi {nbr_tournoi}"][last_gagnant] += 1
 
         stats["nbrWin tournoi"][last_gagnant] += 1
-        print(f"tournoi {nbr_tournoi} de {nbr_partie} parties gagné par joueur{last_gagnant} ({joueurs_bots_noms[last_gagnant]})")
-        print(f"eliminé : {stats['elimine'][f'tournoi {nbr_tournoi}']}\n")
+        if verbose:
+            print(f"tournoi {nbr_tournoi} de {nbr_partie} parties gagné par joueur{last_gagnant} ({joueurs_bots_noms[last_gagnant]})")
+            print(f"eliminé : {stats['elimine'][f'tournoi {nbr_tournoi}']}\n")
+        print(f"tournoi num : {nbr_tournoi}", end='\r' )
         nbr_tournoi+=1
 
     if plot:
