@@ -1,40 +1,65 @@
 from texasholdem.game.game import TexasHoldEm
-
+from texasholdem.game.action_type import ActionType
+from texasholdem.game.player_state import PlayerState
 
 class BestReplySearch:
     def __init__(self, *args):
         self._opponents = None
         self._game = None
+        self._player = None
+        self._simu = {}
+        self._chips = {}
 
-    @property
-    def opponents(self):
-        return self._opponents
-    
-    @opponents.setter
-    def opponents(self, val):
-        self._opponents = val
+    def setter(self, game: TexasHoldEm):
+        self._game = game
+        self._opponents = [o for o in game.players if o != game.players[game.current_player]]
+        self._player = game.players[game.current_player]
+        self._chips = {player.player_id:0 for player in game.players}
 
-    def eval(self):
+    def eval(self, player: int, game: TexasHoldEm) -> int:
+        """
+        Se baser sur la main (prendre en compte que des fois on a une main de merde mais on gagne quand même)
+        Se baser sur la main (en sachant que des fois on est en preflop -> on a que 2 cartes)
+        Se baser sur les outs 
+        Se baser sur les jetons misés
+        """
         pass
 
-    def GenerateMoves(self, MaxPlayer: int):
+    def GenerateMoves(self, player: int):
+        return {player:[action for action in ActionType]}
+
+    def doMove(self, m : ActionType):
+        if m == ActionType.ALL_IN:
+            pass
+        elif m == ActionType.CALL:
+            pass
+        elif m == ActionType.CHECK:
+            pass
+        elif m == ActionType.FOLD:
+            pass
+        elif m == ActionType.RAISE:
+            pass
+
+    def undoMove(self):
         pass
 
-    def doMove(self):
+    def terminal_state(self) -> bool:
         pass
 
 
-    def BRS(self, alpha : float, beta : float, depth : int, turn : bool, game : TexasHoldEm) -> float:
+    def BRS(self, alpha : int, beta : int, depth : int, turn : bool, game : TexasHoldEm, player:int) -> float:
         """
             Implémentation de BRS.
+            alpha = -infini
+            beta = +infini
             
         """
         Moves = []
-        if depth <= 0:
-            return self.eval()
+        if depth <= 0 or self.terminal_state():
+            return self.eval(player)
         
         if turn: #root player’s turn
-            Moves = self.GenerateMoves(len(game.players))
+            Moves = self.GenerateMoves(self._player)
             turn = False #Min
 
         else:

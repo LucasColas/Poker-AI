@@ -19,7 +19,7 @@ def main():
     
 
     
-    get_stat_tournoi(nmax=1,poolrandom=False,plot=True)
+    get_stat_tournoi(nmax=100,poolrandom=False,plot=True)
 
 
     #simu_bots_humains()
