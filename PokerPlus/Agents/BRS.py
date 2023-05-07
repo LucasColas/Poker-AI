@@ -1,27 +1,57 @@
 from texasholdem.game.game import TexasHoldEm
-def eval():
-    pass
-
-def GenerateMoves(MaxPlayer: int):
-    pass
-
-def doMove():
-    pass
 
 
-def BRS(alpha : float, beta : float, depth : int, turn : int, game : TexasHoldEm, MAX: int):
-    """
-        Implémentation de BRS.
-        Pour déterminer les coups probables on se basera sur le type de joueurs.
-        Pour avoir le type de joueurs : Kmeans qui labélise. Puis ensuite classifieur Bayesien qui
-        détermine l'action la plus probable. Mais l'action doit aussi être l'action qui rapporte le plus.
-        Donc on doit avoir une fonction permettant d'évaluer le gain du joueur pour chaque action qu'il peut faire. 
-    """
-    Moves = []
-    if depth <= 0:
-        return eval()
+class BestReplySearch:
+    def __init__(self, *args):
+        self._opponents = None
+        self._game = None
+
+    @property
+    def opponents(self):
+        return self._opponents
     
-    if turn == MAX: #root player’s turn
-        Moves = GenerateMoves(len(game.players))
+    @opponents.setter
+    def opponents(self, val):
+        self._opponents = val
 
-     
+    def eval(self):
+        pass
+
+    def GenerateMoves(self, MaxPlayer: int):
+        pass
+
+    def doMove(self):
+        pass
+
+
+    def BRS(self, alpha : float, beta : float, depth : int, turn : bool, game : TexasHoldEm) -> float:
+        """
+            Implémentation de BRS.
+            
+        """
+        Moves = []
+        if depth <= 0:
+            return self.eval()
+        
+        if turn: #root player’s turn
+            Moves = self.GenerateMoves(len(game.players))
+            turn = False #Min
+
+        else:
+            for o in self._opponents:
+                Moves = self.GenerateMoves(o)
+            turn = True #Max
+
+        for m in Moves:
+            self.doMove(m)
+            v = -self.BRS(-alpha, -beta, depth-1, turn, game)
+            self.undoMove(m)
+            if v >= beta:
+                return v
+            alpha = max(alpha, v)
+
+        return alpha
+
+        
+
+        

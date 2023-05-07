@@ -19,10 +19,10 @@ def main():
     
 
     
-    #get_stat_tournoi(nmax=5000,poolrandom=False,plot=True)
+    get_stat_tournoi(nmax=1,poolrandom=False,plot=True)
 
 
-    simu_bots_humains()
+    #simu_bots_humains()
 
 
 
