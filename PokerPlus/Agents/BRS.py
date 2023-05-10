@@ -18,17 +18,17 @@ class BestReplySearch:
 
     def eval(self, player: int, game: TexasHoldEm) -> int:
         """
-        Se baser sur la main (prendre en compte que des fois on a une main de merde mais on gagne quand même)
-        Se baser sur la main (en sachant que des fois on est en preflop -> on a que 2 cartes)
+        Se baser sur la main
         Se baser sur les outs 
         Se baser sur les jetons misés
+        Peut-être se baser aussi sur la position
         """
         pass
 
     def GenerateMoves(self, player: int):
         return {player:[action for action in ActionType]}
 
-    def doMove(self, m : ActionType):
+    def doMove(self, p : int, m : ActionType):
         if m == ActionType.ALL_IN:
             pass
         elif m == ActionType.CALL:
@@ -40,7 +40,7 @@ class BestReplySearch:
         elif m == ActionType.RAISE:
             pass
 
-    def undoMove(self):
+    def undoMove(self, p : int, m : ActionType):
         pass
 
     def terminal_state(self) -> bool:
@@ -64,13 +64,13 @@ class BestReplySearch:
 
         else:
             for o in self._opponents:
-                Moves = self.GenerateMoves(o)
+                Moves += self.GenerateMoves(o)
             turn = True #Max
 
-        for m in Moves:
-            self.doMove(m)
+        for p,m in Moves.items():
+            self.doMove(p,m)
             v = -self.BRS(-alpha, -beta, depth-1, turn, game)
-            self.undoMove(m)
+            self.undoMove(p,m)
             if v >= beta:
                 return v
             alpha = max(alpha, v)
