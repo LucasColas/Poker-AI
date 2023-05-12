@@ -49,6 +49,7 @@ class BestReplySearch:
 
     def BRS(self, alpha : int, beta : int, depth : int, turn : bool, game : TexasHoldEm, player:int) -> float:
         """
+
             Implémentation de BRS.
             alpha = -infini
             beta = +infini
@@ -76,7 +77,3 @@ class BestReplySearch:
             alpha = max(alpha, v)
 
         return alpha
-
-        
-
-        

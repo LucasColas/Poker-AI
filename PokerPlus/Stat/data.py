@@ -36,4 +36,6 @@ def write_data(m:int,data_dict: dict, max_players=6, filename: str = "data.csv",
             for val, val2 in zip(vpip_.values(), ratio_large_.values()):
                 writer.writerow({fieldnames[0]: val, fieldnames[1]: val2})
 
+
+
             

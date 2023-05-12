@@ -11,6 +11,7 @@ from PokerPlus.Stat.stat import get_stat, get_stat_tournoi
 from PokerPlus.Simulation.simu_bots import simu
 from PokerPlus.Stat.data import get_data, write_data
 from PokerPlus.Simulation.simu_bots_humains import simu_bots_humains
+from PokerPlus.Comportement.simu_comportement import simu_comportement, write_data_comportement
 
 
 def main():
@@ -19,7 +20,8 @@ def main():
     
 
     
-    get_stat_tournoi(nmax=100,poolrandom=False,plot=True)
+    stats = simu_comportement()
+    write_data_comportement(stats)
 
 
     #simu_bots_humains()
