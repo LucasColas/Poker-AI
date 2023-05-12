@@ -94,7 +94,40 @@ def agent_serre_non_agressif(game: TexasHoldEm, seuil: int=0.4):
 
 
 def agent_large_non_agressif(game: TexasHoldEm, seuil: int=0.1):
-    return agent_serre_non_agressif(game, seuil)
+    bet_amount = game.player_bet_amount(game.current_player)
+    chips = game.players[game.current_player].chips
+    min_raise = game.value_to_total(game.min_raise(), game.current_player)
+    max_raise = bet_amount + chips
+    total = None
+    #pre-flop
+    #Strategie : on CHECK si on peut, on fold si on a un début de main et sinon on call
+    if len(game.board) == 0:
+        nbr1, coul1, nbr2, coul2 = conversion(game)
+
+        if game.players[game.current_player].state == PlayerState.IN:
+            action_type = ActionType.CHECK
+        elif (max_raise > min_raise) and (game.players[game.current_player].state == PlayerState.TO_CALL):
+            if (nbr1 >= 9 and nbr2 >= 9) or (nbr1 == nbr2) or (coul1 == coul2):
+                action_type = ActionType.CALL
+            else:
+                action_type = ActionType.FOLD
+
+        else :
+            action_type = ActionType.FOLD
+
+    #FLOP Turn River
+    elif len(game.board) != 0:
+        rank = evaluate(game.hands[game.current_player],game.board)
+        p_win = get_five_card_rank_percentage(rank)
+
+
+        if (game.players[game.current_player].state == PlayerState.IN) and (p_win > seuil) and (max_raise > min_raise):
+        
+            action_type = ActionType.CALL
+
+        else:
+            action_type = ActionType.FOLD
+    return action_type, total
 
 def agent_allIn(game: TexasHoldEm, seuil: int = 0.1): #Agressif et large
     bet_amount = game.player_bet_amount(game.current_player)
