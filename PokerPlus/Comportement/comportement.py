@@ -12,9 +12,9 @@ def vpip(nbr_call : dict,nbr_raise : dict, nbr_action : dict, nbr_fold : dict, m
             vpip[i]=0
     return vpip
 
-def getVpip(nb_call : int, nb_raise : int, nb_fold : int, nb_action : int) -> float:
-    if nb_action-nb_fold != 0:
-        return round((nb_call+nb_raise)/(nb_action-nb_fold),2)
+def getVpip(nb_call : int, nb_raise : int, nb_fold : int, nb_action : int, alpha: int=0.2) -> float:
+    if nb_action != 0:
+        return (nb_call+nb_raise)/(nb_call+nb_raise+nb_fold)
     return 0
 
 def getRatioLarge(nb_fold : int, nb_action : int) -> float:

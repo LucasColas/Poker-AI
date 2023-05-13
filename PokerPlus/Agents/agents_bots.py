@@ -123,7 +123,7 @@ def agent_large_non_agressif(game: TexasHoldEm, seuil: int=0.1):
         if (game.players[game.current_player].state == PlayerState.IN):
             action_type = ActionType.CHECK
 
-        elif (game.players[game.current_player].state == PlayerState.IN) and (p_win > seuil) and (max_raise > min_raise):
+        elif (game.players[game.current_player].state == PlayerState.TO_CALL) and (p_win > seuil) and (max_raise > min_raise):
         
             action_type = ActionType.CALL
 
