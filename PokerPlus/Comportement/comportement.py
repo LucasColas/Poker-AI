@@ -7,14 +7,14 @@ def vpip(nbr_call : dict,nbr_raise : dict, nbr_action : dict, nbr_fold : dict, m
     for i in range(max_player):
         if ((nbr_action[i]-nbr_fold[i]) !=0):
 
-            vpip[i]=round((nbr_call[i]+nbr_raise[i])/(nbr_action[i]),2)
+            vpip[i]=round((nbr_call[i]+nbr_raise[i])/(nbr_action[i]-nbr_fold),2)
         else:
             vpip[i]=0
     return vpip
 
 def getVpip(nb_call : int, nb_raise : int, nb_fold : int, nb_action : int) -> float:
     if nb_action-nb_fold != 0:
-        return round((nb_call+nb_raise)/(nb_action),2)
+        return round((nb_call+nb_raise)/(nb_action-nb_fold),2)
     return 0
 
 def getRatioLarge(nb_fold : int, nb_action : int) -> float:

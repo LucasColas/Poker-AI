@@ -1,9 +1,9 @@
 vpip,ratio action,bot
-0.49,0.56,random_agent
-0.5,0.58,agent_out
-0.15,0.15,agent_serre_agressif
-0.23,0.23,agent_naif
-0.88,0.88,agent_allIn
-0.06,0.06,agent_saboteur
-0.02,0.02,agent_serre_non_agressif
-0.04,0.04,agent_large_non_agressif
+1.0,0.56,random_agent
+1.0,0.43,agent_out
+1.0,0.18,agent_serre_agressif
+1.0,0.25,agent_naif
+1.0,0.94,agent_allIn
+1.0,0.04,agent_saboteur
+0,0.0,agent_serre_non_agressif
+1.0,0.12,agent_large_non_agressif

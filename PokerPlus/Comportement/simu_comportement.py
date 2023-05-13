@@ -40,7 +40,7 @@ def simu_comportement(nb_tournoi : int = 50, max_players : int = 8, big_blind : 
             elif (action == ActionType.FOLD):
                 stats["nbrFold"][(i, bots_noms[i])]+=1
             stats["nbrAction"][(i, bots_noms[i])]+=1
-            
+            print(bots[game.current_player])
             game.take_action(action, total=total)
 
     return stats

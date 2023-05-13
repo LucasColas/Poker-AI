@@ -120,8 +120,10 @@ def agent_large_non_agressif(game: TexasHoldEm, seuil: int=0.1):
         rank = evaluate(game.hands[game.current_player],game.board)
         p_win = get_five_card_rank_percentage(rank)
 
+        if (game.players[game.current_player].state == PlayerState.IN):
+            action_type = ActionType.CHECK
 
-        if (game.players[game.current_player].state == PlayerState.IN) and (p_win > seuil) and (max_raise > min_raise):
+        elif (game.players[game.current_player].state == PlayerState.IN) and (p_win > seuil) and (max_raise > min_raise):
         
             action_type = ActionType.CALL
 
