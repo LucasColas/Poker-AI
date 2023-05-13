@@ -28,18 +28,19 @@ def simu_comportement(nb_tournoi : int = 50, max_players : int = 8, big_blind : 
             action, total = current_bot(game)
             
             #print(f"Player {game.current_player} {action} {total}")
-            i = game.current_player
-            if (action == ActionType.CALL):
-                stats["nbrCall"][(i, bots_noms[i])]+=1
-            elif (action == ActionType.CHECK):
-                stats["nbrCheck"][(i, bots_noms[i])]+=1
-            elif (action == ActionType.RAISE):
-                stats["nbrRaise"][(i, bots_noms[i])]+=1
-            elif (action==ActionType.ALL_IN):
-                stats["nbrRaise"][(i, bots_noms[i])]+=1
-            elif (action == ActionType.FOLD):
-                stats["nbrFold"][(i, bots_noms[i])]+=1
-            stats["nbrAction"][(i, bots_noms[i])]+=1
+            if len(game.board) == 0:
+                i = game.current_player
+                if (action == ActionType.CALL):
+                    stats["nbrCall"][(i, bots_noms[i])]+=1
+                elif (action == ActionType.CHECK):
+                    stats["nbrCheck"][(i, bots_noms[i])]+=1
+                elif (action == ActionType.RAISE):
+                    stats["nbrRaise"][(i, bots_noms[i])]+=1
+                elif (action==ActionType.ALL_IN):
+                    stats["nbrRaise"][(i, bots_noms[i])]+=1
+                elif (action == ActionType.FOLD):
+                    stats["nbrFold"][(i, bots_noms[i])]+=1
+                stats["nbrAction"][(i, bots_noms[i])]+=1
             #print(bots[game.current_player])
             game.take_action(action, total=total)
 
