@@ -13,7 +13,7 @@ from PokerPlus.Agents.agents_bots import agent_naif, agent_allIn
 from PokerPlus.Agents.agent_outs import agent_outs
 
 def simu_bots_humains():
-    max_players = 6
+    max_players = 2
     big_blind = 150
     small_blind = big_blind // 2
     buyin = 1000
@@ -35,11 +35,14 @@ def simu_bots_humains():
             if game.current_player % 2 != 0:
                 gui.set_visible_players([game.current_player])
 
+            
+
             if game.current_player % 2 == 0:
                 #Agent.setGame(game)
                 game.take_action(*Agent.choix(game))
             else:
                 gui.run_step()
+                gui.set_visible_players([])
 
             #game.take_action(*random_agent(game))
             gui.display_action()

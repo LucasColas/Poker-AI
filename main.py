@@ -16,12 +16,12 @@ from PokerPlus.Comportement.simu_comportement import simu_comportement, write_da
 
 def main():
     m = 40
-    #get_stat(plot=True)
+    get_stat_tournoi(plot=True)
     
 
     
-    stats = simu_comportement()
-    write_data_comportement(stats)
+    #stats = simu_comportement()
+    #write_data_comportement(stats)
 
 
     #simu_bots_humains()

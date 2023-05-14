@@ -97,6 +97,7 @@ class agent_outs:
             self.__agent_cards = self.__game.hands[self.__game.current_player]
             d = Deck()
             cards = d.draw(num=nb_cards)
+            p = random.random()
             other_cards = [card for card in cards if card not in self.__agent_cards and card not in self.__game.board]
 
             current_rank = evaluate(self.__agent_cards,self.__game.board)
@@ -134,7 +135,12 @@ class agent_outs:
                 self.__total = self.__max_raise
             else:
                 #print("fold, p =", p, " p_win=", p_win)
-                action_type = ActionType.FOLD
+                rank = evaluate(self.__game.hands[self.__game.current_player],self.__game.board)
+                p_win = get_five_card_rank_percentage(rank)
+                if p_win > p:
+                    action_type = ActionType.CALL
+                else:
+                    action_type = ActionType.FOLD
 
         else:
             current_rank = evaluate(self.__agent_cards,self.__game.board)

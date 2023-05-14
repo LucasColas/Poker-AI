@@ -58,9 +58,9 @@ def write_data_comportement(data_dict: dict, max_players=8, filename: str = "dat
         writer.writeheader()
         for i in range(max_players):
 
-            print("Call : ",data_dict["nbrCall"][(i, bots_noms[i])])
-            print("Raise : ",data_dict["nbrRaise"][(i, bots_noms[i])])
-            print("Action : ",data_dict["nbrAction"][(i, bots_noms[i])])
+            #print("Call : ",data_dict["nbrCall"][(i, bots_noms[i])])
+            #print("Raise : ",data_dict["nbrRaise"][(i, bots_noms[i])])
+            #print("Action : ",data_dict["nbrAction"][(i, bots_noms[i])])
             vpip = getVpip(data_dict["nbrCall"][(i, bots_noms[i])], data_dict["nbrRaise"][(i, bots_noms[i])], data_dict["nbrFold"][(i, bots_noms[i])], data_dict["nbrAction"][(i, bots_noms[i])])
             ratio_large = getRatioLarge(data_dict["nbrFold"][(i, bots_noms[i])], data_dict["nbrAction"][(i, bots_noms[i])])
             writer.writerow({fieldnames[0]: vpip, fieldnames[1]: ratio_large, fieldnames[2]: bots_noms[i]})
