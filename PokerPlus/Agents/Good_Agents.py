@@ -90,11 +90,11 @@ class agent_SA(): #Serré agressif
         if game.players[game.current_player].state == PlayerState.IN:
             
             if (min_raise < max_raise):
-                print("raise preflop")
+                #print("raise preflop")
                 action_type = ActionType.RAISE
                 total = min_raise
             else:
-                print("check preflop")
+                #print("check preflop")
                 action_type = ActionType.CHECK
             #print(action_type, total)
             return action_type, total
@@ -156,7 +156,7 @@ class agent_SA(): #Serré agressif
 
     def action(self, game: TexasHoldEm) -> Tuple[ActionType, int]:
         if len(game.board) == 0:
-            print("agent SA en preflop")
+            #print("agent SA en preflop")
             return self.strategie_preflop(game)
 
         else:

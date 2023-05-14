@@ -131,8 +131,8 @@ class agent_outs:
                 action_type = ActionType.CHECK
             elif (self.__max_raise > self.__min_raise) and (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and chance >= pot_odd :
                 #print("call, p =" ,p, "p_win=",p_win)
-                action_type = ActionType.ALL_IN
-                self.__total = self.__max_raise
+                action_type = ActionType.RAISE
+                self.__total = random.randint(self.__min_raise, self.__max_raise)
             else:
                 #print("fold, p =", p, " p_win=", p_win)
                 rank = evaluate(self.__game.hands[self.__game.current_player],self.__game.board)
@@ -140,7 +140,8 @@ class agent_outs:
                 if p_win > p:
                     action_type = ActionType.CALL
                 else:
-                    action_type = ActionType.FOLD
+                    moves = self.__game.get_available_moves()
+                    return moves.sample()
 
         else:
             current_rank = evaluate(self.__agent_cards,self.__game.board)
