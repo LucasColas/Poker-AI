@@ -356,6 +356,7 @@ def get_stat_tournoi(nmax = 1000, save=False, path='./res', plot=False, poolrand
                     stats["nbrRaise"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
                     stats["nbrRaise_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
                 stats["nbrAction"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
+                stats["nbrAction_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
             
             last_gagnant=str(game.hand_history.settle)[7]
             last_gagnant = int(last_gagnant)
