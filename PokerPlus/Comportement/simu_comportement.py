@@ -64,4 +64,31 @@ def write_data_comportement(data_dict: dict, max_players=8, filename: str = "dat
             vpip = getVpip(data_dict["nbrCall"][(i, bots_noms[i])], data_dict["nbrRaise"][(i, bots_noms[i])], data_dict["nbrFold"][(i, bots_noms[i])], data_dict["nbrAction"][(i, bots_noms[i])])
             ratio_large = getRatioLarge(data_dict["nbrFold"][(i, bots_noms[i])], data_dict["nbrAction"][(i, bots_noms[i])])
             writer.writerow({fieldnames[0]: vpip, fieldnames[1]: ratio_large, fieldnames[2]: bots_noms[i]})
-            
+
+def write_data_comportement2(data_dict: dict, nb_tournoi:int, filename: str = "data_comportement.csv", path: str = "", bots_noms = ["random_agent","agent_out", "agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur", "agent_serre_non_agressif", "agent_large_non_agressif"]):
+    max_players = len(data_dict["nbrWin tournoi"])
+    print("\n\n",max_players,"\n\n")
+
+
+    vpip = {i:[] for i in range(max_players)}
+    ratio_large = {i:[] for i in range(max_players)}
+
+
+    for i in range(nb_tournoi):
+        nb_r = {j:data_dict["nbrRaise"][f"tournoi {i}"][j] for j in range(max_players)}
+        print(nb_r)
+        nb_c = {j:data_dict["nbrCall"][f"tournoi {i}"][j] for j in range(max_players)}
+        nb_f = {j:data_dict["nbrFold"][f"tournoi {i}"][j] for j in range(max_players)}
+        nb_a = {j:data_dict["nbrAction"][f"tournoi {i}"][j] for j in range(max_players)}
+        for j in range(max_players):
+            vpip[j].append(getVpip(nb_c[j], nb_r[j], nb_f[j], nb_a[j]))
+            ratio_large[j].append(getRatioLarge(nb_f[j], nb_a[j]))
+       
+    fieldnames = ['vpip', 'ratio action', 'bot']
+    with open(path+filename, 'w') as csvfile:
+       
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for i in range(max_players):
+            for k in range(nb_tournoi):
+                writer.writerow({fieldnames[0]: vpip[i][k], fieldnames[1]: ratio_large[i][k], fieldnames[2]: bots_noms[i]})    
