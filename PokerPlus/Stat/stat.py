@@ -107,6 +107,7 @@ def plot_stat_tournois(stats, n, joueurs_bots_noms):
         indices_p = random.sample(range(len(stats['position'][f'tournoi {i}'])),3)
         for k in indices_p:
             print(f"Position partie {k}:{stats['position'][f'tournoi {i}'][f'partie {k}']}")
+            print(f"nbr de call partie {k} :{stats['nbrCall_p'][f'tournoi {i}'][f'partie {k}']}")
         print()
 
 
@@ -219,9 +220,9 @@ def get_stat(nmax=500, save=False, cles = ["nbrCall", "nbrCheck", "nbrRaise", "n
 
     return stats
 
-def get_stat_tournoi(nmax = 100, save=False, path='./res', plot=False, poolrandom = True, max_players=6, verbose=False):
+def get_stat_tournoi(nmax = 1000, save=False, path='./res', plot=False, poolrandom = True, max_players=6, verbose=False):
     max_players = max_players
-    big_blind = 200
+    big_blind = 50
     small_blind = big_blind // 2
     buyin = 1000 
 
@@ -249,19 +250,28 @@ def get_stat_tournoi(nmax = 100, save=False, path='./res', plot=False, poolrando
     stats["nbrAction"] = {f"tournoi {k}":{i:0 for i in range(max_players)} for k in range(nmax)}
 
 
+
     #Raise fait par chaque joueur 
     stats["raise"] = {f"tournoi {k}":{i:[] for i in range(max_players)} for k in range(nmax)}
     
     stats["position"] = {f"tournoi {k}":{} for k in range(nmax)}
 
     stats["elimine"] =  {f"tournoi {k}":{i:0 for i in range(max_players)} for k in range(nmax)}
+
+    #stats par partie de chaque tournoi 
+    stats["nbrCall_p"] = {f"tournoi {k}":{} for k in range(nmax)}
+    stats["nbrCheck_p"] = {f"tournoi {k}":{} for k in range(nmax)}
+    stats["nbrFold_p"] = {f"tournoi {k}":{} for k in range(nmax)}
+    stats["nbrRaise_p"] = {f"tournoi {k}":{} for k in range(nmax)}
+    stats["nbrAction_p"] = {f"tournoi {k}":{} for k in range(nmax)}
     #stats {
     #     "nbrWin tournoi":{0:0,1:0,2:0,3:0,4:0,5:0}
     #     "nbrcall":{tournoi 1:{0:0,1:0,2:0,3:0,4:0,5:0} tournoi_2:{0:0,1:0,2:0,3:0,4:0,5:0} ...}
     #     "nbrcheck":{tournoi 1:{0:0,1:0,2:0,3:0,4:0,5:0} tournoi_2:{0:0,1:0,2:0,3:0,4:0,5:0} ...}
     #     "nbrfold":{tournoi 1:{0:0,1:0,2:0,3:0,4:0,5:0} tournoi_2:{0:0,1:0,2:0,3:0,4:0,5:0} ...}
     #     "raise":{tournoi 1:{0:[mise1, mise2 ... mise,n],1:[mise1, mise2 ... mise,n],2:[mise1, mise2 ... mise,n],..,5:[mise1, mise2 ... mise,n]} {tournoi_1:{0:[mise1, mise2 ... mise,n],1:[mise1, mise2 ... mise,n],2:[mise1, mise2 ... mise,n],..,5:[mise1, mise2 ... mise,n]} ...}
-    #     "position" : {tournoi 1}:{partie 1 : [01245], partie 2: [12045]...}
+    #     "position" : {tournoi 1:{partie 1 : [01245], partie 2: [12045]...}
+    #     "nbrcall_p" : {tournoi 1 : {partie 1 : {0:0, 1:0 ...}, partie 2 : {0:1, 1:0 ...} ...}
     nbr_tournoi=0
     while(nbr_tournoi<nmax):
         game = TexasHoldEm(buyin=buyin, big_blind=big_blind, small_blind=small_blind, max_players=max_players)
@@ -297,7 +307,13 @@ def get_stat_tournoi(nmax = 100, save=False, path='./res', plot=False, poolrando
 
 
             stats["position"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]=pos
-            
+
+            stats["nbrCall_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in pos}
+            stats["nbrCheck_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in pos}
+            stats["nbrFold_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in pos}
+            stats["nbrRaise_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in pos}
+            stats["nbrAction_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in pos}
+
                 
             while game.is_hand_running():
                 #print("hand running")
@@ -324,22 +340,22 @@ def get_stat_tournoi(nmax = 100, save=False, path='./res', plot=False, poolrando
 
                 if action == ActionType.CALL:
                     stats["nbrCall"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
-                    stats["nbrAction"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
+                    stats["nbrCall_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
                 elif action == ActionType.CHECK:
                     stats["nbrCheck"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
-                    stats["nbrAction"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
+                    stats["nbrCheck_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
                 elif action == ActionType.FOLD:
                     stats["nbrFold"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
-                    stats["nbrAction"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
+                    stats["nbrFold_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
                 elif action == ActionType.RAISE:
                     stats["raise"][f"tournoi {nbr_tournoi}"][game.current_player].append(total)
                     stats["nbrRaise"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
-                    stats["nbrAction"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
+                    stats["nbrRaise_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
                 elif action == ActionType.ALL_IN:
                     stats["raise"][f"tournoi {nbr_tournoi}"][game.current_player].append(total)
                     stats["nbrRaise"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
-                    stats["nbrAction"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
-
+                    stats["nbrRaise_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
+                stats["nbrAction"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
             
             last_gagnant=str(game.hand_history.settle)[7]
             last_gagnant = int(last_gagnant)
