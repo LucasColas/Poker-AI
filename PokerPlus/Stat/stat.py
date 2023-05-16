@@ -216,9 +216,9 @@ def get_stat(nmax=500, save=False, cles = ["nbrCall", "nbrCheck", "nbrRaise", "n
 
     return stats
 
-def get_stat_tournoi(nmax = 1000, save=False, path='./res', plot=False, poolrandom = True, max_players=6, verbose=False):
+def get_stat_tournoi(nmax = 100, save=False, path='./res', plot=False, poolrandom = True, max_players=6, verbose=False):
     max_players = max_players
-    big_blind = 50
+    big_blind = 200
     small_blind = big_blind // 2
     buyin = 1000 
 
