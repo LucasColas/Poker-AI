@@ -306,7 +306,7 @@ def get_stat_tournoi(nmax = 1000, save=False, path='./res', plot=False, poolrand
                     
 
             
-            if[nbr_partie != 1]:
+            if (nbr_partie != 1):
                 pos_avant = pos
             #print(pos, pos_avant)  
 
@@ -342,7 +342,7 @@ def get_stat_tournoi(nmax = 1000, save=False, path='./res', plot=False, poolrand
                     else:
                         action = ActionType.FOLD
                     game.take_action(action, total=None)
-
+                #print("action : ", action)
                 if action == ActionType.CALL:
                     stats["nbrCall"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
                     stats["nbrCall_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
