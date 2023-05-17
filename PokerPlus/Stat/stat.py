@@ -145,7 +145,7 @@ def pool_1(max_players,
 def get_stat(nmax=500, save=False, cles = ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrWin", "nbrAllin","nbrAction", "profit"], path='./res', plot=False, poolrandom = False):
 
     max_players = 5
-    big_blind = 150
+    big_blind = 300
     small_blind = big_blind // 2
     buyin = 1000
     # Définir les statistiques à suivre
@@ -220,11 +220,11 @@ def get_stat(nmax=500, save=False, cles = ["nbrCall", "nbrCheck", "nbrRaise", "n
 
     return stats
 
-def get_stat_tournoi(nmax = 1000, save=False, path='./res', plot=False, poolrandom = True, max_players=6, verbose=False):
+def get_stat_tournoi(nmax = 1000, buyin=1000, big_blind=20, save=False, path='./res', plot=False, poolrandom = True, max_players=6, verbose=False):
     max_players = max_players
-    big_blind = 50
+    big_blind = big_blind
     small_blind = big_blind // 2
-    buyin = 1000 
+    buyin = buyin 
 
 
     seuil = 0.8
@@ -240,7 +240,7 @@ def get_stat_tournoi(nmax = 1000, save=False, path='./res', plot=False, poolrand
     stats["nbrWin tournoi"] ={i:0 for i in range(max_players)} #Nombre de tournois gagnés par chaque joueur
 
     #Nombre de parties gagnées par chaque joueur à chaque tournoi
-    stats["nbrWin partie"] ={f"tournoi {k}":{i:0 for i in range(max_players)} for k in range(nmax)} 
+    stats["nbrWin partie"] = {f"tournoi {k}":{i:0 for i in range(max_players)} for k in range(nmax)} 
 
     #Nombre de call, check, fold fait à chaque tournoi
     stats["nbrCall"] = {f"tournoi {k}":{i:0 for i in range(max_players)} for k in range(nmax)}
@@ -258,7 +258,7 @@ def get_stat_tournoi(nmax = 1000, save=False, path='./res', plot=False, poolrand
     
     stats["position"] = {f"tournoi {k}":{} for k in range(nmax)}
 
-    stats["elimine"] =  {f"tournoi {k}":{i:0 for i in range(max_players)} for k in range(nmax)}
+    stats["elimine"] =  {f"tournoi {k}":{i:1 for i in range(max_players)} for k in range(nmax)}
 
     #stats par partie de chaque tournoi 
     stats["nbrCall_p"] = {f"tournoi {k}":{} for k in range(nmax)}
@@ -291,7 +291,7 @@ def get_stat_tournoi(nmax = 1000, save=False, path='./res', plot=False, poolrand
             pos =[]
             for i in game.in_pot_iter():
                 pos.append(i)
-                stats["nbrPartie"][f"tournoi {nbr_tournoi}"][i] = nbr_partie
+                #stats["nbrPartie"][f"tournoi {nbr_tournoi}"][i] = nbr_partie
 
             if pos_avant:
                 if(len(pos_avant)!= len(pos)):
@@ -343,6 +343,8 @@ def get_stat_tournoi(nmax = 1000, save=False, path='./res', plot=False, poolrand
                         action = ActionType.FOLD
                     game.take_action(action, total=None)
                 #print("action : ", action)
+                
+                stats["nbrPartie"][f"tournoi {nbr_tournoi}"][game.current_player] = nbr_partie
                 if action == ActionType.CALL:
                     stats["nbrCall"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
                     stats["nbrCall_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
