@@ -248,6 +248,8 @@ def get_stat_tournoi(nmax = 1000, save=False, path='./res', plot=False, poolrand
     stats["nbrFold"] = {f"tournoi {k}":{i:0 for i in range(max_players)} for k in range(nmax)}
     stats["nbrRaise"] = {f"tournoi {k}":{i:0 for i in range(max_players)} for k in range(nmax)}
     stats["nbrAction"] = {f"tournoi {k}":{i:0 for i in range(max_players)} for k in range(nmax)}
+    stats["nbrPartie"] = {f"tournoi {k}":{i:0 for i in range(max_players)} for k in range(nmax)}
+    #print(stats["nbrPartie"])
 
 
 
@@ -283,11 +285,13 @@ def get_stat_tournoi(nmax = 1000, save=False, path='./res', plot=False, poolrand
             #print("hand")
             game.start_hand()
             nbr_partie+=1
+
             
             # les personnes dans le tournois 
             pos =[]
             for i in game.in_pot_iter():
                 pos.append(i)
+                stats["nbrPartie"][f"tournoi {nbr_tournoi}"][i] = nbr_partie
 
             if pos_avant:
                 if(len(pos_avant)!= len(pos)):
@@ -296,6 +300,7 @@ def get_stat_tournoi(nmax = 1000, save=False, path='./res', plot=False, poolrand
                     elimine = pos_avant[0]
                     num_eliminé += 1
                     stats["elimine"][f"tournoi {nbr_tournoi}"][elimine]+=num_eliminé
+                    
                     if verbose:
                         print(f"    le joueur {elimine} est éliminé")
                     
@@ -334,8 +339,8 @@ def get_stat_tournoi(nmax = 1000, save=False, path='./res', plot=False, poolrand
                     if game.players[game.current_player].state == PlayerState.IN:
                         action = ActionType.CHECK
 
-                    
-                    action = ActionType.FOLD
+                    else:
+                        action = ActionType.FOLD
                     game.take_action(action, total=None)
 
                 if action == ActionType.CALL:
@@ -361,8 +366,11 @@ def get_stat_tournoi(nmax = 1000, save=False, path='./res', plot=False, poolrand
             last_gagnant=str(game.hand_history.settle)[7]
             last_gagnant = int(last_gagnant)
             stats["nbrWin partie"][f"tournoi {nbr_tournoi}"][last_gagnant] += 1
+            
+
 
         stats["nbrWin tournoi"][last_gagnant] += 1
+        stats["nbrPartie"][f"tournoi {nbr_tournoi}"][last_gagnant] = nbr_partie
         if verbose:
             print(f"tournoi {nbr_tournoi} de {nbr_partie} parties gagné par joueur{last_gagnant} ({joueurs_bots_noms[last_gagnant]})")
             print(f"eliminé : {stats['elimine'][f'tournoi {nbr_tournoi}']}\n")
