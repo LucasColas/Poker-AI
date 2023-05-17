@@ -15,8 +15,8 @@ def getVpip(nb_call : int, nb_raise : int, nb_fold : int, nb_action : int, alpha
     
 
 def getRatioLarge(nb_fold : int, nb_partie : int) -> float:
-    print("nb fold : ", nb_fold, "nb partie : ", nb_partie, nb_fold/nb_partie > 1)
     if nb_partie != 0:
+        print("nb fold : ", nb_fold, "nb partie : ", nb_partie, nb_fold/nb_partie > 1)
         return round((1-(nb_fold/nb_partie)), 2)
     return 0
 
