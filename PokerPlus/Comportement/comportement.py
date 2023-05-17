@@ -7,13 +7,15 @@ def vpip(nbr_call_p : dict,nbr_raise_p : dict, nbr_action_p : dict, nbr_fold_p :
     return {i: getVpip(nbr_call_p[i], nbr_raise_p[i], nbr_fold_p[i], nbr_action_p[i]) for i in nbr_call_p.keys()}
     
 
-def getVpip(nb_call : int, nb_raise : int, nb_fold : int, nb_action : int, alpha: int=0.4) -> float:
+def getVpip(nb_call : int, nb_raise : int, nb_fold : int, nb_action : int, alpha: int=0.2) -> float:
+    print("nb call : ", nb_call, "nb raise : ", nb_raise, "nb fold : ", nb_fold, "nb action : ", nb_action)
     if (nb_action - nb_fold) !=0:
-        return round((alpha*nb_call +(1-alpha)*nb_raise)/(nb_action - nb_fold), 2)
+        return round((nb_call + nb_raise)/(nb_action - nb_fold), 2)
     return 0
     
 
 def getRatioLarge(nb_fold : int, nb_partie : int) -> float:
+    print("nb fold : ", nb_fold, "nb partie : ", nb_partie, nb_fold/nb_partie > 1)
     if nb_partie != 0:
         return round((1-(nb_fold/nb_partie)), 2)
     return 0

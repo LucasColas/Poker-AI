@@ -32,7 +32,7 @@ def write_data(m:int, max_players: int = 6, filename: str = "data.csv", path: st
             #print(data_dict[i]["nbrRaise_p"][f"tournoi {nb_tournoi}"])
             #print(data_dict[i]["nbrAction_p"][f"tournoi {nb_tournoi}"])
             #print(data_dict[i]["nbrFold_p"][f"tournoi {nb_tournoi}"])
-            print("nb partie : ",data_dict[i]["nbrPartie"][f"tournoi {nb_tournoi}"])
+            print("nb partie : ", data_dict[i]["nbrPartie"][f"tournoi {nb_tournoi}"])
             
 
             vpip_ = vpip(data_dict[i]["nbrCall"][f"tournoi {nb_tournoi}"], 

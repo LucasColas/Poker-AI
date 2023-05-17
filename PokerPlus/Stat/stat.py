@@ -288,6 +288,8 @@ def get_stat_tournoi(nmax = 1000, buyin=1000, big_blind=20, save=False, path='./
 
             
             # les personnes dans le tournois 
+            """
+            
             pos =[]
             for i in game.in_pot_iter():
                 pos.append(i)
@@ -303,7 +305,7 @@ def get_stat_tournoi(nmax = 1000, buyin=1000, big_blind=20, save=False, path='./
                     
                     if verbose:
                         print(f"    le joueur {elimine} est éliminé")
-                    
+            
 
             
             if (nbr_partie != 1):
@@ -312,13 +314,13 @@ def get_stat_tournoi(nmax = 1000, buyin=1000, big_blind=20, save=False, path='./
 
 
             stats["position"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]=pos
-
+            
             stats["nbrCall_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in pos}
             stats["nbrCheck_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in pos}
             stats["nbrFold_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in pos}
             stats["nbrRaise_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in pos}
             stats["nbrAction_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in pos}
-
+            """
                 
             while game.is_hand_running():
                 #print("hand running")
@@ -347,27 +349,28 @@ def get_stat_tournoi(nmax = 1000, buyin=1000, big_blind=20, save=False, path='./
                 stats["nbrPartie"][f"tournoi {nbr_tournoi}"][game.current_player] = nbr_partie
                 if action == ActionType.CALL:
                     stats["nbrCall"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
-                    stats["nbrCall_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
+                    #stats["nbrCall_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
                 elif action == ActionType.CHECK:
                     stats["nbrCheck"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
-                    stats["nbrCheck_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
+                    #stats["nbrCheck_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
                 elif action == ActionType.FOLD:
                     stats["nbrFold"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
-                    stats["nbrFold_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
+                    #stats["nbrFold_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
                 elif action == ActionType.RAISE:
                     stats["raise"][f"tournoi {nbr_tournoi}"][game.current_player].append(total)
                     stats["nbrRaise"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
-                    stats["nbrRaise_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
+                    #stats["nbrRaise_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
                 elif action == ActionType.ALL_IN:
                     stats["raise"][f"tournoi {nbr_tournoi}"][game.current_player].append(total)
-                    stats["nbrRaise"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
-                    stats["nbrRaise_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
+                    #stats["nbrRaise"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
+                    #stats["nbrRaise_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
                 stats["nbrAction"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
-                stats["nbrAction_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
+                #stats["nbrAction_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
             
             last_gagnant=str(game.hand_history.settle)[7]
             last_gagnant = int(last_gagnant)
             stats["nbrWin partie"][f"tournoi {nbr_tournoi}"][last_gagnant] += 1
+            print("nbr partie : ",nbr_partie, end="\r")
             
 
 
@@ -376,6 +379,7 @@ def get_stat_tournoi(nmax = 1000, buyin=1000, big_blind=20, save=False, path='./
         if verbose:
             print(f"tournoi {nbr_tournoi} de {nbr_partie} parties gagné par joueur{last_gagnant} ({joueurs_bots_noms[last_gagnant]})")
             print(f"eliminé : {stats['elimine'][f'tournoi {nbr_tournoi}']}\n")
+            print("fold :", stats["nbrFold"][f"tournoi {nbr_tournoi}"])
         print(f"tournoi num : {nbr_tournoi}", end='\r' )
         nbr_tournoi+=1
 
