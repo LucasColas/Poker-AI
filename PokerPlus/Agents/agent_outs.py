@@ -90,7 +90,7 @@ class agent_outs:
 
 
         if len_cards_game_board == 0:
-            return strategie_preflop1(self.__game)
+            return strategie_preflop_raise(self.__game)
 
         elif len_cards_game_board == 3 or len_cards_game_board == 4:
             self.raise_config()
@@ -128,20 +128,29 @@ class agent_outs:
 
             if self.__game.players[self.__game.current_player].state == PlayerState.IN:
                 #print("flop check")
-                action_type = ActionType.CHECK
+                if self.__nb_check_consecutifs >= 1 and self.__min_raise < self.__max_raise:
+                    action_type = ActionType.RAISE
+                    self.__total = random.randint(self.__min_raise, self.__max_raise)
+                    self.__nb_check_consecutifs = 0
+                else:    
+                    action_type = ActionType.CHECK
+                    self.__nb_check_consecutifs += 1
             elif (self.__max_raise > self.__min_raise) and (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and chance >= pot_odd :
                 #print("call, p =" ,p, "p_win=",p_win)
                 action_type = ActionType.RAISE
                 self.__total = random.randint(self.__min_raise, self.__max_raise)
             else:
                 #print("fold, p =", p, " p_win=", p_win)
+                """
+                
                 rank = evaluate(self.__game.hands[self.__game.current_player],self.__game.board)
                 p_win = get_five_card_rank_percentage(rank)
                 if p_win > p:
                     action_type = ActionType.CALL
                 else:
-                    moves = self.__game.get_available_moves()
-                    return moves.sample()
+                """
+                moves = self.__game.get_available_moves()
+                return moves.sample()
 
         else:
             current_rank = evaluate(self.__agent_cards,self.__game.board)

@@ -16,8 +16,8 @@ from PokerPlus.Comportement.simu_comportement import simu_comportement, write_da
 
 def main():
     m = 100
-    write_data(m=m, max_players=6, filename="data.csv", path="")
-    #get_stat_tournoi(nmax=20, poolrandom=True, max_players=6, verbose=True, plot=True)
+    #write_data(m=m, max_players=6, filename="data.csv", path="")
+    get_stat_tournoi(nmax=20, poolrandom=True, max_players=6, verbose=True, plot=True)
 
     #simu_bots_humains()
     
