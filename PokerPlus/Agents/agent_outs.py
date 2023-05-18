@@ -75,7 +75,7 @@ class agent_outs:
 
     def raise_config(self):
         self.__bet_amount = self.__game.player_bet_amount( self.__game.current_player)
-        self.__chips =  self.__game.players[ self.__game.current_player].chips
+        self.__chips =  self.__game.players[self.__game.current_player].chips
         self.__min_raise =  self.__game.value_to_total( self.__game.min_raise(),  self.__game.current_player)
         self.__max_raise = self.__bet_amount + self.__chips
         self.__total = None
@@ -130,7 +130,7 @@ class agent_outs:
                 #print("flop check")
                 if self.__nb_check_consecutifs >= 1 and self.__min_raise < self.__max_raise:
                     action_type = ActionType.RAISE
-                    self.__total = random.randint(self.__min_raise, self.__max_raise)
+                    self.__total = random.randint(self.__min_raise, min(self.__game.big_blind*3, self.__max_raise))
                     self.__nb_check_consecutifs = 0
                 else:    
                     action_type = ActionType.CHECK
@@ -138,7 +138,10 @@ class agent_outs:
             elif (self.__max_raise > self.__min_raise) and (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and chance >= pot_odd :
                 #print("call, p =" ,p, "p_win=",p_win)
                 action_type = ActionType.RAISE
-                self.__total = random.randint(self.__min_raise, self.__max_raise)
+                if (0.5*self.__max_raise) > self.__min_raise:
+                    self.__total = random.randint(self.__min_raise, int(0.5*self.__max_raise))
+                else:
+                    self.__total = random.randint(self.__min_raise, self.__max_raise)
             else:
                 #print("fold, p =", p, " p_win=", p_win)
                 """

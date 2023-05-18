@@ -14,7 +14,7 @@ from PokerPlus.Agents.agent_outs import agent_outs
 
 def simu_bots_humains():
     max_players = 2
-    big_blind = 150
+    big_blind = 50
     small_blind = big_blind // 2
     buyin = 1000
     game = TexasHoldEm(buyin=buyin, big_blind=big_blind, small_blind=small_blind, max_players=max_players)
