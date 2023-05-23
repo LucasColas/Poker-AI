@@ -10,16 +10,13 @@ from texasholdem.gui.text_gui import TextGUI
 from PokerPlus.Stat.stat import get_stat, get_stat_tournoi
 from PokerPlus.Simulation.simu_bots import simu
 from PokerPlus.Stat.data import get_data, write_data
-from PokerPlus.Simulation.simu_bots_humains import simu_bots_humains
+from PokerPlus.Simulation.simu_bots_humains import simu_bots_humains, tournoi_avec_humain
 from PokerPlus.Comportement.simu_comportement import simu_comportement, write_data_comportement, write_data_comportement2
 
 
 def main():
-    m = 350
-    #write_data(m=m, max_players=6, filename="data.csv", path="")
-    #get_stat_tournoi(nmax=m, poolrandom=True, max_players=6, verbose=True, plot=True)
-
-    simu_bots_humains()
+    #simu_bots_humains()
+    tournoi_avec_humain()
     
 
 
