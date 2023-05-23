@@ -49,9 +49,9 @@ def simu_bots_humains():
         gui.display_win()
 
 
-def getComportemens(stats : dict):
+def getComportements(stats : dict, cluster):
     """
     Donne le comportement pour chaque joueur. A partir du cluster.
-    
+    Renvoie une liste le comportement. 
     """
 
