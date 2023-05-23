@@ -134,7 +134,7 @@ def tournoi_avec_humain():
             stats["nbrActions"][f"partie {nb_partie}"][game.current_player]+=1
             gui.display_action()
             
-
+        #path = game.export_history('./pgns')
         gui.display_win()
         print(stats["nbrCall"])
     pass
