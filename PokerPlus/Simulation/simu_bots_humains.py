@@ -1,9 +1,4 @@
 
-"""
-
-Code qui ne devrait plus être utilisée
-
-"""
 
 
 from texasholdem.game.game import TexasHoldEm
@@ -13,6 +8,10 @@ from PokerPlus.Agents.agents_bots import agent_naif, agent_allIn
 from PokerPlus.Agents.agent_outs import agent_outs
 
 def simu_bots_humains():
+    #Mettre menu pour choisir les agents, et nombre de personnes
+    #Stats pour avoir Nb Fold / Nb Parties et VPIP.
+    #Stocker dans un fichier les comportements des joueurs.
+    #Stocker dans un autre fichier vainqueurs des tournois.
     max_players = 2
     big_blind = 50
     small_blind = big_blind // 2
@@ -35,8 +34,6 @@ def simu_bots_humains():
             if game.current_player % 2 != 0:
                 gui.set_visible_players([game.current_player])
 
-            
-
             if game.current_player % 2 == 0:
                 #Agent.setGame(game)
                 game.take_action(*Agent.choix(game))
@@ -50,3 +47,11 @@ def simu_bots_humains():
 
         #path = game.export_history('./pgns')
         gui.display_win()
+
+
+def getComportemens(stats : dict):
+    """
+    Donne le comportement pour chaque joueur. A partir du cluster.
+    
+    """
+
