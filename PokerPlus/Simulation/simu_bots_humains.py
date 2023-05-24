@@ -9,6 +9,8 @@ from texasholdem.agents.basic import random_agent
 from PokerPlus.Agents.agents_bots import agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif
 from PokerPlus.Agents.agent_outs import agent_outs
 from PokerPlus.Agents.Good_Agents import agent_SA
+from sklearn.cluster import KMeans
+import pickle
 
 def simu_bots_humains():
     #Mettre menu pour choisir les agents, et nombre de personnes
@@ -58,6 +60,10 @@ def getComportements(stats : dict, cluster):
     Renvoie une liste le comportement. 
     """
 
+    with open('model.pkl', 'rb') as file:
+        kmeans = pickle.load(file)
+        
+
 
 def pool_bots_min_max(nummin,maxplayer, 
                       bots = [random_agent, agent_outs().choix,agent_SA().action, agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif], 
@@ -79,8 +85,10 @@ def tournoi_avec_humain():
     Faire un tournoi avec des humains.
     """
     #Mettre menu pour choisir les agents, et nombre de personnes
+    min = 2
+    max = 9
     print("Bienvenue dans le tournoi de PokerPlus !")
-    print("Veuillez choisir le nombre de joueurs (entre 2 et 8) : ")
+    print(f"Veuillez choisir le nombre de joueurs (entre {min} et {max}) : ")
     max_players = int(input())
     print("Veuillez choisir le nombre d'humains qui joueront dans ce tournoi (entre 1 et {}) : ".format(max_players))
     nb_humains = int(input())
@@ -108,7 +116,7 @@ def tournoi_avec_humain():
             gui.wait_until_prompted()
             if game.current_player in range(nb_humains):
                 gui.set_visible_players([game.current_player])
-                #TODO Recuperer les actions des humains ??? du tyle action = et total=
+                #TODO Recuperer les actions des humains ??? du style action = et total=
                 action = None
                 total = None
 
