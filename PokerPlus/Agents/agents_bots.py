@@ -84,8 +84,11 @@ def agent_serre_non_agressif(game: TexasHoldEm, seuil: int=0.4):
         p_win = get_five_card_rank_percentage(rank)
 
 
-        if (game.players[game.current_player].state == PlayerState.IN) and (p_win > seuil) and (max_raise > min_raise):
+        if (game.players[game.current_player].state == PlayerState.IN):
         
+            action_type = ActionType.CHECK
+
+        elif (game.players[game.current_player].state == PlayerState.TO_CALL) and (p_win > seuil) and (max_raise > min_raise):
             action_type = ActionType.CALL
 
         else:

@@ -5,6 +5,7 @@ from texasholdem.evaluator.evaluator import *
 from texasholdem.gui.text_gui import TextGUI
 from typing import Tuple
 import itertools
+import random
 
 import numpy as np
 
@@ -87,7 +88,8 @@ def strategie_preflop_raise(game: TexasHoldEm):
         action_type = ActionType.CHECK
     elif (game.players[game.current_player].state == PlayerState.TO_CALL):
         if (nbr1==nbr2) or (coul1==coul2) or (abs(nbr1-nbr2)==1):
-            if (max_raise > min_raise):
+            if (max_raise > min_raise) and random.random() > 0.5:
+
                 action_type = ActionType.RAISE
                 total = min_raise
             else:

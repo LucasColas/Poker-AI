@@ -76,7 +76,7 @@ def pool_bots_min_max(nummin,maxplayer,
         joueurs_bots_noms[i] = bots_noms[num]
     return joueurs_bots, joueurs_bots_noms 
 
-def getRatio(stats_Fold : dict, nb_joueurs : int): 
+def getLargeur(stats_Fold : dict, nb_joueurs : int): 
     """
     Renvoie la somme des Fold pour chaque joueur.
     """
@@ -121,7 +121,7 @@ def tournoi_avec_humain():
     """
     Faire un tournoi avec des humains.
     """
-    #Mettre menu pour choisir les agents, et nombre de personnes
+    #TODO : Donner possibilité de choisir bots random ou de choisir des bots particuliers.
     min = 2
     max = 9
     print("Bienvenue dans le tournoi de PokerPlus !")
@@ -181,7 +181,7 @@ def tournoi_avec_humain():
             gui.display_action()
 
         vpip_ = VPIP(stats["nbrCall"], stats["nbrRaise"], stats["nbrFold"], stats["nbrActions"], max_players)
-        ratio_large_ = getRatio(stats["nbrFold"], max_players)
+        largeur = getLargeur(stats["nbrFold"], max_players)
             
         #path = game.export_history('./pgns')
         gui.display_win()
