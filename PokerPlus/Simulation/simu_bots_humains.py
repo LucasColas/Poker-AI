@@ -12,12 +12,27 @@ from PokerPlus.Agents.Good_Agents import agent_SA
 from sklearn.cluster import KMeans
 import pickle
 
+def getAction(action : tuple):
+    """
+    Renvoie l'action à partir du tuple.
+    """
+    if action[0] == ActionType.CALL:
+        return "CALL"
+    
+    elif action[0] == ActionType.CHECK:
+        return "CHECK"
+    
+    elif action[0] == ActionType.RAISE:
+        return "RAISE"
+    
+    return "FOLD"
+
 def simu_bots_humains():
     #Mettre menu pour choisir les agents, et nombre de personnes
     #Stats pour avoir Nb Fold / Nb Parties et VPIP.
     #Stocker dans un fichier les comportements des joueurs.
     #Stocker dans un autre fichier vainqueurs des tournois.
-    max_players = 5
+    max_players = 2
     big_blind = 50
     small_blind = big_blind // 2
     buyin = 1000
@@ -47,6 +62,8 @@ def simu_bots_humains():
                 gui.set_visible_players([])
 
             #game.take_action(*random_agent(game))
+            
+            print("action, total : ", game._action)
             gui.display_action()
             
 
@@ -128,6 +145,8 @@ def tournoi_avec_humain():
             else:
                 gui.run_step()
                 gui.set_visible_players([])
+
+            action, total = game._action
 
             if (action == ActionType.CALL):
                 stats["nbrCall"][f"partie {nb_partie}"][game.current_player]+=1
