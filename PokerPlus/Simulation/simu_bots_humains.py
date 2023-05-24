@@ -9,23 +9,10 @@ from texasholdem.agents.basic import random_agent
 from PokerPlus.Agents.agents_bots import agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif
 from PokerPlus.Agents.agent_outs import agent_outs
 from PokerPlus.Agents.Good_Agents import agent_SA
+from PokerPlus.Comportement.comportement import vpip, getRatioLarge, getVpip, ratio_large
 from sklearn.cluster import KMeans
 import pickle
 
-def getAction(action : tuple):
-    """
-    Renvoie l'action à partir du tuple.
-    """
-    if action[0] == ActionType.CALL:
-        return "CALL"
-    
-    elif action[0] == ActionType.CHECK:
-        return "CHECK"
-    
-    elif action[0] == ActionType.RAISE:
-        return "RAISE"
-    
-    return "FOLD"
 
 def simu_bots_humains():
     #Mettre menu pour choisir les agents, et nombre de personnes
@@ -81,7 +68,6 @@ def getComportements(stats : dict, cluster):
         kmeans = pickle.load(file)
         
 
-
 def pool_bots_min_max(nummin,maxplayer, 
                       bots = [random_agent, agent_outs().choix,agent_SA().action, agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif], 
                       bots_noms = ["random_agent", "agent_out", "agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur", "agent_serre_non_agressif", "agent_large_non_agressif"]): 
@@ -96,6 +82,47 @@ def pool_bots_min_max(nummin,maxplayer,
         joueurs_bots[i] = bots[num]
         joueurs_bots_noms[i] = bots_noms[num]
     return joueurs_bots, joueurs_bots_noms 
+
+def getRatio(stats_Fold : dict, nb_joueurs : int): 
+    """
+    Renvoie la somme des Fold pour chaque joueur.
+    """
+    somme_fold = {i:0 for i in range(nb_joueurs)}
+    nb_parties = {i:0 for i in range(nb_joueurs)}
+    for i in stats_Fold.keys():
+        for p in stats_Fold[i].keys():
+            somme_fold[p] += stats_Fold[i][p]
+            nb_parties[p] += 1
+
+    return {i: getRatioLarge(somme_fold[i], nb_parties[i]) for i in somme_fold.keys()}
+
+def VPIP(stats_Call : dict, stats_Raise : dict, stats_Fold : dict, nb_actions : dict, nb_joueurs : int):
+    """
+    Renvoie le VPIP pour chaque joueur.
+    """
+    somme_fold = {i:0 for i in range(nb_joueurs)}
+    nb_call = {i:0 for i in range(nb_joueurs)}
+    nb_raise = {i:0 for i in range(nb_joueurs)}
+    VPIP = {i:0 for i in range(nb_joueurs)}
+    somme_actions = {i:0 for i in range(nb_joueurs)}
+    for i in stats_Fold.keys():
+        for p in stats_Fold[i].keys():
+            somme_fold[p] += stats_Fold[i][p]
+    
+    for i in stats_Call.keys():
+        for p in stats_Call[i].keys():
+            nb_call[p] += stats_Call[i][p] + nb_raise[i][p]
+
+    for i in stats_Raise.keys():
+        for p in stats_Raise[i].keys():
+            nb_raise[p] += stats_Raise[i][p]
+
+    for i in nb_actions.keys():
+        for p in nb_actions[i].keys():
+            somme_actions[p] += nb_actions[i][p]
+
+    return {i: getVpip(nb_call[i], nb_raise[i], somme_fold[i], somme_actions[i]) for i in somme_fold.keys()}
+    
 
 def tournoi_avec_humain():
     """
@@ -133,9 +160,7 @@ def tournoi_avec_humain():
             gui.wait_until_prompted()
             if game.current_player in range(nb_humains):
                 gui.set_visible_players([game.current_player])
-                #TODO Recuperer les actions des humains ??? du style action = et total=
-                action = None
-                total = None
+               
 
             if game.current_player in joueurs_bots:
                 print("Le joueur {} joue.".format(joueurs_bots_noms[game.current_player]))
@@ -156,7 +181,7 @@ def tournoi_avec_humain():
                 stats["nbrRaise"][f"partie {nb_partie}"][game.current_player]+=1
             elif (action == ActionType.FOLD):
                 stats["nbrFold"][f"partie {nb_partie}"][game.current_player]+=1
-            elif(action == ActionType.ALL_IN):
+            elif (action == ActionType.ALL_IN):
                 stats["nbrAllin"][f"partie {nb_partie}"][game.current_player]+=1
             stats["nbrActions"][f"partie {nb_partie}"][game.current_player]+=1
             gui.display_action()
@@ -164,4 +189,6 @@ def tournoi_avec_humain():
         #path = game.export_history('./pgns')
         gui.display_win()
         print(stats["nbrCall"])
+
+        
     pass
