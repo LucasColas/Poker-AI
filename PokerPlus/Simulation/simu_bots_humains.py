@@ -58,14 +58,7 @@ def simu_bots_humains():
         gui.display_win()
 
 
-def getComportements(stats : dict, cluster):
-    """
-    Donne le comportement pour chaque joueur. A partir du cluster.
-    Renvoie une liste le comportement. 
-    """
 
-    with open('model.pkl', 'rb') as file:
-        kmeans = pickle.load(file)
         
 
 def pool_bots_min_max(nummin,maxplayer, 
@@ -195,4 +188,8 @@ def tournoi_avec_humain():
         print(stats["nbrCall"])
 
         
+    pass
+
+
+def prediction(vpip : dict, ratio_large : dict):
     pass
