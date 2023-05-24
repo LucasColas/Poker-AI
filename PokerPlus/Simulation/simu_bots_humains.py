@@ -111,7 +111,7 @@ def VPIP(stats_Call : dict, stats_Raise : dict, stats_Fold : dict, nb_actions : 
     
     for i in stats_Call.keys():
         for p in stats_Call[i].keys():
-            nb_call[p] += stats_Call[i][p] + nb_raise[i][p]
+            nb_call[p] += stats_Call[i][p]
 
     for i in stats_Raise.keys():
         for p in stats_Raise[i].keys():
@@ -149,6 +149,7 @@ def tournoi_avec_humain():
     gui = TextGUI(game=game, visible_players=[])
     stats ={i:{} for i in ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrAllin", "nbrActions"]}
     nb_partie = 0
+
     while game.is_game_running():
         game.start_hand()
         nb_partie += 1
@@ -166,7 +167,7 @@ def tournoi_avec_humain():
                 print("Le joueur {} joue.".format(joueurs_bots_noms[game.current_player]))
                 current_bot = joueurs_bots[game.current_player]
                 action, total = current_bot(game)
-                game.take_action(action, total=None)
+                game.take_action(action, total)
             else:
                 gui.run_step()
                 gui.set_visible_players([])
@@ -185,6 +186,9 @@ def tournoi_avec_humain():
                 stats["nbrAllin"][f"partie {nb_partie}"][game.current_player]+=1
             stats["nbrActions"][f"partie {nb_partie}"][game.current_player]+=1
             gui.display_action()
+
+        vpip_ = VPIP(stats["nbrCall"], stats["nbrRaise"], stats["nbrFold"], stats["nbrActions"], max_players)
+        ratio_large_ = getRatio(stats["nbrFold"], max_players)
             
         #path = game.export_history('./pgns')
         gui.display_win()
