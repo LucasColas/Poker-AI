@@ -58,7 +58,6 @@ def simu_bots_humains():
         gui.display_win()
 
 
-
         
 
 def pool_bots_min_max(nummin,maxplayer, 
@@ -185,11 +184,33 @@ def tournoi_avec_humain():
             
         #path = game.export_history('./pgns')
         gui.display_win()
-        print(stats["nbrCall"])
+        #print(stats["nbrCall"])
+        print("prediction : ", prediction(vpip_, largeur))
 
         
     pass
 
 
-def prediction(vpip : dict, ratio_large : dict):
-    pass
+def prediction(vpip : dict, ratio_large : dict) -> dict:
+    """
+    Renvoie une prédiction de chaque joueur en fonction de son VPIP et de sa largeur.
+    Le dictionnaire renvoyé contient comme clé le joueur (son numéro) et comme valeur la prédiction (string).
+    """
+
+    return {i: getPrediction(vpip[i], ratio_large[i]) for i in vpip.keys()}
+
+def labelName(label):
+    labelsName = {
+        0: "Tight-Passive",
+        1: "Loose-Passive",
+        2: "Tight-Aggressive",
+        3: "Loose-Aggressive"
+    }
+    return labelsName[label]
+
+def getPrediction(vpip : float, ratio_large : float):
+    with open("PokerPlus/Stat/model.pkl", "rb") as f:
+        model = pickle.load(f)
+
+        return labelName(model.predict([[vpip, ratio_large]])[0])
+    
