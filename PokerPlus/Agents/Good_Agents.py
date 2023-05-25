@@ -140,8 +140,15 @@ class agent_SA(): #Serré agressif
 
             action_type = ActionType.RAISE
             total = random.randint(min_raise, max_raise)
+
+        
+
         elif min_raise < max_raise:
-            action_type = ActionType.CALL
+            if game.players[game.current_player].state == PlayerState.IN:
+                action_type = ActionType.RAISE
+                total = min_raise
+            else:
+                action_type = ActionType.CALL
 
 
         

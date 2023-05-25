@@ -122,7 +122,7 @@ def tournoi_avec_humain():
     """
     #TODO : Donner possibilité de choisir bots random ou de choisir des bots particuliers.
     min = 2
-    max = 9
+    max = 23
     print("Bienvenue dans le tournoi de PokerPlus !")
     print(f"Veuillez choisir le nombre de joueurs (entre {min} et {max}) : ")
     max_players = int(input())
