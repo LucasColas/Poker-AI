@@ -367,10 +367,10 @@ def get_stat_tournoi(nmax = 1000, buyin=1000, big_blind=20, save=False, path='./
                 stats["nbrAction"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
                 #stats["nbrAction_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
             
-            last_gagnant=str(game.hand_history.settle)[7]
+            last_gagnant = str(game.hand_history.settle)[7]
             last_gagnant = int(last_gagnant)
             stats["nbrWin partie"][f"tournoi {nbr_tournoi}"][last_gagnant] += 1
-            print("nbr partie : ",nbr_partie, end="\r")
+            print("nbr partie : ", nbr_partie, end="\r")
             
 
 
