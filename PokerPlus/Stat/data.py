@@ -14,7 +14,7 @@ def get_data(m: int=2, max_players=6) -> dict:
 
     return data_dict
 
-def write_data(m:int, max_players: int = 6, filename: str = "data.csv", path: str = ""):
+def write_data(m:int, max_players: int = 6, filename: str = "data_test.csv", path: str = ""):
     max_players = max_players
     simu = 0
     nb_tournoi = 0
