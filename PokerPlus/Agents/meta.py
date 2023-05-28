@@ -1,7 +1,10 @@
 import math
 
 class GameMeta:
-    pass
+    
+    OUTCOMES = {'loose': -1, 'win': 1}
+    INF = float('inf')
+    
 
 
 class MCTSMeta:

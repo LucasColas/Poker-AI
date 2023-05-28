@@ -53,7 +53,7 @@ class MCTS:
 
         if self.expand(node, state):
             node = random.choice(list(node.children.values()))
-            state.move(node.move)
+            state.take_action(node.move)
 
         return node, state
 
@@ -68,9 +68,9 @@ class MCTS:
     
     def get_outcome(self, state: TexasHoldEm) -> int:
         if str(state.hand_history.settle)[7] == self.player:
-            return 1000
+            return 1
         
-        return -1000
+        return -1
 
     def roll_out(self, state: TexasHoldEm) -> int:
         while not state.is_hand_running():
@@ -87,10 +87,7 @@ class MCTS:
             node.N += 1
             node.Q += reward
             node = node.parent
-            #if outcome == STG:
-                #reward = 0
-            #else:
-                #reward = 1 - reward
+            reward = 1 - reward
 
     def search(self, time_limit: int):
         start_time = time.process_time()
@@ -127,3 +124,4 @@ class MCTS:
 
     def statistics(self) -> tuple:
         return self.num_rollouts, self.run_time
+    
