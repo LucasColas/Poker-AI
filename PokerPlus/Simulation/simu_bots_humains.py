@@ -1,5 +1,6 @@
 
 
+from time import sleep
 from texasholdem.game.action_type import ActionType
 
 import random
@@ -7,6 +8,7 @@ from texasholdem.game.game import TexasHoldEm
 from texasholdem.gui.text_gui import TextGUI
 from texasholdem.agents.basic import random_agent
 from PokerPlus.Agents.agents_bots import agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif
+from PokerPlus.Agents.agent_comportement import agent_comportement
 from PokerPlus.Agents.agent_outs import agent_outs
 from PokerPlus.Agents.Good_Agents import agent_SA
 from PokerPlus.Comportement.comportement import vpip, getRatioLarge, getVpip, ratio_large
@@ -62,8 +64,8 @@ def simu_bots_humains():
         
 
 def pool_bots_min_max(nummin,maxplayer, 
-                      bots = [random_agent, agent_outs().choix,agent_SA().action, agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif], 
-                      bots_noms = ["random_agent", "agent_out", "agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur", "agent_serre_non_agressif", "agent_large_non_agressif"]): 
+                      bots = [agent_comportement,random_agent, agent_outs().choix,agent_SA().action, agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif], 
+                      bots_noms = ["agent_comportement","random_agent", "agent_out", "agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur", "agent_serre_non_agressif", "agent_large_non_agressif"]): 
     """
     Crée un pool de bots aléatoires de taille nummin à maxplayer.
     """
@@ -121,14 +123,48 @@ def tournoi_avec_humain():
     """
     Faire un tournoi avec des humains.
     """
-    #TODO : Donner possibilité de choisir bots random ou de choisir des bots particuliers.
-    min = 2
-    max = 23
+    min_players = 2
+    max_players = 23
+
     print("Bienvenue dans le tournoi de PokerPlus !")
-    print(f"Veuillez choisir le nombre de joueurs (entre {min} et {max}) : ")
-    max_players = int(input())
-    print("Veuillez choisir le nombre d'humains qui joueront dans ce tournoi (entre 1 et {}) : ".format(max_players))
-    nb_humains = int(input())
+    print("""
+
+ _______             __                            _______   __                            __ 
+/       \           /  |                          /       \ /  |                          /  |
+$$$$$$$  |  ______  $$ |   __   ______    ______  $$$$$$$  |$$ | __    __   _______       $$ |
+$$ |__$$ | /      \ $$ |  /  | /      \  /      \ $$ |__$$ |$$ |/  |  /  | /       |      $$ |
+$$    $$/ /$$$$$$  |$$ |_/$$/ /$$$$$$  |/$$$$$$  |$$    $$/ $$ |$$ |  $$ |/$$$$$$$/       $$ |
+$$$$$$$/  $$ |  $$ |$$   $$<  $$    $$ |$$ |  $$/ $$$$$$$/  $$ |$$ |  $$ |$$      \       $$/ 
+$$ |      $$ \__$$ |$$$$$$  \ $$$$$$$$/ $$ |      $$ |      $$ |$$ \__$$ | $$$$$$  |       __ 
+$$ |      $$    $$/ $$ | $$  |$$       |$$ |      $$ |      $$ |$$    $$/ /     $$/       /  |
+$$/        $$$$$$/  $$/   $$/  $$$$$$$/ $$/       $$/       $$/  $$$$$$/  $$$$$$$/        $$/ 
+                                                                                              
+                                                                                              
+                                                                                              
+
+        """)
+        
+
+    # Demande le nombre de joueurs
+    while True:
+        print(f"Veuillez choisir le nombre de joueurs (entre {min_players} et {max_players}) : ")
+        max_players_input = int(input())
+        if min_players <= max_players_input <= max_players:
+            break
+        print("Nombre de joueurs invalide. Veuillez réessayer.")
+
+    # Demande le nombre d'humains participants
+    while True:
+        print(f"Veuillez choisir le nombre d'humains qui joueront dans ce tournoi (entre 1 et {max_players_input}) : ")
+        nb_humains = int(input())
+        if 0 <= nb_humains <= max_players_input:
+            break
+        print("Nombre d'humains invalide. Veuillez réessayer.")
+
+    # Affiche les choix
+    print(f"Vous avez choisi un tournoi avec {max_players_input} joueurs, dont {nb_humains} humains.")
+    sleep(1)
+
 
 
     big_blind = 50
@@ -136,18 +172,21 @@ def tournoi_avec_humain():
     buyin = 1000
 
     #Choix des agents
-    joueurs_bots, joueurs_bots_noms = pool_bots_min_max(nummin=nb_humains, maxplayer=max_players)
-    #print(joueurs_bots_noms)
-    game = TexasHoldEm(buyin=buyin, big_blind=big_blind, small_blind=small_blind, max_players=max_players)
+    joueurs_bots, joueurs_bots_noms = pool_bots_min_max(nummin=nb_humains, maxplayer=max_players_input)
+    for i in range(nb_humains):
+        joueurs_bots_noms[i] = "Humain"
+    
+    game = TexasHoldEm(buyin=buyin, big_blind=big_blind, small_blind=small_blind, max_players=max_players_input)
     gui = TextGUI(game=game, visible_players=[])
     stats ={i:{} for i in ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrAllin", "nbrActions"]}
     nb_partie = 0
+    pred ={}
 
     while game.is_game_running():
         game.start_hand()
         nb_partie += 1
         for j in stats.keys():
-            stats[j][f"partie {nb_partie}"] = {i:0 for i in range(max_players)}
+            stats[j][f"partie {nb_partie}"] = {i:0 for i in range(max_players_input)}
         
         while game.is_hand_running():
             gui.display_state()
@@ -159,7 +198,11 @@ def tournoi_avec_humain():
             if game.current_player in joueurs_bots:
                 print("Le joueur {} joue.".format(joueurs_bots_noms[game.current_player]))
                 current_bot = joueurs_bots[game.current_player]
-                action, total = current_bot(game)
+                if joueurs_bots_noms[game.current_player] == "agent_comportement":
+                    action, total = current_bot(game,pred,game.current_player)
+
+                else :
+                    action, total = current_bot(game)
                 game.take_action(action, total)
             else:
                 gui.run_step()
@@ -180,14 +223,22 @@ def tournoi_avec_humain():
             stats["nbrActions"][f"partie {nb_partie}"][game.current_player]+=1
             gui.display_action()
 
-        vpip_ = VPIP(stats["nbrCall"], stats["nbrRaise"], stats["nbrFold"], stats["nbrActions"], max_players)
-        largeur = getLargeur(stats["nbrFold"], max_players)
-            
+        vpip_ = VPIP(stats["nbrCall"], stats["nbrRaise"], stats["nbrFold"], stats["nbrActions"], max_players_input)
+        largeur = getLargeur(stats["nbrFold"], max_players_input)
+        pred = prediction(vpip_, largeur)
         #path = game.export_history('./pgns')
         gui.display_win()
         #print(stats["nbrCall"])
-        print("prediction : ", prediction(vpip_, largeur))
-
+        print("prediction : ", pred)
+        print(game.hand_history.settle)
+        print()
+    # on ecrite le gagnant dans un fichier a la suite de ce qu'il y a deja
+    if str(game.hand_history.settle)[8] == " ":
+        gagnant=str(game.hand_history.settle)[7]
+    else:
+        gagnant=str(game.hand_history.settle)[7:8]
+    with open("./gagnant.txt", "a") as f:
+        f.write(f"{str(game.hand_history.settle)[0:9]} : {joueurs_bots_noms[int(gagnant)]}\n")
         
     pass
 
