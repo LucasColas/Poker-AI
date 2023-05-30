@@ -3,125 +3,95 @@ import time
 import math
 from copy import deepcopy
 from texasholdem.game.game import TexasHoldEm
-
-from meta import GameMeta, MCTSMeta
-
+ 
 
 class Node:
-    def __init__(self, move, parent):
-        self.move = move
-        self.parent = parent
-        self.N = 0
-        self.Q = 0
-        self.children = {}
-        self.outcome = None
-
-    def add_children(self, children: dict) -> None:
-        for child in children:
-            self.children[child.move] = child
-
-    def value(self, explore: float = MCTSMeta.EXPLORATION):
-        if self.N == 0:
-            return 0 if explore == 0 else GameMeta.INF
-        else:
-            return self.Q / self.N + explore * math.sqrt(math.log(self.parent.N) / self.N)
-
+    def __init__(self, state):
+        print("State : ", state)
+        #Deepcopy à faire manuellement
+        self.state = deepcopy(state)
+        print("State : ", self.state)
+        self.parent = None
+        self.children = []
+        self.visits = 0
+        self.wins = 0
 
 class MCTS:
-    def __init__(self, state : TexasHoldEm, player : int):
-        self.root_state = deepcopy(state)
-        self.root = Node(None, None)
-        self.player = player # Pour savoir quel joueur est MCTS
-        self.run_time = 0
-        self.node_count = 0
-        self.num_rollouts = 0
+    def __init__(self, num_iterations : int, num_player : int):
+        self.num_iterations = num_iterations
+        self.num_player = num_player #Pour savoir quel joueur est MCTS
 
-    def select_node(self) -> tuple:
-        node = self.root
-        state = deepcopy(self.root_state)
 
-        while len(node.children) != 0:
-            children = node.children.values()
-            max_value = max(children, key=lambda n: n.value()).value()
-            max_nodes = [n for n in children if n.value() == max_value]
+    def select(self, node):
+        while not node.state.is_hand_running():
+            if len(node.children) == 0:
+                return self.expand(node)
+            else:
+                node = self.uct_select(node)
+        return node
 
-            node = random.choice(max_nodes)
-            state.move(node.move)
+    def expand(self, node):
+        possible_actions = node.state.get_available_moves()
+        for action in possible_actions:
+            new_state = node.state.take_action(*action)
+            new_node = Node(new_state)
+            new_node.parent = node
+            node.children.append(new_node)
+        return random.choice(node.children)
 
-            if node.N == 0:
-                return node, state
+    def uct_select(self, node):
+        selected_node = None
+        best_uct = float("-inf")
+        total_visits = math.log(node.visits or 1)  # Avoid division by zero
 
-        if self.expand(node, state):
-            node = random.choice(list(node.children.values()))
-            state.take_action(node.move)
+        for child in node.children:
+            uct_value = (child.wins / (child.visits or 1)) + 1.4 * math.sqrt(total_visits / (child.visits or 1))
+            if uct_value > best_uct:
+                selected_node = child
+                best_uct = uct_value
 
-        return node, state
+        return selected_node
 
-    def expand(self, parent: Node, state: TexasHoldEm) -> bool:
-        if state.game_over():
-            return False
+    def simulate(self, node):
+        current_state = node.state
+        while not current_state.is_hand_running():
+            action = random.choice(current_state.get_available_moves())
+            current_state = current_state.take_action(*action)
 
-        children = [Node(move, parent) for move in state.get_available_moves()]
-        parent.add_children(children)
-
-        return True
-    
-    def get_outcome(self, state: TexasHoldEm) -> int:
-        if str(state.hand_history.settle)[7] == self.player:
+        gagnant = str(current_state.hand_history.settle)[7]
+        gagnant = int(gagnant)
+        if gagnant == self.num_player:
             return 1
-        
         return -1
 
-    def roll_out(self, state: TexasHoldEm) -> int:
-        while not state.is_hand_running():
-            state.action(*state.get_available_moves().sample())
-
-        return self.get_outcome(state)
-
-    def back_propagate(self, node: Node, turn: int, outcome: int) -> None:
-
-        # For the current player, not the next player
-        reward = 0 if outcome == turn else 1
-
+    def backpropagate(self, node, result):
         while node is not None:
-            node.N += 1
-            node.Q += reward
+            node.visits += 1
+            if result == 1:
+                node.wins += 1
             node = node.parent
-            reward = 1 - reward
 
-    def search(self, time_limit: int):
-        start_time = time.process_time()
+    def get_best_action(self, node):
+        best_child = None
+        best_wins = float("-inf")
 
-        num_rollouts = 0
-        while time.process_time() - start_time < time_limit:
-            node, state = self.select_node()
-            outcome = self.roll_out(state)
-            self.back_propagate(node, state.to_play, outcome)
-            num_rollouts += 1
+        for child in node.children:
+            if child.wins > best_wins:
+                best_child = child
+                best_wins = child.wins
 
-        run_time = time.process_time() - start_time
-        self.run_time = run_time
-        self.num_rollouts = num_rollouts
+        return best_child.state._action
 
-    def best_move(self):
-        if self.root_state.game_over():
-            return -1
+    def search(self, initial_state, num_player : int):
+        root_node = Node(initial_state)
+        self.num_player = num_player
 
-        max_value = max(self.root.children.values(), key=lambda n: n.N).N
-        max_nodes = [n for n in self.root.children.values() if n.N == max_value]
-        best_child = random.choice(max_nodes)
+        for _ in range(self.num_iterations):
+            selected_node = self.select(root_node)
+            simulation_result = self.simulate(selected_node)
+            self.backpropagate(selected_node, simulation_result)
 
-        return best_child.move
+        return self.get_best_action(root_node)
 
-    def move(self, move):
-        if move in self.root.children:
-            self.root_state.move(move)
-            self.root = self.root.children[move]
-            return
 
-        self.root_state.move(move)
-        self.root = Node(None, None)
-
-    def statistics(self) -> tuple:
-        return self.num_rollouts, self.run_time
-    
+# Example usage
