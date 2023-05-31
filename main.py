@@ -15,8 +15,8 @@ from PokerPlus.Comportement.simu_comportement import simu_comportement, write_da
 
 
 def main():
-    tournoi_avec_humain()
-    #simu_bots_humains()
+    #tournoi_avec_humain()
+    simu_bots_humains()
     
     
 

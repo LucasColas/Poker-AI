@@ -13,8 +13,9 @@ from PokerPlus.Agents.agent_outs import agent_outs
 from PokerPlus.Agents.Good_Agents import agent_SA
 from PokerPlus.Comportement.comportement import vpip, getRatioLarge, getVpip, ratio_large
 from sklearn.cluster import KMeans
+from copy import copy
 import pickle
-from PokerPlus.Agents.MCTS import MCTS
+from PokerPlus.Agents.MCTS import MCTS, simu, agent_proba
 
 def simu_bots_humains():
     #Mettre menu pour choisir les agents, et nombre de personnes
@@ -28,7 +29,8 @@ def simu_bots_humains():
     game = TexasHoldEm(buyin=buyin, big_blind=big_blind, small_blind=small_blind, max_players=max_players)
     gui = TextGUI(game=game, visible_players=[])
     Agent = agent_outs()
-    agent_MCTS = MCTS(num_iterations=100, num_player=1)
+    agent_MCTS = MCTS(num_iterations=1000, num_player=1)
+    
     while game.is_game_running():
         game.start_hand()
 
@@ -46,7 +48,12 @@ def simu_bots_humains():
 
             if game.current_player != 0:
                 #Agent.setGame(game)
-                game.take_action(*agent_MCTS.search(game, game.current_player))
+                #action = agent_MCTS.search(game, game.current_player)
+                
+                action = agent_proba(game)
+                
+                
+                game.take_action(*action)
             else:
                 gui.run_step()
                 gui.set_visible_players([])
@@ -61,7 +68,6 @@ def simu_bots_humains():
         gui.display_win()
 
 
-        
 
 def pool_bots_min_max(nummin,maxplayer, 
                       bots = [agent_comportement,random_agent, agent_outs().choix,agent_SA().action, agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif], 
