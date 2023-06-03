@@ -7,8 +7,11 @@ from texasholdem.game.action_type import ActionType
 from texasholdem.agents.basic import random_agent
 from texasholdem.evaluator.evaluator import *
 from texasholdem.card.deck import Deck
+from texasholdem.game.player_state import PlayerState
 from itertools import combinations 
+
 import time
+from PokerPlus.Agents.fonctions_auxiliaires import obtenir_cote,cote_en_pourcentage
 """
 
 HandPotential(ourcards, boardcards) {
@@ -127,16 +130,28 @@ def proba_win(game : TexasHoldEm):
     return HS * (1 - HP[1]) + (1 - HS) * HP[0]
     
 def agent_proba(game : TexasHoldEm):
+    bet_amount = game.player_bet_amount(game.current_player)
+    chips =  game.players[game.current_player].chips
+    min_raise =  game.value_to_total(game.min_raise(),game.current_player)
+    max_raise = bet_amount + chips
     if len(game.board) == 0:
-        return random_agent(game)
+        action, total = game.get_available_moves().sample()
+        if action == ActionType.RAISE:
+            return action, min_raise
     
     elif len(game.board) != 0:
+        if game.players[game.current_player].state == PlayerState.IN:
+            return ActionType.CHECK, None
         p_win = proba_win(game)
         print("p_win : ", p_win)
-        if p_win > 0.5:
-            available_moves = game.get_available_moves()
+        print("cote : ", obtenir_cote(game))
+        print("cote pourcentage", cote_en_pourcentage(obtenir_cote(game)))
+        print("p win * 100 : ", p_win*100)
+        if p_win*100 > cote_en_pourcentage(obtenir_cote(game)):
+            move, total = game.get_available_moves().sample()
             
-            return game.get_available_moves().sample()
+            print("on sample une action")
+            return move, total
     
 
     return ActionType.FOLD, None

@@ -29,7 +29,6 @@ def simu_bots_humains():
     game = TexasHoldEm(buyin=buyin, big_blind=big_blind, small_blind=small_blind, max_players=max_players)
     gui = TextGUI(game=game, visible_players=[])
     Agent = agent_outs()
-    agent_MCTS = MCTS(num_iterations=1000, num_player=1)
     
     while game.is_game_running():
         game.start_hand()
@@ -47,12 +46,10 @@ def simu_bots_humains():
                 gui.set_visible_players([game.current_player])
 
             if game.current_player != 0:
-                #Agent.setGame(game)
-                #action = agent_MCTS.search(game, game.current_player)
                 
-                action = agent_proba(game)
+                #action = agent_proba(game)
                 
-                
+                action = Agent.choix(game)
                 game.take_action(*action)
             else:
                 gui.run_step()
