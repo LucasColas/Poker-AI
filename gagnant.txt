@@ -1,7 +1,9 @@
 Player 1  : agent_allIn
-
-Player 0  : Humain (prédiction : serré agressif)
+Player 0  : Humain
 Player 5  : agent_allIn
 Player 2  : agent_out
 Player 1  : random_agent
 Player 3  : random_agent
+Player 0  : Humain
+Player 6  : agent_out
+Player 1  : random_agent

@@ -68,8 +68,8 @@ def simu_bots_humains():
 
 
 def pool_bots_min_max(nummin,maxplayer, 
-                      bots = [agent_comportement,random_agent, agent_outs().choix,agent_SA().action, agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif], 
-                      bots_noms = ["agent_comportement","random_agent", "agent_out", "agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur", "agent_serre_non_agressif", "agent_large_non_agressif"]): 
+                      bots = [agent_comportement,random_agent, agent_outs().choix,agent_SA().action, agent_naif, agent_allIn, agent_saboteur], 
+                      bots_noms = ["agent_comportement","random_agent", "agent_out", "agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur"]): 
     """
     Crée un pool de bots aléatoires de taille nummin à maxplayer.
     """
@@ -130,7 +130,7 @@ def tournoi_avec_humain():
     min_players = 2
     max_players = 23
 
-    print("Bienvenue dans le tournoi de PokerPlus !")
+    print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nBienvenue dans le tournoi de PokerPlus !")
     print("""
 
  _______             __                            _______   __                            __ 
@@ -208,6 +208,7 @@ $$/        $$$$$$/  $$/   $$/  $$$$$$$/ $$/       $$/       $$/  $$$$$$/  $$$$$$
 
                 else :
                     action, total = current_bot(game)
+                print(f"le bot {joueurs_bots_noms[game.current_player]} a {action} {total}")
                 game.take_action(action, total)
             else:
                 gui.run_step()
@@ -245,6 +246,7 @@ $$/        $$$$$$/  $$/   $$/  $$$$$$$/ $$/       $$/       $$/  $$$$$$/  $$$$$$
     with open("./gagnant.txt", "a") as f:
         f.write(f"{str(game.hand_history.settle)[0:9]} : {joueurs_bots_noms[int(gagnant)]}\n")
     print(joueurs_bots_noms)
+    print(pred)
 
     fieldnames = ["Gagnant","Nom du gagnant", "Liste nom", "buyin", "bigblind", "smallblind", "prediction", "nbr de partie"]
     with open("./data_gagnant.csv", 'a') as csvfile:
@@ -265,18 +267,32 @@ def prediction(vpip : dict, ratio_large : dict) -> dict:
 
     return {i: getPrediction(vpip[i], ratio_large[i]) for i in vpip.keys()}
 
-def labelName(label):
-    labelsName = {
-        0: "Tight-Passive",
-        1: "Loose-Passive",
-        2: "Tight-Aggressive",
-        3: "Loose-Aggressive"
-    }
-    return labelsName[label]
+
 
 def getPrediction(vpip : float, ratio_large : float):
     with open("PokerPlus/Stat/model.pkl", "rb") as f:
         model = pickle.load(f)
 
         return labelName(model.predict([[vpip, ratio_large]])[0])
-    
+
+import matplotlib.pyplot as plt
+
+def plot_gagnant_from_csv(filename = "./data_gagnant.csv" ):
+    """ bar plot du nombre de partie gagné pour chaque type de joueur """
+    fieldnames = ["Gagnant","Nom du gagnant", "Liste nom", "buyin", "bigblind", "smallblind", "prediction", "nbr de partie"]
+    nbr_win ={}
+    with open(filename, 'r') as csvfile:
+        reader = csv.DictReader(csvfile, fieldnames=fieldnames)
+        # on recupere que la colonne de Nom du gagnant:
+        for row in reader:
+            if row["Nom du gagnant"] in nbr_win.keys():
+                nbr_win[row["Nom du gagnant"]] += 1
+            else:
+                nbr_win[row["Nom du gagnant"]] = 1
+    #print(nbr_win)
+    plt.bar(nbr_win.keys(), nbr_win.values())
+    plt.title(f"Nombre de partie gagné pour chaque type de joueur\n{filename}")
+    plt.xlabel("Joueurs")
+    plt.ylabel("Nombre de victoires")
+    plt.show()
+

@@ -27,15 +27,15 @@ def agent_comportement(game: TexasHoldEm, pred: dict, num_bot: int, agent_outs :
                 elif val == "Loose-Aggressive":
                     nb_Loose +=1
                     nb_Passive +=1
-        print(pred)
-        print(nb_Tight,nb_Loose,nb_Aggressive,nb_Passive)
+        #print(pred)
+        #print(nb_Tight,nb_Loose,nb_Aggressive,nb_Passive)
 
         #Si on a beaoucp de large pas trop agressif : agent_naif
         if nb_Loose > nb_Tight and nb_Loose > nb_Aggressive :
             return agent_naif(game)
         #Si on a beaucoup de tight pas trop agressif : agent_SA
         elif nb_Tight > nb_Loose and nb_Tight > nb_Aggressive :
-            return agent_outs.choix(game)
+            return agent_SA.action(game)
 
         else :
             return agent_outs.choix(game)
