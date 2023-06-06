@@ -1,0 +1,2 @@
+Gagnant,Nom du gagnant,Liste nom,buyin,bigblind,smallblind,prediction,nbr de partie
+2,agent_out,"{1: 'agent_saboteur', 2: 'agent_out', 3: 'agent_comportement', 4: 'agent_saboteur', 5: 'agent_naif', 6: 'agent_serre_agressif', 0: 'Humain'}",1000,50,25,"{0: 'Loose-Aggressive', 1: 'Loose-Aggressive', 2: 'Tight-Aggressive', 3: 'Loose-Aggressive', 4: 'Loose-Aggressive', 5: 'Loose-Aggressive', 6: 'Tight-Aggressive'}",69

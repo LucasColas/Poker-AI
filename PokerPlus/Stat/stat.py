@@ -10,6 +10,9 @@ from pathlib import Path
 from PokerPlus.Agents.agents_bots import agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif
 from PokerPlus.Agents.agent_outs import agent_outs
 from PokerPlus.Agents.Good_Agents import agent_SA
+from PokerPlus.Agents.agent_comportement import *
+from PokerPlus.Simulation.simu_bots_humains import *
+
 import matplotlib.pyplot as plt
 import random
 from time import sleep
@@ -112,7 +115,9 @@ def plot_stat_tournois(stats, n, joueurs_bots_noms):
 
 
 
-def pool_random(max_players, bots = [random_agent, agent_outs().choix,agent_SA().action, agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif], bots_noms = ["random_agent", "agent_out", "agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur", "agent_serre_non_agressif", "agent_large_non_agressif"]):
+def pool_random(max_players,
+                bots = [random_agent, agent_outs().choix,agent_SA().action, agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif],
+                bots_noms = ["random_agent", "agent_out", "agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur", "agent_serre_non_agressif", "agent_large_non_agressif"]):
     
     joueurs_bots = {}
     joueurs_bots_noms = {}
@@ -131,8 +136,8 @@ def pool_random(max_players, bots = [random_agent, agent_outs().choix,agent_SA()
     return joueurs_bots, joueurs_bots_noms
 
 def pool_1(max_players,
-            bots = [random_agent,agent_outs().choix, agent_SA().action, agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif],
-            bots_noms = ["random_agent","agent_out", "agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur", "agent_serre_non_agressif", "agent_large_non_agressif"],
+            bots = [random_agent,agent_outs().choix,agent_comportement, agent_SA().action, agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif],
+            bots_noms = ["random_agent","agent_out","agent_comportement","agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur", "agent_serre_non_agressif", "agent_large_non_agressif"],
            ):
     #pour chaque joueur, on lui attribue le bot avec le numéro de joueur
     joueurs_bots = {}
@@ -280,12 +285,13 @@ def get_stat_tournoi(nmax = 1000, buyin=1000, big_blind=20, save=False, path='./
         nbr_partie=0
         pos_avant=[]
         num_eliminé = 0
-
+        pred ={}
+        agent_outs_comportement = agent_outs()
         while game.is_game_running():
             #print("hand")
             game.start_hand()
             nbr_partie+=1
-
+            
             
             # les personnes dans le tournois 
             """
@@ -314,19 +320,19 @@ def get_stat_tournoi(nmax = 1000, buyin=1000, big_blind=20, save=False, path='./
 
 
             stats["position"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]=pos
-            
-            stats["nbrCall_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in pos}
-            stats["nbrCheck_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in pos}
-            stats["nbrFold_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in pos}
-            stats["nbrRaise_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in pos}
-            stats["nbrAction_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in pos}
             """
+            stats["nbrCall_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in range(max_players)}
+            stats["nbrCheck_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in range(max_players)}
+            stats["nbrFold_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in range(max_players)}
+            stats["nbrRaise_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in range(max_players)}
+            stats["nbrAction_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in range(max_players)}
+            
                 
             while game.is_hand_running():
                 #print("hand running")
                 current_bot = joueurs_bots[game.current_player]
-                if(current_bot==agent_allIn):
-                    action, total = current_bot(game,seuil)
+                if(current_bot==agent_comportement):
+                    action, total = current_bot(game,pred,game.current_player,agent_outs_comportement)
                 else:
                     #print("action")
                     action, total = current_bot(game)
@@ -349,24 +355,33 @@ def get_stat_tournoi(nmax = 1000, buyin=1000, big_blind=20, save=False, path='./
                 stats["nbrPartie"][f"tournoi {nbr_tournoi}"][game.current_player] = nbr_partie
                 if action == ActionType.CALL:
                     stats["nbrCall"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
-                    #stats["nbrCall_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
+                    stats["nbrCall_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
                 elif action == ActionType.CHECK:
                     stats["nbrCheck"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
-                    #stats["nbrCheck_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
+                    stats["nbrCheck_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
                 elif action == ActionType.FOLD:
                     stats["nbrFold"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
-                    #stats["nbrFold_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
+                    stats["nbrFold_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
                 elif action == ActionType.RAISE:
                     stats["raise"][f"tournoi {nbr_tournoi}"][game.current_player].append(total)
                     stats["nbrRaise"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
-                    #stats["nbrRaise_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
+                    stats["nbrRaise_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
                 elif action == ActionType.ALL_IN:
                     stats["raise"][f"tournoi {nbr_tournoi}"][game.current_player].append(total)
-                    #stats["nbrRaise"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
-                    #stats["nbrRaise_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
+                    stats["nbrRaise"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
+                    stats["nbrRaise_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
                 stats["nbrAction"][f"tournoi {nbr_tournoi}"][game.current_player]+=1
-                #stats["nbrAction_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
+                stats["nbrAction_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"][game.current_player]+=1
+
+            vpip_ = VPIP(stats["nbrCall_p"][f"tournoi {nbr_tournoi}"],
+                          stats["nbrRaise_p"][f"tournoi {nbr_tournoi}"],
+                            stats["nbrFold_p"][f"tournoi {nbr_tournoi}"],
+                              stats["nbrAction_p"][f"tournoi {nbr_tournoi}"], max_players)
             
+            largeur = getLargeur(stats["nbrFold_p"][f"tournoi {nbr_tournoi}"], max_players)
+            pred = prediction(vpip_, largeur)
+            #print(pred)
+
             last_gagnant = str(game.hand_history.settle)[7]
             last_gagnant = int(last_gagnant)
             stats["nbrWin partie"][f"tournoi {nbr_tournoi}"][last_gagnant] += 1

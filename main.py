@@ -15,7 +15,8 @@ from PokerPlus.Comportement.simu_comportement import simu_comportement, write_da
 from PokerPlus.Agents.MCTS import MainGame, MCTS
 
 def main():
-    tournoi_avec_humain()
+    get_stat_tournoi(nmax = 100, buyin=1000, big_blind=50, save=False, path='./res', plot=True, poolrandom = False, max_players=6, verbose=False)
+    #tournoi_avec_humain()
     #simu_bots_humains()
     #MainGame(1000, 150, 75, 6, 3)
     
