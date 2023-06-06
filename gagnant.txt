@@ -1,2 +1,3 @@
 Player 1  : agent_allIn
 
+Player 0  : Humain (prédiction : serré agressif)
