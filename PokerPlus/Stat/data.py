@@ -2,7 +2,7 @@ import os
 import csv
 from PokerPlus.Stat.stat import get_stat, get_stat_tournoi
 from PokerPlus.Comportement.comportement import vpip, ratio_large
-
+import random
 def get_data(m: int=2, max_players=6) -> dict:
     """
     Fonction qui récupère les stats de m simulations de tournois.
@@ -14,13 +14,14 @@ def get_data(m: int=2, max_players=6) -> dict:
 
     return data_dict
 
-def write_data(m:int, max_players: int = 6, filename: str = "data_test.csv", path: str = ""):
+def write_data(m:int, max_players: int = 9, filename: str = "data_trial.csv", path: str = ""):
     max_players = max_players
     simu = 0
     nb_tournoi = 0
     simu_print = f"simu : {simu}"
     fieldnames = ['vpip', 'ratio action']
-    data_dict = get_data(m=m, max_players=max_players)
+    max_players_contest = random.randint(2, max_players)
+    data_dict = get_data(m=m, max_players=max_players_contest)
     with open(path+filename, 'w') as csvfile:
 
         

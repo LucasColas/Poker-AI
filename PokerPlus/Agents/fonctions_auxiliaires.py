@@ -28,12 +28,12 @@ def obtenir_cote(game: TexasHoldEm):
     """
 
     id_last_pot = -1
-    print("pot actuel",game.pots[id_last_pot].get_total_amount())
+    #print("pot actuel",game.pots[id_last_pot].get_total_amount())
     pot_actuel = game.pots[id_last_pot].get_total_amount()
     chips_to_call = game.pots[id_last_pot].chips_to_call(game.current_player)
-    print("chips to call", chips_to_call)
+    #print("chips to call", chips_to_call)
     if chips_to_call != 0:
-        print("cote actuelle : ", pot_actuel / chips_to_call)
+        #print("cote actuelle : ", pot_actuel / chips_to_call)
         return round(pot_actuel / chips_to_call, 2)
     return 1
 
