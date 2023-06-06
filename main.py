@@ -12,16 +12,32 @@ from PokerPlus.Simulation.simu_bots import simu
 from PokerPlus.Stat.data import get_data, write_data
 from PokerPlus.Simulation.simu_bots_humains import simu_bots_humains, tournoi_avec_humain
 from PokerPlus.Comportement.simu_comportement import simu_comportement, write_data_comportement, write_data_comportement2
-from PokerPlus.Agents.MCTS import MainGame, MCTS
+from PokerPlus.Agents.MCTS import MainGame, MCTS, simu
 
 def main():
-    get_stat_tournoi(nmax = 100, buyin=1000, big_blind=50, save=False, path='./res', plot=True, poolrandom = False, max_players=6, verbose=False)
-    #tournoi_avec_humain()
-    #simu_bots_humains()
-    #MainGame(1000, 150, 75, 6, 3)
-    
-    
+    tournoi_avec_humain()
+    """
+    buyin = 1000
+    big_blind = 150
+    small_blind = 75
+    nb_players = 6
+    num_MCTS = 3
+    actions, Blinds, mains_player, cards_boards = MainGame(buyin, big_blind, small_blind, nb_players, num_MCTS)
+    print()
+    print()
 
+    print()
+    print()
+    print()
+    print()
+
+    print("actions : ", actions)
+    print("Blinds : ", Blinds)
+    print("mains players : ", mains_player)
+    print("Cards boards : ", cards_boards)
+    simu(actions, Blinds, mains_player, cards_boards, buyin,big_blind, small_blind, nb_players, num_MCTS)
+    
+    """
 
 
 
