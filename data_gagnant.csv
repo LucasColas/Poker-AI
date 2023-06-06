@@ -4,3 +4,5 @@ Gagnant,Nom du gagnant,Liste nom,buyin,bigblind,smallblind,prediction,nbr de par
 
 1,random_agent,"{0: 'agent_serre_agressif', 1: 'random_agent', 2: 'agent_large_non_agressif', 3: 'agent_serre_non_agressif', 4: 'agent_naif', 5: 'agent_naif', 6: 'agent_saboteur', 7: 'agent_saboteur', 8: 'agent_saboteur', 9: 'agent_allIn'}",1000,200,100,"{0: 'Loose-Aggressive', 1: 'Tight-Aggressive', 2: 'Loose-Aggressive', 3: 'Loose-Passive', 4: 'Loose-Aggressive', 5: 'Loose-Aggressive', 6: 'Loose-Aggressive', 7: 'Loose-Aggressive', 8: 'Loose-Aggressive', 9: 'Loose-Passive'}",74
 
+3,random_agent,"{0: 'agent_naif', 1: 'agent_saboteur', 2: 'random_agent', 3: 'random_agent', 4: 'agent_saboteur'}",1000,200,100,"{0: 'Loose-Aggressive', 1: 'Loose-Aggressive', 2: 'Loose-Aggressive', 3: 'Tight-Passive', 4: 'Loose-Aggressive'}",19
+

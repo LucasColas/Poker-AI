@@ -249,7 +249,7 @@ $$/        $$$$$$/  $$/   $$/  $$$$$$$/ $$/       $$/       $$/  $$$$$$/  $$$$$$
     fieldnames = ["Gagnant","Nom du gagnant", "Liste nom", "buyin", "bigblind", "smallblind", "prediction", "nbr de partie"]
     with open("./data_gagnant.csv", 'a') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
+       #writer.writeheader()
         writer.writerow({fieldnames[0]: gagnant, fieldnames[1]: joueurs_bots_noms[int(gagnant)],
                          fieldnames[2]: joueurs_bots_noms, fieldnames[3]: buyin, fieldnames[4]: big_blind,
                          fieldnames[5]: small_blind, fieldnames[6]: pred, fieldnames[7]: nb_partie})    
