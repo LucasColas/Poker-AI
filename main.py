@@ -15,8 +15,8 @@ from PokerPlus.Comportement.simu_comportement import simu_comportement, write_da
 from PokerPlus.Agents.MCTS import MainGame, MCTS, simu
 
 def main():
-    #tournoi_avec_humain()
-    #simu_bots_humains()
+    tournoi_avec_humain()
+    """
     buyin = 1000
     big_blind = 150
     small_blind = 75
@@ -37,7 +37,7 @@ def main():
     print("Cards boards : ", cards_boards)
     simu(actions, Blinds, mains_player, cards_boards, buyin,big_blind, small_blind, nb_players, num_MCTS)
     
-
+    """
 
 
 
