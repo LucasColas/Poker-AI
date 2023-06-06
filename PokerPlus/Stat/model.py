@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 from sklearn.cluster import KMeans
+
+import matplotlib.pyplot as plt
 dataset = pd.read_csv("data.csv", encoding= 'ISO-8859-1')
 
 dataset.head()
@@ -18,7 +20,7 @@ dataset = dataset[~neg_rows]
 n_clusters = 4
 kmeans = KMeans(n_clusters=n_clusters, random_state=0, n_init=10).fit(dataset)
 
-import matplotlib.pyplot as plt
+
 
 # Représentation des clusters
 plt.figure(figsize=(8, 6))
