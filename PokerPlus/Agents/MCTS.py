@@ -180,7 +180,7 @@ def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS):
         game.start_hand()
         num_action = 0
         Blinds[num_partie] = (game.sb_loc, game.bb_loc)
-        
+        actions[num_partie] = {}
         while game.is_hand_running():
             gui.display_state()
             gui.wait_until_prompted()
