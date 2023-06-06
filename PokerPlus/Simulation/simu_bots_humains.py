@@ -1,5 +1,6 @@
 
 
+import ast
 import csv
 from time import sleep
 from texasholdem.game.action_type import ActionType
@@ -281,18 +282,42 @@ def plot_gagnant_from_csv(filename = "./data_gagnant.csv" ):
     """ bar plot du nombre de partie gagné pour chaque type de joueur """
     fieldnames = ["Gagnant","Nom du gagnant", "Liste nom", "buyin", "bigblind", "smallblind", "prediction", "nbr de partie"]
     nbr_win ={}
+    nbr_partie_joue = {}
     with open(filename, 'r') as csvfile:
         reader = csv.DictReader(csvfile, fieldnames=fieldnames)
+        next(reader)
         # on recupere que la colonne de Nom du gagnant:
         for row in reader:
             if row["Nom du gagnant"] in nbr_win.keys():
                 nbr_win[row["Nom du gagnant"]] += 1
             else:
                 nbr_win[row["Nom du gagnant"]] = 1
+            #on recupere le dico des cases row["Liste nom"]  sous forme de string et on le transforme en dico :
+            dico : dict = ast.literal_eval(row["Liste nom"])
+            #print(dico)
+            #print(type(dico))
+            for num,i in dico.items():
+                if i in nbr_partie_joue.keys():
+                    nbr_partie_joue[i] +=1
+                else:
+                    nbr_partie_joue[i] =1
     #print(nbr_win)
     plt.bar(nbr_win.keys(), nbr_win.values())
     plt.title(f"Nombre de partie gagné pour chaque type de joueur\n{filename}")
     plt.xlabel("Joueurs")
     plt.ylabel("Nombre de victoires")
+    plt.show()
+
+    plt.bar(nbr_partie_joue.keys(), nbr_partie_joue.values())
+    plt.title(f"Nombre de partie joué pour chaque type de joueur\n{filename}")
+    plt.xlabel("Joueurs")
+    plt.ylabel("Nombre de parties jouées")
+    plt.show()
+
+    nbr_partie_win_sur_nbr_partie_joue = {i: nbr_win[i]/nbr_partie_joue[i] for i in nbr_win.keys()}
+    plt.bar(nbr_partie_win_sur_nbr_partie_joue.keys(), nbr_partie_win_sur_nbr_partie_joue.values())
+    plt.title(f"Nombre de partie gagné sur le nombre de partie joué pour chaque type de joueur\n{filename}")
+    plt.xlabel("Joueurs")
+    plt.ylabel("Nombre de victoires sur le nombre de parties jouées")
     plt.show()
 
