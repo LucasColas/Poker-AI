@@ -1,5 +1,6 @@
 
 
+import csv
 from time import sleep
 from texasholdem.game.action_type import ActionType
 
@@ -170,7 +171,7 @@ $$/        $$$$$$/  $$/   $$/  $$$$$$$/ $$/       $$/       $$/  $$$$$$/  $$$$$$
 
 
 
-    big_blind = 50
+    big_blind = 200
     small_blind = big_blind // 2
     buyin = 1000
 
@@ -184,6 +185,7 @@ $$/        $$$$$$/  $$/   $$/  $$$$$$$/ $$/       $$/       $$/  $$$$$$/  $$$$$$
     stats ={i:{} for i in ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrAllin", "nbrActions"]}
     nb_partie = 0
     pred ={}
+    agent_outs_comportement = agent_outs()
 
     while game.is_game_running():
         game.start_hand()
@@ -199,10 +201,10 @@ $$/        $$$$$$/  $$/   $$/  $$$$$$$/ $$/       $$/       $$/  $$$$$$/  $$$$$$
                
 
             if game.current_player in joueurs_bots:
-                print("Le joueur {} joue.".format(joueurs_bots_noms[game.current_player]))
+                #print("Le joueur {} joue.".format(joueurs_bots_noms[game.current_player]))
                 current_bot = joueurs_bots[game.current_player]
                 if joueurs_bots_noms[game.current_player] == "agent_comportement":
-                    action, total = current_bot(game,pred,game.current_player)
+                    action, total = current_bot(game,pred,game.current_player,agent_outs_comportement)
 
                 else :
                     action, total = current_bot(game)
@@ -232,9 +234,9 @@ $$/        $$$$$$/  $$/   $$/  $$$$$$$/ $$/       $$/       $$/  $$$$$$/  $$$$$$
         #path = game.export_history('./pgns')
         gui.display_win()
         #print(stats["nbrCall"])
-        print("prediction : ", pred)
-        print(game.hand_history.settle)
-        print()
+        #print("prediction : ", pred)
+        #print(game.hand_history.settle)
+        #print()
     # on ecrite le gagnant dans un fichier a la suite de ce qu'il y a deja
     if str(game.hand_history.settle)[8] == " ":
         gagnant=str(game.hand_history.settle)[7]
@@ -242,6 +244,15 @@ $$/        $$$$$$/  $$/   $$/  $$$$$$$/ $$/       $$/       $$/  $$$$$$/  $$$$$$
         gagnant=str(game.hand_history.settle)[7:8]
     with open("./gagnant.txt", "a") as f:
         f.write(f"{str(game.hand_history.settle)[0:9]} : {joueurs_bots_noms[int(gagnant)]}\n")
+    print(joueurs_bots_noms)
+
+    fieldnames = ["Gagnant","Nom du gagnant", "Liste nom", "buyin", "bigblind", "smallblind", "prediction", "nbr de partie"]
+    with open("./data_gagnant.csv", 'a') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerow({fieldnames[0]: gagnant, fieldnames[1]: joueurs_bots_noms[int(gagnant)],
+                         fieldnames[2]: joueurs_bots_noms, fieldnames[3]: buyin, fieldnames[4]: big_blind,
+                         fieldnames[5]: small_blind, fieldnames[6]: pred, fieldnames[7]: nb_partie})    
         
     pass
 

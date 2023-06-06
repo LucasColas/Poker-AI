@@ -1,2 +1,6 @@
-Gagnant,Nom du gagnant,Liste nom,buyin,bigblind,smallblind,prediction,nbr de partie
-2,agent_out,"{1: 'agent_saboteur', 2: 'agent_out', 3: 'agent_comportement', 4: 'agent_saboteur', 5: 'agent_naif', 6: 'agent_serre_agressif', 0: 'Humain'}",1000,50,25,"{0: 'Loose-Aggressive', 1: 'Loose-Aggressive', 2: 'Tight-Aggressive', 3: 'Loose-Aggressive', 4: 'Loose-Aggressive', 5: 'Loose-Aggressive', 6: 'Tight-Aggressive'}",69
+Gagnant,Nom du gagnant,Liste nom,buyin,bigblind,smallblind,prediction,nbr de partie
+
+2,agent_out,"{1: 'agent_saboteur', 2: 'agent_out', 3: 'agent_comportement', 4: 'agent_saboteur', 5: 'agent_naif', 6: 'agent_serre_agressif', 0: 'Humain'}",1000,50,25,"{0: 'Loose-Aggressive', 1: 'Loose-Aggressive', 2: 'Tight-Aggressive', 3: 'Loose-Aggressive', 4: 'Loose-Aggressive', 5: 'Loose-Aggressive', 6: 'Tight-Aggressive'}",69
+
+1,random_agent,"{0: 'agent_serre_agressif', 1: 'random_agent', 2: 'agent_large_non_agressif', 3: 'agent_serre_non_agressif', 4: 'agent_naif', 5: 'agent_naif', 6: 'agent_saboteur', 7: 'agent_saboteur', 8: 'agent_saboteur', 9: 'agent_allIn'}",1000,200,100,"{0: 'Loose-Aggressive', 1: 'Tight-Aggressive', 2: 'Loose-Aggressive', 3: 'Loose-Passive', 4: 'Loose-Aggressive', 5: 'Loose-Aggressive', 6: 'Loose-Aggressive', 7: 'Loose-Aggressive', 8: 'Loose-Aggressive', 9: 'Loose-Passive'}",74
+
