@@ -19,6 +19,8 @@ from copy import copy
 import pickle
 from PokerPlus.Agents.MCTS import MCTS, simu, agent_proba
 
+import matplotlib as mpl
+
 def simu_bots_humains():
     #Mettre menu pour choisir les agents, et nombre de personnes
     #Stats pour avoir Nb Fold / Nb Parties et VPIP.
@@ -290,6 +292,11 @@ def plot_gagnant_from_csv(filename = "./data_gagnant.csv" ):
     fieldnames = ["Gagnant","Nom du gagnant", "Liste nom", "buyin", "bigblind", "smallblind", "prediction", "nbr de partie"]
     nbr_win ={}
     nbr_partie_joue = {}
+
+
+    colours = ["#bbdefb", "#2196f3"]
+    cmap = mpl.colors.LinearSegmentedColormap.from_list("colour_map", colours, N=256)
+    
     with open(filename, 'r') as csvfile:
         reader = csv.DictReader(csvfile, fieldnames=fieldnames)
         next(reader)
@@ -309,13 +316,19 @@ def plot_gagnant_from_csv(filename = "./data_gagnant.csv" ):
                 else:
                     nbr_partie_joue[i] =1
     #print(nbr_win)
-    plt.bar(nbr_win.keys(), nbr_win.values())
+    norm = mpl.colors.Normalize(min(list(nbr_win.values())), max(list(nbr_win.values()))) # linearly normalizes data into the [0.0, 1.0] interval
+
+    plt.bar(nbr_win.keys(), nbr_win.values(), color=cmap(norm(list(nbr_win.values()))))
+    
     plt.title(f"Nombre de partie gagné pour chaque type de joueur\n{filename}")
     plt.xlabel("Joueurs")
     plt.ylabel("Nombre de victoires")
     plt.show()
 
-    plt.bar(nbr_partie_joue.keys(), nbr_partie_joue.values())
+
+
+    norm = mpl.colors.Normalize(min(list(nbr_partie_joue.values())), max(list(nbr_partie_joue.values())))
+    plt.bar(nbr_partie_joue.keys(), nbr_partie_joue.values(), color=cmap(norm(list(nbr_win.values()))))
     plt.title(f"Nombre de partie joué pour chaque type de joueur\n{filename}")
     plt.xlabel("Joueurs")
     plt.ylabel("Nombre de parties jouées")
