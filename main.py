@@ -15,8 +15,9 @@ from PokerPlus.Comportement.simu_comportement import simu_comportement, write_da
 from PokerPlus.Agents.MCTS import MainGame, MCTS, simu
 
 def main():
+    
+    tournoi_avec_humain()
     plot_gagnant_from_csv(filename = "./data_gagnant.csv" )
-    #tournoi_avec_humain()
     """
     buyin = 1000
     big_blind = 150
