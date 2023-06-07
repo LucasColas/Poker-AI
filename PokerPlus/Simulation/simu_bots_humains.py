@@ -1,5 +1,7 @@
 
 
+import ast
+import csv
 from time import sleep
 from texasholdem.game.action_type import ActionType
 
@@ -67,8 +69,8 @@ def simu_bots_humains():
 
 
 def pool_bots_min_max(nummin,maxplayer, 
-                      bots = [agent_comportement,random_agent, agent_outs().choix,agent_SA().action, agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif], 
-                      bots_noms = ["agent_comportement","random_agent", "agent_out", "agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur", "agent_serre_non_agressif", "agent_large_non_agressif"]): 
+                      bots = [agent_comportement,random_agent, agent_outs().choix,agent_SA().action, agent_naif, agent_allIn, agent_saboteur], 
+                      bots_noms = ["agent_comportement","random_agent", "agent_out", "agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur"]): 
     """
     Crée un pool de bots aléatoires de taille nummin à maxplayer.
     """
@@ -129,7 +131,7 @@ def tournoi_avec_humain():
     min_players = 2
     max_players = 23
 
-    print("Bienvenue dans le tournoi de PokerPlus !")
+    print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nBienvenue dans le tournoi de PokerPlus !")
     print("""
 
  _______             __                            _______   __                            __ 
@@ -170,7 +172,7 @@ $$/        $$$$$$/  $$/   $$/  $$$$$$$/ $$/       $$/       $$/  $$$$$$/  $$$$$$
 
 
 
-    big_blind = 50
+    big_blind = 200
     small_blind = big_blind // 2
     buyin = 1000
 
@@ -184,6 +186,7 @@ $$/        $$$$$$/  $$/   $$/  $$$$$$$/ $$/       $$/       $$/  $$$$$$/  $$$$$$
     stats ={i:{} for i in ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrAllin", "nbrActions"]}
     nb_partie = 0
     pred ={}
+    agent_outs_comportement = agent_outs()
 
     while game.is_game_running():
         game.start_hand()
@@ -199,13 +202,14 @@ $$/        $$$$$$/  $$/   $$/  $$$$$$$/ $$/       $$/       $$/  $$$$$$/  $$$$$$
                
 
             if game.current_player in joueurs_bots:
-                print("Le joueur {} joue.".format(joueurs_bots_noms[game.current_player]))
+                #print("Le joueur {} joue.".format(joueurs_bots_noms[game.current_player]))
                 current_bot = joueurs_bots[game.current_player]
                 if joueurs_bots_noms[game.current_player] == "agent_comportement":
-                    action, total = current_bot(game,pred,game.current_player)
+                    action, total = current_bot(game,pred,game.current_player,agent_outs_comportement)
 
                 else :
                     action, total = current_bot(game)
+                print(f"le bot {joueurs_bots_noms[game.current_player]} a {action} {total}")
                 game.take_action(action, total)
             else:
                 gui.run_step()
@@ -232,9 +236,9 @@ $$/        $$$$$$/  $$/   $$/  $$$$$$$/ $$/       $$/       $$/  $$$$$$/  $$$$$$
         #path = game.export_history('./pgns')
         gui.display_win()
         #print(stats["nbrCall"])
-        print("prediction : ", pred)
-        print(game.hand_history.settle)
-        print()
+        #print("prediction : ", pred)
+        #print(game.hand_history.settle)
+        #print()
     # on ecrite le gagnant dans un fichier a la suite de ce qu'il y a deja
     if str(game.hand_history.settle)[8] == " ":
         gagnant=str(game.hand_history.settle)[7]
@@ -242,6 +246,16 @@ $$/        $$$$$$/  $$/   $$/  $$$$$$$/ $$/       $$/       $$/  $$$$$$/  $$$$$$
         gagnant=str(game.hand_history.settle)[7:8]
     with open("./gagnant.txt", "a") as f:
         f.write(f"{str(game.hand_history.settle)[0:9]} : {joueurs_bots_noms[int(gagnant)]}\n")
+    print(joueurs_bots_noms)
+    print(pred)
+
+    fieldnames = ["Gagnant","Nom du gagnant", "Liste nom", "buyin", "bigblind", "smallblind", "prediction", "nbr de partie"]
+    with open("./data_gagnant.csv", 'a') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+       #writer.writeheader()
+        writer.writerow({fieldnames[0]: gagnant, fieldnames[1]: joueurs_bots_noms[int(gagnant)],
+                         fieldnames[2]: joueurs_bots_noms, fieldnames[3]: buyin, fieldnames[4]: big_blind,
+                         fieldnames[5]: small_blind, fieldnames[6]: pred, fieldnames[7]: nb_partie})    
         
     pass
 
@@ -254,18 +268,56 @@ def prediction(vpip : dict, ratio_large : dict) -> dict:
 
     return {i: getPrediction(vpip[i], ratio_large[i]) for i in vpip.keys()}
 
-def labelName(label):
-    labelsName = {
-        0: "Tight-Passive",
-        1: "Loose-Passive",
-        2: "Tight-Aggressive",
-        3: "Loose-Aggressive"
-    }
-    return labelsName[label]
+
 
 def getPrediction(vpip : float, ratio_large : float):
     with open("PokerPlus/Stat/model.pkl", "rb") as f:
         model = pickle.load(f)
 
         return labelName(model.predict([[vpip, ratio_large]])[0])
-    
+
+import matplotlib.pyplot as plt
+
+def plot_gagnant_from_csv(filename = "./data_gagnant.csv" ):
+    """ bar plot du nombre de partie gagné pour chaque type de joueur """
+    fieldnames = ["Gagnant","Nom du gagnant", "Liste nom", "buyin", "bigblind", "smallblind", "prediction", "nbr de partie"]
+    nbr_win ={}
+    nbr_partie_joue = {}
+    with open(filename, 'r') as csvfile:
+        reader = csv.DictReader(csvfile, fieldnames=fieldnames)
+        next(reader)
+        # on recupere que la colonne de Nom du gagnant:
+        for row in reader:
+            if row["Nom du gagnant"] in nbr_win.keys():
+                nbr_win[row["Nom du gagnant"]] += 1
+            else:
+                nbr_win[row["Nom du gagnant"]] = 1
+            #on recupere le dico des cases row["Liste nom"]  sous forme de string et on le transforme en dico :
+            dico : dict = ast.literal_eval(row["Liste nom"])
+            #print(dico)
+            #print(type(dico))
+            for num,i in dico.items():
+                if i in nbr_partie_joue.keys():
+                    nbr_partie_joue[i] +=1
+                else:
+                    nbr_partie_joue[i] =1
+    #print(nbr_win)
+    plt.bar(nbr_win.keys(), nbr_win.values())
+    plt.title(f"Nombre de partie gagné pour chaque type de joueur\n{filename}")
+    plt.xlabel("Joueurs")
+    plt.ylabel("Nombre de victoires")
+    plt.show()
+
+    plt.bar(nbr_partie_joue.keys(), nbr_partie_joue.values())
+    plt.title(f"Nombre de partie joué pour chaque type de joueur\n{filename}")
+    plt.xlabel("Joueurs")
+    plt.ylabel("Nombre de parties jouées")
+    plt.show()
+
+    nbr_partie_win_sur_nbr_partie_joue = {i: nbr_win[i]/nbr_partie_joue[i] for i in nbr_win.keys()}
+    plt.bar(nbr_partie_win_sur_nbr_partie_joue.keys(), nbr_partie_win_sur_nbr_partie_joue.values())
+    plt.title(f"Nombre de partie gagné sur le nombre de partie joué pour chaque type de joueur\n{filename}")
+    plt.xlabel("Joueurs")
+    plt.ylabel("Nombre de victoires sur le nombre de parties jouées")
+    plt.show()
+
