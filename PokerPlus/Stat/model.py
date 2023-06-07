@@ -17,8 +17,19 @@ neg_rows = np.any(dataset <= 0, axis=1)
 
 dataset = dataset[~neg_rows]
 
+lower_bound = 0.35
+upper_bound = 0.45
+
+row_indices, col_indices = np.where(np.logical_and(dataset >= lower_bound, dataset <= upper_bound))
+indices_to_keep = np.random.choice(len(row_indices), size=int(len(row_indices) * 0.95), replace=False)
+
+row_indices_to_keep = row_indices[indices_to_keep]
+col_indices_to_keep = col_indices[indices_to_keep]
+dataset = np.delete(dataset, np.column_stack((row_indices_to_keep, col_indices_to_keep)), axis=0)
+
+
 n_clusters = 4
-kmeans = KMeans(n_clusters=n_clusters, random_state=0, n_init=10).fit(dataset)
+kmeans = KMeans(n_clusters=n_clusters, random_state=0, n_init=300).fit(dataset)
 
 
 
