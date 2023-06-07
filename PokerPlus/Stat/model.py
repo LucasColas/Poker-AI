@@ -17,6 +17,10 @@ neg_rows = np.any(dataset <= 0, axis=1)
 
 dataset = dataset[~neg_rows]
 
+neg_rows = np.any(dataset >= 1, axis=1)
+
+dataset = dataset[~neg_rows]
+
 lower_bound = 0.35
 upper_bound = 0.45
 

@@ -268,7 +268,14 @@ def prediction(vpip : dict, ratio_large : dict) -> dict:
 
     return {i: getPrediction(vpip[i], ratio_large[i]) for i in vpip.keys()}
 
-
+def labelName(label):
+    labelsName = {
+        0: "Tight-Passive",
+        1: "Loose-Aggressive",
+        2: "Loose-Passive",
+        3: "Tight-Aggressive"
+    }
+    return labelsName[label]
 
 def getPrediction(vpip : float, ratio_large : float):
     with open("PokerPlus/Stat/model.pkl", "rb") as f:
