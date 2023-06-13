@@ -122,20 +122,22 @@ def cloneTexasHoldem(actions, Blinds, mains_player, cards_boards, buyin, big_bli
         game.bb_loc = Blinds[num_partie][1]
         num_action = 0
         while game.is_hand_running():
-            #gui.display_state()
-            #gui.wait_until_prompted()
-            #gui.wait_until_prompted()
-            #action_type, total = random_agent(game)
-            #actions[num_partie][num_action] = (action_type, total, game.current_player)
+
             action_type, total = actions[num_partie][num_action][0], actions[num_partie][num_action][1]
             game.take_action(action_type=action_type, total=total)
             num_action += 1
+
+            #Terminer la partie avec du random
             
             #mains_player[num_partie] = (game.current_player, game.hands[game.current_player])
             if len(game.board) != 0:
                 game.board = cards_boards[num_partie][0:len(game.board)]
-            #gui.display_action()
-        #gui.display_win()
+
+        #Score : 
+        #Nombre de jetons gagné 
+        #Et ensuite return le score à la fin de la main
+
+
     
 
 
@@ -163,6 +165,7 @@ def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS):
             gui.wait_until_prompted()
             if game.current_player == num_MCTS:
                 pass
+
                 #MCTS joue
             else:
                 action_type, total = random_agent(game)
