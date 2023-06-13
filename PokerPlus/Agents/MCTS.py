@@ -14,6 +14,8 @@ from texasholdem.gui.text_gui import TextGUI
 import time
 from PokerPlus.Agents.fonctions_auxiliaires import obtenir_cote,cote_en_pourcentage
 
+from PokerPlus.Agents.agents_bots import agent_naif
+
 
 def HandPotentiel(ourcards, boardcards):
     oppcards = Deck().draw(num=52)
@@ -138,43 +140,116 @@ def cloneTexasHoldem(actions, Blinds, mains_player, cards_boards, buyin, big_bli
         #Nombre de jetons gagné 
         #Et ensuite return le score à la fin de la main
 
-def cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS, btn_loc):
+def cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS, btn_loc, next_action):
+    #TODO virer le gui
     game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
 
     while (game.btn_loc != btn_loc):
         game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
     
     num_partie = 0
-    gui = TextGUI(game=game)
+    #gui = TextGUI(game=game)
     
-
+    # on regarde cb de partie on a dans actions
+    num_partie_save = len(actions)
+    print(f" on  a {num_partie_save} parties")
+    ok = True
     while game.is_game_running():
         num_partie += 1
         game.start_hand()
-        game.hands = mains_player[num_partie]
-        game.sb_loc = Blinds[num_partie][0]
-        game.bb_loc = Blinds[num_partie][1]
+        if num_partie <= num_partie_save:
+            game.hands = mains_player[num_partie]
+            game.sb_loc = Blinds[num_partie][0]
+            game.bb_loc = Blinds[num_partie][1]
         num_action = 0
         while game.is_hand_running():
-            gui.display_state()
-            gui.wait_until_prompted()
-            action_type, total = actions[num_partie][num_action][0], actions[num_partie][num_action][1]
-            game.take_action(action_type=action_type, total=total)
-            num_action += 1
+            #gui.display_state()
+            #gui.wait_until_prompted()
+
+            #on refait la game 
+            #print(f"num_p = {num_partie}, num_a = {num_action}")
+            if num_partie in actions.keys() and num_action in actions[num_partie].keys():
+                action_type, total = actions[num_partie][num_action][0], actions[num_partie][num_action][1]
+                game.take_action(action_type=action_type, total=total)
+                num_action += 1
+                if len(game.board) != 0:
+                    game.board = cards_boards[num_partie][0:len(game.board)]
 
             #Terminer la partie avec du random
-            
+            elif ok == True:
+                action_type, total = next_action
+                game.take_action(action_type=action_type, total=total)
+                ok = False
+            else:
+                #TODO : marche pas
+                action, total = game.get_available_moves().sample()
+                #print(f"action : {action}")
+                game.take_action(action_type=action, total=total)
             #mains_player[num_partie] = (game.current_player, game.hands[game.current_player])
-            if len(game.board) != 0:
-                game.board = cards_boards[num_partie][0:len(game.board)]
-            gui.display_action()
-        gui.display_win()
+            
+
+            #gui.display_action()
+
+        #gui.display_win()
+
+        
 
         #Score : 
-        #Nombre de jetons gagné 
+        #Nombre de jetons gagné a la fin de la partie
+        if ok ==False:
+            for p in game.players:
+                if p.player_id == num_MCTS:
+                    print(f"fin de la partie simule avec le coup {next_action}, on retourne {p.chips}")
+                    return p.chips
+
         #Et ensuite return le score à la fin de la main
 
+def choix_MCTS(nbr_de_simu_par_action,game, actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS, btn_loc):
+    bet_amount = game.player_bet_amount(game.current_player)
+    chips = game.players[game.current_player].chips
+    min_raise = game.value_to_total(game.min_raise(), game.current_player)
+    max_raise = bet_amount + chips
     
+    
+    score = {}
+    available_moves = game.get_available_moves()
+    for i in range(nbr_de_simu_par_action):
+        #action du type fold, call, allin,check avec none ou raise avec min_raise
+        #print(f"nbr : {len(available_moves)}")
+        
+        #TODO trop long avec les affichages
+        """
+        for action,total in available_moves:
+            if action == ActionType.RAISE:
+                if (max_raise > min_raise):
+                    total = random.randint(min_raise, max_raise)
+                else:
+                    action = ActionType.ALL_IN
+                    total = None
+            else:
+                total = None
+        """
+        action_ok =[a for a in available_moves if a[0] != ActionType.RAISE]
+        for action in action_ok:
+            print(f"        simu : {i} |action : {action[0]}, total : {action[1]}")
+            next_action = action
+            if next_action not in score.keys():
+                score[next_action] = [cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS, btn_loc,next_action)]
+            score[next_action].append(cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS, btn_loc,next_action))
+            #print(f"        score : {score}")
+    print(f"\n\nscore : {score}")
+    dico_moy = {}
+    for action in score.keys():
+        dico_moy[action] = sum(score[action])/len(score[action])
+    print(f"dico_moy : {dico_moy}")
+
+    #on prend le max
+    max = 0
+    for action in dico_moy.keys():
+        if dico_moy[action] > max:
+            max = dico_moy[action]
+            action_max = action
+    return action_max
 
 
 def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS):
@@ -240,15 +315,20 @@ def MainGame2(buyin,big_blind, small_blind, nb_players, num_MCTS, nbr_parties):
         num_action = 0
         Blinds[num_partie] = (game.sb_loc, game.bb_loc)
         actions[num_partie] = {}
-        print("mains player", mains_player)
-        print("game hands :", game.hands)
+        #print("mains player", mains_player)
+        #print("game hands :", game.hands)
         mains_player[num_partie] = {i:game.hands[i] for i in game.hands}
         while game.is_hand_running():
             gui.display_state()
             gui.wait_until_prompted()
             if game.current_player == num_MCTS:
-                action_type, total = ActionType.FOLD, None
-                pass
+                #TODO temp
+                #return actions, Blinds, mains_player, cards_boards, btn_loc
+                
+                action_type, total = choix_MCTS(20,game, actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS, btn_loc)
+                #action_type, total = ActionType.FOLD, None
+                print(f"MCTS joue : {action_type} {total}")
+                return actions, Blinds, mains_player, cards_boards, btn_loc
 
                 #MCTS joue
             else:
@@ -373,5 +453,7 @@ class MCTS:
             self.backpropagate(selected_node, simulation_result)
 
         return self.get_best_action(root_node)
+
+
 
 

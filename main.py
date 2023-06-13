@@ -5,6 +5,7 @@ from texasholdem.agents.basic import random_agent, call_agent
 from texasholdem.evaluator.evaluator import *
 from texasholdem.card.deck import Deck
 from texasholdem.gui.text_gui import TextGUI
+from texasholdem.game.action_type import ActionType
 
 
 #PokerPlus
@@ -26,20 +27,18 @@ def main():
     nb_players = 6
     num_MCTS = 3
     actions, Blinds, mains_player, cards_boards, btn_loc = MainGame2(buyin, big_blind, small_blind, nb_players, num_MCTS,1)
-    print()
-    print()
-    sleep(2)
-    print()
-    print()
-    print()
-    print()
 
+    """
     print("actions : ", actions)
     print("Blinds : ", Blinds)
     print("mains players : ", mains_player)
     print("Cards boards : ", cards_boards)
+    print("btn_loc : ", btn_loc)
+    """
+    
     #simu(actions, Blinds, mains_player, cards_boards, buyin,big_blind, small_blind, nb_players, num_MCTS)
-    cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS, btn_loc)
+    #next_mouv = ActionType.ALL_IN,None
+    #cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS, btn_loc, next_mouv)
     
     
 
