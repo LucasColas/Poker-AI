@@ -16,6 +16,15 @@ import os
 #print(os.getcwd())
 
 
+"""
+
+Potentiel agent : 
+On prend toutes les cartes qui pourraient tomber et on fait un minimax sur 
+chaque carte pour voir celle qui nous donne le plus de chance de gagner
+
+"""
+
+
 def agent_naif(game: TexasHoldEm) -> Tuple[ActionType, int]:
     bet_amount = game.player_bet_amount(game.current_player)
     chips = game.players[game.current_player].chips

@@ -13,57 +13,7 @@ from texasholdem.agents.basic import random_agent
 from texasholdem.gui.text_gui import TextGUI
 import time
 from PokerPlus.Agents.fonctions_auxiliaires import obtenir_cote,cote_en_pourcentage
-"""
 
-HandPotential(ourcards, boardcards) {
-    // Hand potential array, each index represents ahead, tied, and behind
-    integer array HP[3][3] // initialize to 0
-    integer array HPTotal[3] // initialize to 0
-    ourrank = Rank(ourcards, boardcards)
-
-    // Consider all two card combinations of the remaining cards for the opponent
-    for each case(oppcards) {
-        opprank = Rank(oppcards, boardcards)
-        if (ourrank > opprank) index = ahead
-        else if (ourrank == opprank) index = tied
-        else index = behind
-        HPTotal[index] += 1
-
-        // All possible board cards to come
-        for each case(turn, river) {
-            // Final 5-card board
-            board = [boardcards, turn, river]
-            ourbest = Rank(ourcards, board)
-            oppbest = Rank(oppcards, board)
-            if (ourbest > oppbest) HP[index][ahead] += 1
-            else if (ourbest == oppbest) HP[index][tied] += 1
-            else HP[index][behind] += 1
-        }
-    }
-
-    // Ppot: were behind but moved ahead
-    Ppot = (HP[behind][ahead] + HP[behind][tied] / 2 + HP[tied][ahead] / 2) / (HPTotal[behind] + HPTotal[tied])
-    // Npot: were ahead but fell behind
-    Npot = (HP[ahead][behind] + HP[tied][behind] / 2 + HP[ahead][tied] / 2) / (HPTotal[ahead] + HPTotal[tied])
-
-    return [ Ppot, Npot ]
-}
-HandStrength(ourcards, boardcards) {
-    ahead = tied = behind = 0
-    ourrank = Rank(ourcards, boardcards)
-
-    for each case(oppcards) {
-        opprank = Rank(oppcards, boardcards)
-        if (ourrank > opprank) ahead += 1
-        else if (ourrank == opprank) tied += 1
-        else behind += 1
-    }
-
-    handstrength = (ahead + tied / 2) / (ahead + tied + behind)
-
-    return handstrength
-}
-"""
 
 def HandPotentiel(ourcards, boardcards):
     oppcards = Deck().draw(num=52)
@@ -211,8 +161,12 @@ def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS):
         while game.is_hand_running():
             gui.display_state()
             gui.wait_until_prompted()
-            gui.wait_until_prompted()
-            action_type, total = random_agent(game)
+            if game.current_player == num_MCTS:
+                pass
+                #MCTS joue
+            else:
+                action_type, total = random_agent(game)
+
             actions[num_partie][num_action] = (action_type, total, game.current_player)
             
             game.take_action(action_type=action_type, total=total)
@@ -247,9 +201,10 @@ class Node:
         self.wins = 0
 
 class MCTS:
-    def __init__(self, num_iterations : int, num_player : int):
+    def __init__(self, info_game : dict, num_iterations : int, num_player : int):
         self.num_iterations = num_iterations
         self.num_player = num_player #Pour savoir quel joueur est MCTS
+        self.info_game = info_game #On récupère toutes les actions, blinds, mains et cartes de chaque partie du tournoi
 
 
     def select(self, node):
