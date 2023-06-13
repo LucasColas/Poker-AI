@@ -190,10 +190,10 @@ def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS):
     
 
 class Node:
-    def __init__(self, actions, Blinds, mains_player, cards_boards):
+    def __init__(self, state : dict):
         #print("State : ", state)
         #Deepcopy à faire manuellement
-        self.state = {"actions" : actions, "Blinds" : Blinds, "mains_player" : mains_player, "cards_boards" : cards_boards}
+        self.state = state
         #print("State : ", self.state)
         self.parent = None
         self.children = []
@@ -201,10 +201,10 @@ class Node:
         self.wins = 0
 
 class MCTS:
-    def __init__(self, info_game : dict, num_iterations : int, num_player : int):
+    def __init__(self, state, num_iterations : int, num_player : int):
         self.num_iterations = num_iterations
         self.num_player = num_player #Pour savoir quel joueur est MCTS
-        self.info_game = info_game #On récupère toutes les actions, blinds, mains et cartes de chaque partie du tournoi
+        self.state = state #Dictionnaire avec toutes les actions, blinds, mains, cartes du joueur MCTS, buyin, big blind, small blind, nb_players de chaque partie du tournoi
 
 
     def select(self, node):
@@ -240,7 +240,7 @@ class MCTS:
         return selected_node
 
     def simulate(self, node):
-        current_state = copy_game(node.state)
+        current_state = cloneTexasHoldem(node.state["actions"], node.state["Blinds"], node.state["mains_player"], node.state["cards_boards"])
         print("Current state : ", current_state)
         while current_state.is_hand_running():
             print("hand running")
