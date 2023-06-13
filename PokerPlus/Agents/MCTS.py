@@ -133,10 +133,46 @@ def cloneTexasHoldem(actions, Blinds, mains_player, cards_boards, buyin, big_bli
             if len(game.board) != 0:
                 game.board = cards_boards[num_partie][0:len(game.board)]
 
+
         #Score : 
         #Nombre de jetons gagné 
         #Et ensuite return le score à la fin de la main
 
+def cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS, btn_loc):
+    game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
+
+    while (game.btn_loc != btn_loc):
+        game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
+    
+    num_partie = 0
+    gui = TextGUI(game=game)
+    
+
+    while game.is_game_running():
+        num_partie += 1
+        game.start_hand()
+        game.hands = mains_player[num_partie]
+        game.sb_loc = Blinds[num_partie][0]
+        game.bb_loc = Blinds[num_partie][1]
+        num_action = 0
+        while game.is_hand_running():
+            gui.display_state()
+            gui.wait_until_prompted()
+            action_type, total = actions[num_partie][num_action][0], actions[num_partie][num_action][1]
+            game.take_action(action_type=action_type, total=total)
+            num_action += 1
+
+            #Terminer la partie avec du random
+            
+            #mains_player[num_partie] = (game.current_player, game.hands[game.current_player])
+            if len(game.board) != 0:
+                game.board = cards_boards[num_partie][0:len(game.board)]
+            gui.display_action()
+        gui.display_win()
+
+        #Score : 
+        #Nombre de jetons gagné 
+        #Et ensuite return le score à la fin de la main
 
     
 
@@ -187,7 +223,56 @@ def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS):
             gui.display_action()
         gui.display_win()
         return actions, Blinds, mains_player, cards_boards
+
+def MainGame2(buyin,big_blind, small_blind, nb_players, num_MCTS, nbr_parties):
+    game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
+    gui = TextGUI(game=game, visible_players=[])
+    actions = {} #Dictionnaire qui contiendra pour chaque partie un dictionnaire avec les infos sur les actions des joueurs. La clé sera le num de la main / partie. La valeur un dictionnaire des actions. Pour chaque action, la clé sera l'ordre de l'action. La valeur sera un tuple avec l'action, le total puis le joueur.
+    Blinds = {} #Dictionnaire pour stocker les blinds. La clé sera le num de la main/partie. Et la valeur sera un tuple avec les joueurs ayant payé les blinds.
+    mains_player = {} #Dictionnaire pour stocker les mains des joueurs. La clé sera le num de la main/partie. Et la valeur sera un dictionnaire avec les joueurs et leurs mains.
+    cards_boards = {} #Dictionnaire pour stocker les boards. La clé sera le num de la main/partie. Et la valeur sera un tuple avec les cartes.
+    btn_loc = game.btn_loc
+    num_partie = 0
     
+    while game.is_game_running():
+        num_partie += 1
+        game.start_hand()
+        num_action = 0
+        Blinds[num_partie] = (game.sb_loc, game.bb_loc)
+        actions[num_partie] = {}
+        print("mains player", mains_player)
+        print("game hands :", game.hands)
+        mains_player[num_partie] = {i:game.hands[i] for i in game.hands}
+        while game.is_hand_running():
+            gui.display_state()
+            gui.wait_until_prompted()
+            if game.current_player == num_MCTS:
+                action_type, total = ActionType.FOLD, None
+                pass
+
+                #MCTS joue
+            else:
+                action_type, total = random_agent(game)
+
+            actions[num_partie][num_action] = (action_type, total, game.current_player)
+            
+            game.take_action(action_type=action_type, total=total)
+            num_action += 1
+            
+            #mains_player[num_partie] = (game.current_player, game.hands[game.current_player])
+            if len(game.board) != 0:
+                cards_boards[num_partie] = game.board
+
+            print("actions : ", actions)
+            print("Blinds : ", Blinds)
+            print("mains_player : ", mains_player)
+            print("cards_boards : ", cards_boards)
+            
+            gui.display_action()
+        gui.display_win()
+        if num_partie == nbr_parties:
+            return actions, Blinds, mains_player, cards_boards, btn_loc
+    return actions, Blinds, mains_player, cards_boards, btn_loc
 
     
     
