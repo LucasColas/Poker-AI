@@ -12,12 +12,12 @@ from PokerPlus.Simulation.simu_bots import simu
 from PokerPlus.Stat.data import get_data, write_data
 from PokerPlus.Simulation.simu_bots_humains import simu_bots_humains, tournoi_avec_humain, plot_gagnant_from_csv
 from PokerPlus.Comportement.simu_comportement import simu_comportement, write_data_comportement, write_data_comportement2
-from PokerPlus.Agents.MCTS import MainGame, MCTS, simu
+from PokerPlus.Agents.MCTS import MainGame
 
 def main():
     
-    tournoi_avec_humain()
-    #plot_gagnant_from_csv(filename = "./data_gagnant.csv" )
+    #tournoi_avec_humain()
+    plot_gagnant_from_csv(filename = "./data_gagnant.csv" )
     """
     buyin = 1000
     big_blind = 150

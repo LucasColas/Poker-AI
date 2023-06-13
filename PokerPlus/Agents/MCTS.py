@@ -158,7 +158,7 @@ def agent_proba(game : TexasHoldEm):
     return ActionType.FOLD, None
 
 
-def simu(actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS):
+def cloneTexasHoldem(actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS):
     game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
     num_partie = 0
     gui = TextGUI(game=game)
@@ -172,9 +172,9 @@ def simu(actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_bl
         game.bb_loc = Blinds[num_partie][1]
         num_action = 0
         while game.is_hand_running():
-            gui.display_state()
-            gui.wait_until_prompted()
-            gui.wait_until_prompted()
+            #gui.display_state()
+            #gui.wait_until_prompted()
+            #gui.wait_until_prompted()
             #action_type, total = random_agent(game)
             #actions[num_partie][num_action] = (action_type, total, game.current_player)
             action_type, total = actions[num_partie][num_action][0], actions[num_partie][num_action][1]
@@ -184,8 +184,8 @@ def simu(actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_bl
             #mains_player[num_partie] = (game.current_player, game.hands[game.current_player])
             if len(game.board) != 0:
                 game.board = cards_boards[num_partie][0:len(game.board)]
-            gui.display_action()
-        gui.display_win()
+            #gui.display_action()
+        #gui.display_win()
     
 
 
@@ -235,14 +235,11 @@ def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS):
     
     
 
-
-
-
 class Node:
-    def __init__(self, state : TexasHoldEm):
+    def __init__(self, actions, Blinds, mains_player, cards_boards):
         #print("State : ", state)
         #Deepcopy à faire manuellement
-        self.state = copy(state)
+        self.state = {"actions" : actions, "Blinds" : Blinds, "mains_player" : mains_player, "cards_boards" : cards_boards}
         #print("State : ", self.state)
         self.parent = None
         self.children = []

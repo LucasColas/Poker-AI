@@ -17,7 +17,7 @@ from PokerPlus.Comportement.comportement import vpip, getRatioLarge, getVpip, ra
 from sklearn.cluster import KMeans
 from copy import copy
 import pickle
-from PokerPlus.Agents.MCTS import MCTS, simu, agent_proba
+from PokerPlus.Agents.MCTS import MCTS
 
 import matplotlib as mpl
 
