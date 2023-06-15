@@ -164,6 +164,8 @@ def cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_bl
     while game.is_game_running():
         num_partie += 1
         game.start_hand()
+
+        #TODO : vérifier que les cartes du tableau ou du joueur MCTS ne sont pas distribuées
         if num_partie <= num_partie_save:
             for id in game.hands:
                 if id == num_MCTS:
