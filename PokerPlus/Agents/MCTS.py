@@ -144,14 +144,19 @@ def cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_bl
     #TODO virer le gui
     game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
 
-    while (game.btn_loc != btn_loc):
+    while (game.btn_loc != btn_loc): #Pour avoir le même croupier
         game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
     
     num_partie = 0
     #gui = TextGUI(game=game)
-    NewDeck = Deck()
-    NewDeck.cards = [card for card in NewDeck.cards if card not in mains_player[num_partie] and card not in cards_boards[num_MCTS]]
-    game._deck = NewDeck
+
+    #La technique d'enlever les cartes du deck ne fonctionne pas.
+    #Car si on a 50 mains à faire, on va enlever les cartes des 50 mains. Et donc on aura plus de cartes.
+    #Il faut vérifier plutôt lors de la distribution que les cartes du tableau et du joueur MCTS ne sont pas distribuées.
+    #NewDeck = Deck()
+    #NewDeck.cards = [card for card in NewDeck.cards if card not in mains_player[1][] and card not in cards_boards[num_MCTS]]
+    #game._deck = NewDeck
+
     # on regarde cb de partie on a dans actions
     num_partie_save = len(actions)
     print(f" on  a {num_partie_save} parties")
