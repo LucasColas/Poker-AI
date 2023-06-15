@@ -149,7 +149,9 @@ def cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_bl
     
     num_partie = 0
     #gui = TextGUI(game=game)
-    
+    NewDeck = Deck()
+    NewDeck.cards = [card for card in NewDeck.cards if card not in mains_player[num_partie] and card not in cards_boards[num_MCTS]]
+    game._deck = NewDeck
     # on regarde cb de partie on a dans actions
     num_partie_save = len(actions)
     print(f" on  a {num_partie_save} parties")
@@ -158,7 +160,10 @@ def cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_bl
         num_partie += 1
         game.start_hand()
         if num_partie <= num_partie_save:
-            game.hands = mains_player[num_partie]
+            for id in game.hands:
+                if id == num_MCTS:
+                    game.hands[id] = mains_player[num_partie][id]
+            #game.hands = mains_player[num_partie]
             game.sb_loc = Blinds[num_partie][0]
             game.bb_loc = Blinds[num_partie][1]
         num_action = 0
