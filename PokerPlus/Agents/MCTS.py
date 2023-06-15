@@ -11,6 +11,7 @@ from texasholdem.game.player_state import PlayerState
 from itertools import combinations 
 from texasholdem.agents.basic import random_agent
 from texasholdem.gui.text_gui import TextGUI
+from texasholdem.evaluator.evaluator import *
 import time
 from PokerPlus.Agents.fonctions_auxiliaires import obtenir_cote,cote_en_pourcentage
 
@@ -163,20 +164,78 @@ def cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_bl
     ok = True
     while game.is_game_running():
         num_partie += 1
+
         game.start_hand()
 
         #TODO : vérifier que les cartes du tableau ou du joueur MCTS ne sont pas distribuées
-        if num_partie <= num_partie_save:
+        if num_partie == num_partie_save:
+            print("game hands",game.hands)
+            print("num partie : ", num_partie)
+             
             for id in game.hands:
-                if id == num_MCTS:
-                    game.hands[id] = mains_player[num_partie][id]
-            #game.hands = mains_player[num_partie]
+                print("id :", id)
+                
+                while num_partie in cards_boards and (game.hands[id][0] in cards_boards[num_partie] or game.hands[id][1] in cards_boards[num_partie]):
+                    #Changer la carte 
+
+                    
+                    if game.hands[id][0] in cards_boards[num_partie]:
+
+                        game.hands[id][0] = game._deck.draw(num=1)
+
+                    if game.hands[id][1] in cards_boards[num_partie]:
+                        game.hands[id][1] = game._deck.draw(num=1)
+
+                while game.hands[id][0] in mains_player[num_partie][num_MCTS] or game.hands[id][1] in mains_player[num_partie][num_MCTS]:
+                    #Changer la carte 
+                    
+                    if game.hands[id][0] in mains_player[num_partie][num_MCTS]:
+
+                        game.hands[id][0] = game._deck.draw(num=1)
+
+                    if game.hands[id][1] in mains_player[num_partie][num_MCTS]:
+                        game.hands[id][1] = game._deck.draw(num=1)
+
+            game.hands[num_MCTS] = mains_player[num_partie][num_MCTS]
+            print("game hands : ", game.hands)
+            
+
+        
+
+
+        if num_partie <= num_partie_save:
+            
+            game.hands = mains_player[num_partie]
             game.sb_loc = Blinds[num_partie][0]
             game.bb_loc = Blinds[num_partie][1]
         num_action = 0
         while game.is_hand_running():
             #gui.display_state()
             #gui.wait_until_prompted()
+            print("state :", game.hand_phase)
+            #Problème : évaluation causé par l'évaluation des bits
+            # Remplacer les cartes stockées par les "même" cartes venant du deck.
+            for id in game.hands:
+                if game.hands[id][0] in game.board or game.hands[id][1] in game.board:
+                    
+                    print("erreur. cartes : ", game.hands[id])
+
+                if game.hands[id][0] in game.board or game.hands[id][1] in game.board:
+                    print("erreur. cartes : ", game.hands[id])
+
+                
+
+                #print("evaluate : ", evaluate(game.hands[id], game.board))
+
+            
+
+            #print("deck  : ", game._deck)
+            print("game hands : ", game.hands)
+            #print("cards boards : ", cards_boards)
+            #print("game board : ", game.board)
+
+           
+
 
             #on refait la game 
             #print(f"num_p = {num_partie}, num_a = {num_action}")
@@ -185,6 +244,7 @@ def cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_bl
                 game.take_action(action_type=action_type, total=total)
                 num_action += 1
                 if len(game.board) != 0:
+                    print("ecrase tableau")
                     game.board = cards_boards[num_partie][0:len(game.board)]
 
             #Terminer la partie avec du random
@@ -193,7 +253,7 @@ def cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_bl
                 game.take_action(action_type=action_type, total=total)
                 ok = False
             else:
-                #TODO : marche pas
+                #
                 action, total = game.get_available_moves().sample()
                 #print(f"action : {action}")
                 game.take_action(action_type=action, total=total)
