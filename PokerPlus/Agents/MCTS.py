@@ -17,98 +17,156 @@ from PokerPlus.Agents.fonctions_auxiliaires import obtenir_cote,cote_en_pourcent
 
 from PokerPlus.Agents.agents_bots import agent_naif
 
+from texasholdem.game.history import (
+    History,
+    PrehandHistory,
+    BettingRoundHistory,
+    PlayerAction,
+    HistoryImportError,
+    SettleHistory,
+)
 
-def HandPotentiel(ourcards, boardcards):
-    oppcards = Deck().draw(num=52)
-    ahead = 0
-    tied = 1
-    behind = 2
 
-    oppcards = [card for card in oppcards if card not in ourcards and card not in boardcards]
-    ourrank = evaluate(ourcards, boardcards)
-    HP = [[0,0,0],[0,0,0],[0,0,0]]
-    HPTotal = [0,0,0]
-    for set_ in combinations(oppcards, 2):
-        opprank = evaluate(list(set_), boardcards)
-        if ourrank > opprank:
-            index = ahead
-        elif ourrank == opprank:
-            index = tied
-        else:
-            index = behind
-        
-        for T_R in combinations(oppcards, 2):
-            if list(T_R)[0] not in list(set_) and list(T_R)[1] not in list(set_):
-                board = boardcards + list(T_R)
-                    #print(ourcards, board)
-                ourbest = evaluate(ourcards, board)
-                    #print(list(set_), board)
-                oppbest = evaluate(list(set_), board)
-                if ourbest > oppbest:
-                    HP[index][ahead] += 1
-                elif ourbest == oppbest:
-                    HP[index][tied] += 1
-                else:
-                    HP[index][behind] += 1
-                HPTotal[index] += 1
-    Ppot = (HP[behind][ahead] + (HP[behind][tied]/2) + (HP[tied][ahead]/2)) / (HPTotal[behind] + HPTotal[tied])
-    Npot = (HP[ahead][behind] + (HP[tied][behind]/2) + (HP[ahead][tied]/2)) / (HPTotal[ahead] + HPTotal[tied])
-    return [Ppot, Npot]
+def generate_game(history, blinds, gui=False):
+    """
+    print("history : ", history)
+    num_players = len(history.prehand.player_chips)
+    game = TexasHoldEm(
+            buyin=1,
+            big_blind=history.prehand.big_blind,
+            small_blind=history.prehand.small_blind,
+            max_players=num_players,
+    )
 
-def HandStrength(ourcards, boardcards):
-    ahead = 0
-    tied = 0
-    behind = 0
-    ourrank = evaluate(ourcards, boardcards)
-    oppcards = Deck().draw(num=52)
-    oppcards = [card for card in oppcards if card not in ourcards and card not in boardcards]
-    for set_ in combinations(oppcards, 2):
-        opprank = evaluate(list(set_), boardcards)
-        if ourrank > opprank:
-            ahead += 1
-        elif ourrank == opprank:
-            tied += 1
-        else:
-            behind += 1
-    handstrength = (ahead + tied/2) / (ahead + tied + behind)
-    return handstrength
+        # button placed right before 0
+    game.btn_loc = num_players - 1
 
-def proba_win(game : TexasHoldEm):
-    ts = time.time()
-    HS = HandStrength(game.hands[game.current_player], game.board)
-    print("HS : ", HS)
-    HP = HandPotentiel(game.hands[game.current_player], game.board)
-    print("HP : ", HP)
-    res = time.time() - ts
-    print("Time : ", res)
-    return HS * (1 - HP[1]) + (1 - HS) * HP[0]
+    # read chips
+    for i in game.player_iter(0):
+        game.players[i].chips = history.prehand.player_chips[i]
+
+    # stack deck
+    deck = Deck()
+    if history.settle:
+        deck.cards = list(history.settle.new_cards)
+
+    # player actions in a stack
+    player_actions = []
+    for bet_round in (history.river, history.turn, history.flop, history.preflop):
+        if bet_round:
+            deck.cards = bet_round.new_cards + deck.cards
+            for action in reversed(bet_round.actions):
+                player_actions.insert(
+                    0, (action.player_id, action.action_type, action.total)
+                )
+
+    # start hand (deck will deal)
+
+    game.start_hand()
+    print("sb_loc : ", game.sb_loc)
+    print("bb_loc : ", game.bb_loc)
     
-def agent_proba(game : TexasHoldEm):
-    bet_amount = game.player_bet_amount(game.current_player)
-    chips =  game.players[game.current_player].chips
-    min_raise =  game.value_to_total(game.min_raise(),game.current_player)
-    max_raise = bet_amount + chips
-    if len(game.board) == 0:
-        action, total = game.get_available_moves().sample()
-        if action == ActionType.RAISE:
-            return action, min_raise
+    #game.current_player = next(game.in_pot_iter(loc=game.bb_loc + 1))
+
+
+        # give players old cards
+    for i in game.player_iter():
+        game.hands[i] = history.prehand.player_cards[i]
+
     
-    elif len(game.board) != 0:
-        if game.players[game.current_player].state == PlayerState.IN:
-            return ActionType.CHECK, None
-        p_win = proba_win(game)
-        print("p_win : ", p_win)
-        print("cote : ", obtenir_cote(game))
-        print("cote pourcentage", cote_en_pourcentage(obtenir_cote(game)))
-        print("p win * 100 : ", p_win*100)
-        if p_win*100 > cote_en_pourcentage(obtenir_cote(game)):
-            move, total = game.get_available_moves().sample()
+
+        # swap decks
+    if not history.settle:
+        #Les cartes sauf celles des mains des joueurs
+        cards = []
+        for card in deck.cards:
+            for hand in game.hands.values():
+                if card in hand:
+                    cards.append(card)
+
+        deck.cards = cards
+    game._deck = deck
+    print("game hands", game.hands)
+
+    while game.is_hand_running():
+        if gui:
+            gui = TextGUI(game=game)
+            gui.display_state()
+            gui.wait_until_prompted()
+
+        try:
             
-            print("on sample une action")
-            return move, total
+            player_id, action_type, total = player_actions.pop(0)
+            print("player_id : ", player_id)
+            print("current_player : ", game.current_player)
+            game.take_action(action_type=action_type, total=total)
+        except:
+            action, total = random_agent(game)
+            print("current_player : ", game.current_player)
+            game.take_action(action_type=action, total=total)
+
+    """
+    num_players = len(history.prehand.player_chips)
+    game = TexasHoldEm(
+            buyin=1,
+            big_blind=history.prehand.big_blind,
+            small_blind=history.prehand.small_blind,
+            max_players=num_players,
+        )
+    
+    gui = TextGUI(game=game)
+
+        # button placed right before 0
+    game.btn_loc = num_players - 1
+
+        # read chips
+    for i in game.player_iter(0):
+        game.players[i].chips = history.prehand.player_chips[i]
+
+        # stack deck
+    deck = Deck()
+    if history.settle:
+        deck.cards = list(history.settle.new_cards)
+
+
+        # player actions in a stack
+    player_actions  = []
+    for bet_round in (history.river, history.turn, history.flop, history.preflop):
+        if bet_round:
+            deck.cards = bet_round.new_cards + deck.cards
+            for action in reversed(bet_round.actions):
+                player_actions.insert(
+                    0, (action.player_id, action.action_type, action.total)
+                )
+
+    # start hand (deck will deal)
+    game.start_hand()
+
+    # give players old cards
+    for i in game.player_iter():
+        game.hands[i] = history.prehand.player_cards[i]
+
+        # swap decks
+    game._deck = deck
+
+    while game.is_hand_running():
+        gui.display_state()
+        gui.wait_until_prompted()
+        try:
+            player_id, action_type, total = player_actions.pop(0)
+            game.take_action(action_type=action_type, total=total)
+        except:
+            action, total = random_agent(game)
+            game.take_action(action_type=action, total=total)
+
+        gui.display_action()
+
+    gui.display_win()
     
 
-    return ActionType.FOLD, None
+    
+    
+            
 
 
 def cloneTexasHoldem(actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS):
@@ -141,6 +199,8 @@ def cloneTexasHoldem(actions, Blinds, mains_player, cards_boards, buyin, big_bli
         #Nombre de jetons gagné 
         #Et ensuite return le score à la fin de la main
 
+
+
 def cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS, btn_loc, next_action):
     #TODO virer le gui
     game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
@@ -150,13 +210,6 @@ def cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_bl
     
     num_partie = 0
     #gui = TextGUI(game=game)
-
-    #La technique d'enlever les cartes du deck ne fonctionne pas.
-    #Car si on a 50 mains à faire, on va enlever les cartes des 50 mains. Et donc on aura plus de cartes.
-    #Il faut vérifier plutôt lors de la distribution que les cartes du tableau et du joueur MCTS ne sont pas distribuées.
-    #NewDeck = Deck()
-    #NewDeck.cards = [card for card in NewDeck.cards if card not in mains_player[1][] and card not in cards_boards[num_MCTS]]
-    #game._deck = NewDeck
 
     # on regarde cb de partie on a dans actions
     num_partie_save = len(actions)
@@ -169,7 +222,9 @@ def cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_bl
 
         #TODO : vérifier que les cartes du tableau ou du joueur MCTS ne sont pas distribuées
         if num_partie == num_partie_save:
-            print("game hands",game.hands)
+            game.sb_loc = Blinds[num_partie][0]
+            game.bb_loc = Blinds[num_partie][1]
+            print("game hands", game.hands)
             print("num partie : ", num_partie)
              
             for id in game.hands:
@@ -197,13 +252,18 @@ def cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_bl
                         game.hands[id][1] = game._deck.draw(num=1)
 
             game.hands[num_MCTS] = mains_player[num_partie][num_MCTS]
+            index = 0
+            for hand in game._deck.cards:
+                if hand in game.hands[num_MCTS]:
+                    game.hands[num_MCTS][0] = hand 
+                    game._deck.cards.remove(hand)
+                    index += 1
+
             print("game hands : ", game.hands)
             
 
-        
 
-
-        if num_partie <= num_partie_save:
+        if num_partie < num_partie_save:
             
             game.hands = mains_player[num_partie]
             game.sb_loc = Blinds[num_partie][0]
@@ -213,6 +273,7 @@ def cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_bl
             #gui.display_state()
             #gui.wait_until_prompted()
             print("state :", game.hand_phase)
+
             #Problème : évaluation causé par l'évaluation des bits
             # Remplacer les cartes stockées par les "même" cartes venant du deck.
             for id in game.hands:
@@ -373,7 +434,7 @@ def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS):
 
 def MainGame2(buyin,big_blind, small_blind, nb_players, num_MCTS, nbr_parties):
     game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
-    gui = TextGUI(game=game, visible_players=[])
+    gui = TextGUI(game=game)
     actions = {} #Dictionnaire qui contiendra pour chaque partie un dictionnaire avec les infos sur les actions des joueurs. La clé sera le num de la main / partie. La valeur un dictionnaire des actions. Pour chaque action, la clé sera l'ordre de l'action. La valeur sera un tuple avec l'action, le total puis le joueur.
     Blinds = {} #Dictionnaire pour stocker les blinds. La clé sera le num de la main/partie. Et la valeur sera un tuple avec les joueurs ayant payé les blinds.
     mains_player = {} #Dictionnaire pour stocker les mains des joueurs. La clé sera le num de la main/partie. Et la valeur sera un dictionnaire avec les joueurs et leurs mains.
@@ -386,6 +447,7 @@ def MainGame2(buyin,big_blind, small_blind, nb_players, num_MCTS, nbr_parties):
         game.start_hand()
         num_action = 0
         Blinds[num_partie] = (game.sb_loc, game.bb_loc)
+        print("Blinds : ", Blinds)
         actions[num_partie] = {}
         #print("mains player", mains_player)
         #print("game hands :", game.hands)
@@ -396,11 +458,15 @@ def MainGame2(buyin,big_blind, small_blind, nb_players, num_MCTS, nbr_parties):
             if game.current_player == num_MCTS:
                 #TODO temp
                 #return actions, Blinds, mains_player, cards_boards, btn_loc
-                
-                action_type, total = choix_MCTS(20,game, actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS, btn_loc)
+                print("Fin partie")
+                return game.hand_history, [game.sb_loc, game.bb_loc]
+                action_type, total = random_agent(game)
+                #cloneTexasHoldem3(game.hand_history, None)
+                #return
+                #action_type, total = choix_MCTS(20,game, actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS, btn_loc)
                 #action_type, total = ActionType.FOLD, None
                 print(f"MCTS joue : {action_type} {total}")
-                return actions, Blinds, mains_player, cards_boards, btn_loc
+                #return actions, Blinds, mains_player, cards_boards, btn_loc
 
                 #MCTS joue
             else:
@@ -415,16 +481,16 @@ def MainGame2(buyin,big_blind, small_blind, nb_players, num_MCTS, nbr_parties):
             if len(game.board) != 0:
                 cards_boards[num_partie] = game.board
 
-            print("actions : ", actions)
-            print("Blinds : ", Blinds)
-            print("mains_player : ", mains_player)
-            print("cards_boards : ", cards_boards)
+            #print("actions : ", actions)
+            #print("Blinds : ", Blinds)
+            #print("mains_player : ", mains_player)
+            #print("cards_boards : ", cards_boards)
             
             gui.display_action()
         gui.display_win()
-        if num_partie == nbr_parties:
-            return actions, Blinds, mains_player, cards_boards, btn_loc
-    return actions, Blinds, mains_player, cards_boards, btn_loc
+    
+        
+        return game.hand_history
 
     
     
