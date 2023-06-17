@@ -2,7 +2,7 @@ import random
 import time
 import math
 from copy import deepcopy, copy
-from texasholdem.game.game import TexasHoldEm
+from texasholdem.game.game import TexasHoldEm, Pot
 from texasholdem.game.action_type import ActionType
 from texasholdem.agents.basic import random_agent
 from texasholdem.evaluator.evaluator import *
@@ -120,8 +120,7 @@ def generate_game(history, blinds, gui=False):
     game.btn_loc = num_players - 1
 
         # read chips
-    for i in game.player_iter(0):
-        game.players[i].chips = history.prehand.player_chips[i]
+    
 
         # stack deck
     deck = Deck()
@@ -146,16 +145,37 @@ def generate_game(history, blinds, gui=False):
     for i in game.player_iter():
         game.hands[i] = history.prehand.player_cards[i]
 
+    game.pots = [Pot()]
+
+    for i in game.player_iter(0):
+        game.players[i].chips = history.prehand.player_chips[i]
+        game.players[i].state = PlayerState.IN
+        game.players[i].last_pot = 0
+
+
+
+    game.btn_loc = history.prehand.btn_loc
+    game.sb_loc = blinds[0]
+    game.bb_loc = blinds[1]
+    game._player_post(game.sb_loc, history.prehand.small_blind)
+    game._player_post(game.bb_loc, history.prehand.big_blind)
+    game.current_player = next(game.in_pot_iter(loc=game.bb_loc + 1))
+
         # swap decks
     game._deck = deck
 
     while game.is_hand_running():
+        print("current_player : ", game.current_player)
         gui.display_state()
         gui.wait_until_prompted()
         try:
             player_id, action_type, total = player_actions.pop(0)
+            #game.current_player = player_id
             game.take_action(action_type=action_type, total=total)
-        except:
+            #print("current_player : ", game.current_player)
+        except Exception as e:
+            print(e)
+            print("random action")
             action, total = random_agent(game)
             game.take_action(action_type=action, total=total)
 
@@ -459,7 +479,9 @@ def MainGame2(buyin,big_blind, small_blind, nb_players, num_MCTS, nbr_parties):
                 #TODO temp
                 #return actions, Blinds, mains_player, cards_boards, btn_loc
                 print("Fin partie")
+                
                 return game.hand_history, [game.sb_loc, game.bb_loc]
+        
                 action_type, total = random_agent(game)
                 #cloneTexasHoldem3(game.hand_history, None)
                 #return

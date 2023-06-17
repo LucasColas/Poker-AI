@@ -29,7 +29,8 @@ def main():
     #actions, Blinds, mains_player, cards_boards, btn_loc = MainGame2(buyin, big_blind, small_blind, nb_players, num_MCTS,1)
     hand_history, Blinds = MainGame2(buyin, big_blind, small_blind, nb_players, num_MCTS,1)
     print(hand_history)
-    #generate_game(hand_history, Blinds, gui=True)
+
+    generate_game(hand_history, Blinds, gui=True)
     
     """
     game = TexasHoldEm(buyin=500, big_blind=5, small_blind=2, max_players=6)
@@ -41,10 +42,11 @@ def main():
         while game.is_hand_running():
             gui.run_step()
 
-        path = game.export_history('./pgns')     # save history
-        gui.replay_history(path)   
-    """
+        #path = game.export_history('./pgns')     # save history
+        gui.replay_history()  
 
+    """ 
+    
 
 if __name__ == "__main__":
     main()
