@@ -100,11 +100,16 @@ def generate_game(history, blinds, gui=False):
             if action_type == ActionType.CALL and game.players[player_id].state == PlayerState.IN:
                 game.players[player_id].state = PlayerState.TO_CALL
 
-            
+            if game.players[player_id].state != PlayerState.TO_CALL:
+                game.players[player_id].state = PlayerState.TO_CALL
             print("player iter", next(game.player_iter(game.current_player)))
             game.take_action(action_type=action_type, total=total)
+            print("action : ", action_type, total)
             #print("current_player : ", game.current_player)
             print("player iter", next(game.player_iter(game.current_player)))
+            if len(player_actions) == 0:
+                game.current_player = game.current_player+1 if game.current_player+1 < num_players else 0
+            print("game current player : ",game.current_player)
         except Exception as e:
             print(e)
             print("random action")
