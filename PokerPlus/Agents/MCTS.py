@@ -119,16 +119,16 @@ def generate_game(history, blinds, gui=False):
         # button placed right before 0
     game.btn_loc = num_players - 1
 
-        # read chips
+    # read chips
     
 
-        # stack deck
+    # stack deck
     deck = Deck()
     if history.settle:
         deck.cards = list(history.settle.new_cards)
 
 
-        # player actions in a stack
+    # player actions in a stack
     player_actions  = []
     for bet_round in (history.river, history.turn, history.flop, history.preflop):
         if bet_round:
@@ -160,6 +160,8 @@ def generate_game(history, blinds, gui=False):
     game._player_post(game.sb_loc, history.prehand.small_blind)
     game._player_post(game.bb_loc, history.prehand.big_blind)
     game.current_player = next(game.in_pot_iter(loc=game.bb_loc + 1))
+    print("current_player : ", game.current_player)
+    print("pot iter : ", next(game.in_pot_iter(loc=game.bb_loc + 1)))
 
         # swap decks
     game._deck = deck
@@ -169,10 +171,12 @@ def generate_game(history, blinds, gui=False):
         gui.display_state()
         gui.wait_until_prompted()
         try:
+            print("game current player : ",game.current_player)
             player_id, action_type, total = player_actions.pop(0)
-            #game.current_player = player_id
+            game.current_player = player_id
             game.take_action(action_type=action_type, total=total)
             #print("current_player : ", game.current_player)
+            print("player iter", next(game.player_iter(game.current_player)))
         except Exception as e:
             print(e)
             print("random action")
