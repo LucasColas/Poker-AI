@@ -28,84 +28,7 @@ from texasholdem.game.history import (
 
 
 def generate_game(history, blinds, gui=False):
-    """
-    print("history : ", history)
-    num_players = len(history.prehand.player_chips)
-    game = TexasHoldEm(
-            buyin=1,
-            big_blind=history.prehand.big_blind,
-            small_blind=history.prehand.small_blind,
-            max_players=num_players,
-    )
-
-        # button placed right before 0
-    game.btn_loc = num_players - 1
-
-    # read chips
-    for i in game.player_iter(0):
-        game.players[i].chips = history.prehand.player_chips[i]
-
-    # stack deck
-    deck = Deck()
-    if history.settle:
-        deck.cards = list(history.settle.new_cards)
-
-    # player actions in a stack
-    player_actions = []
-    for bet_round in (history.river, history.turn, history.flop, history.preflop):
-        if bet_round:
-            deck.cards = bet_round.new_cards + deck.cards
-            for action in reversed(bet_round.actions):
-                player_actions.insert(
-                    0, (action.player_id, action.action_type, action.total)
-                )
-
-    # start hand (deck will deal)
-
-    game.start_hand()
-    print("sb_loc : ", game.sb_loc)
-    print("bb_loc : ", game.bb_loc)
     
-    #game.current_player = next(game.in_pot_iter(loc=game.bb_loc + 1))
-
-
-        # give players old cards
-    for i in game.player_iter():
-        game.hands[i] = history.prehand.player_cards[i]
-
-    
-
-        # swap decks
-    if not history.settle:
-        #Les cartes sauf celles des mains des joueurs
-        cards = []
-        for card in deck.cards:
-            for hand in game.hands.values():
-                if card in hand:
-                    cards.append(card)
-
-        deck.cards = cards
-    game._deck = deck
-    print("game hands", game.hands)
-
-    while game.is_hand_running():
-        if gui:
-            gui = TextGUI(game=game)
-            gui.display_state()
-            gui.wait_until_prompted()
-
-        try:
-            
-            player_id, action_type, total = player_actions.pop(0)
-            print("player_id : ", player_id)
-            print("current_player : ", game.current_player)
-            game.take_action(action_type=action_type, total=total)
-        except:
-            action, total = random_agent(game)
-            print("current_player : ", game.current_player)
-            game.take_action(action_type=action, total=total)
-
-    """
     num_players = len(history.prehand.player_chips)
     game = TexasHoldEm(
             buyin=1,
@@ -174,6 +97,11 @@ def generate_game(history, blinds, gui=False):
             print("game current player : ",game.current_player)
             player_id, action_type, total = player_actions.pop(0)
             game.current_player = player_id
+            if action_type == ActionType.CALL and game.players[player_id].state == PlayerState.IN:
+                game.players[player_id].state = PlayerState.TO_CALL
+
+            
+            print("player iter", next(game.player_iter(game.current_player)))
             game.take_action(action_type=action_type, total=total)
             #print("current_player : ", game.current_player)
             print("player iter", next(game.player_iter(game.current_player)))
@@ -182,6 +110,7 @@ def generate_game(history, blinds, gui=False):
             print("random action")
             action, total = random_agent(game)
             game.take_action(action_type=action, total=total)
+            print("player iter", next(game.player_iter(game.current_player)))
 
         gui.display_action()
 
