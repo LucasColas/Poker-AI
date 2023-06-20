@@ -53,12 +53,10 @@ def simulation(game : TexasHoldEm, num_MCTS : int, gui=False) -> float:
         if gui:
             gui.display_win()
 
-        #TODO : renvoyer les chips qu'a gagné le joueur en sachant que s'il gagne les 
-        #jetons ne sont pas encore dans sa poche, donc il faut regarder dans le pot
-        #et pas que que l'attribut chips.
-        for id in range(len(game.players)):
-            if id == num_MCTS:
-                return game.players[id].chips
+        for p in game.players:
+            if p.player_id == num_MCTS:
+                print(f"chips : {p.chips}")
+                return p.chips
 
         
 
