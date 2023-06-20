@@ -29,9 +29,10 @@ from texasholdem.game.history import (
 
 
 
-def simulation(game : TexasHoldEm, num_MCTS : int, gui=False) -> float:
+def simulation(game : TexasHoldEm, num_MCTS : int, next_action : any, gui=False) -> float:
     if gui:
         gui = TextGUI(game=game)
+    ok = True
     while game.is_game_running():
 
         
@@ -39,12 +40,16 @@ def simulation(game : TexasHoldEm, num_MCTS : int, gui=False) -> float:
             if gui:
                 gui.display_state()
                 gui.wait_until_prompted()
-            if game.current_player == num_MCTS:
-                #Pour test je joue random
-                action_type, total = random_agent(game)
+                
+            if ok and game.current_player == num_MCTS:
+                action_type, total = next_action
+                ok = False
+                if action_type == ActionType.RAISE:
+                    print(f"on joue l'action choisi pour cett simu {next_action}")
 
             else:
                 action_type, total = random_agent(game)
+                #print(f"{game.current_player} joue l'action random {action_type, total}")
 
             game.take_action(action_type=action_type, total=total)
             if gui:
@@ -56,47 +61,37 @@ def simulation(game : TexasHoldEm, num_MCTS : int, gui=False) -> float:
         #TODO : renvoyer les chips qu'a gagné le joueur en sachant que s'il gagne les 
         #jetons ne sont pas encore dans sa poche, donc il faut regarder dans le pot
         #et pas que que l'attribut chips.
-        for id in range(len(game.players)):
-            if id == num_MCTS:
-                return game.players[id].chips
+        for p in game.players:
+            if p.player_id == num_MCTS:
+                #print(f"chips : {p.chips}")
+                return p.chips
 
         
 
-def choix_MCTS(nbr_de_simu_par_action,game, actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS, btn_loc):
-    bet_amount = game.player_bet_amount(game.current_player)
-    chips = game.players[game.current_player].chips
-    min_raise = game.value_to_total(game.min_raise(), game.current_player)
-    max_raise = bet_amount + chips
-    
-    
+def choix_MCTS(nbr_de_simu_par_action,game, num_MCTS):
+
     score = {}
     available_moves = game.get_available_moves()
+    action_ok = []
+     # je veux choisir 10 actions au hasard parmi les actions possible qui raise:
+    available_moves_raise = [a for a in available_moves if a[0] == ActionType.RAISE and a[1] !=None]
+    if len(available_moves_raise) > 10:
+        # jen prend 10 au hasard
+        action_ok  += random.sample(available_moves_raise, 10)
+    elif len(available_moves_raise) > 0:
+        action_ok += random.sample(available_moves_raise, 1)
+    print(f"\n\ntaille action_ok : {len(action_ok)}")
+    action_ok +=[a for a in available_moves if a[0] != ActionType.RAISE]
+
     for i in range(nbr_de_simu_par_action):
-        #action du type fold, call, allin,check avec none ou raise avec min_raise
-        #print(f"nbr : {len(available_moves)}")
-        
-        #TODO trop long avec les affichages
-        """
-        for action,total in available_moves:
-            if action == ActionType.RAISE:
-                if (max_raise > min_raise):
-                    total = random.randint(min_raise, max_raise)
-                else:
-                    action = ActionType.ALL_IN
-                    total = None
-            else:
-                total = None
-        """
-        action_ok =[a for a in available_moves if a[0] != ActionType.RAISE]
         for action in action_ok:
             print(f"        simu : {i} |action : {action[0]}, total : {action[1]}")
-            next_action = action
-            if next_action not in score.keys():
-                pass
-                #score[next_action] = 
-            #score[next_action].append()
-            #print(f"        score : {score}")
-    #print(f"\n\nscore : {score}")
+            if action not in score.keys():
+                score[action] = [simulation(deepcopy(game), num_MCTS, action, gui=False) ]
+            else:
+                score[action].append(simulation(deepcopy(game), num_MCTS, action, gui=False))
+
+    #print(f"score : {score}")
     dico_moy = {}
     for action in score.keys():
         dico_moy[action] = sum(score[action])/len(score[action])
@@ -111,7 +106,7 @@ def choix_MCTS(nbr_de_simu_par_action,game, actions, Blinds, mains_player, cards
     return action_max
 
 
-def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS):
+def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS, nbr_de_simu_par_action = 1000):
     game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
     gui = TextGUI(game=game)
     
@@ -125,9 +120,8 @@ def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS):
             gui.wait_until_prompted()
             if game.current_player == num_MCTS:
                 #Test de 1 simulation
-                res = simulation(deepcopy(game), num_MCTS, True)
-                print(f"res : {res}")
-                return 
+                action_type, total = choix_MCTS(nbr_de_simu_par_action,deepcopy(game), num_MCTS)
+                print(f"action_type : {action_type}") 
             else:
                 action_type, total = random_agent(game)
 
@@ -135,8 +129,6 @@ def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS):
             
             game.take_action(action_type=action_type, total=total)
             
-            #mains_player[num_partie] = (game.current_player, game.hands[game.current_player])
-
             
             gui.display_action()
         gui.display_win()
