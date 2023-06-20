@@ -38,7 +38,7 @@ def simulation(game : TexasHoldEm, num_MCTS : int, next_action : any, gui=False)
 
     # On remet les mains des joueurs dans la pioche 
     for p in game.players:
-        if p.player_id != num_MCTS:
+        if p.player_id != num_MCTS and p.player_id in game.hands.keys():
             
             game._deck.cards.extend(game.hands[p.player_id])
             game.hands[p.player_id] = []
