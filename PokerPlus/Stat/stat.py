@@ -12,11 +12,13 @@ from PokerPlus.Agents.agent_outs import agent_outs
 from PokerPlus.Agents.Good_Agents import agent_SA
 from PokerPlus.Agents.agent_comportement import *
 from PokerPlus.Simulation.simu_bots_humains import *
+from PokerPlus.Agents.MCTS import choix_MCTS
 
 import matplotlib.pyplot as plt
 import random
 from time import sleep
 from pprint import pprint
+from copy import deepcopy, copy
 
 def plot_stat(stats, n, joueurs_bots_noms, max_players):
     plt.bar(stats["nbrWin"].keys(), stats["nbrWin"].values())
@@ -116,9 +118,11 @@ def plot_stat_tournois(stats, n, joueurs_bots_noms):
 
 
 def pool_random(max_players,
-                bots = [random_agent, agent_outs().choix,agent_SA().action, agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif],
-                bots_noms = ["random_agent", "agent_out", "agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur", "agent_serre_non_agressif", "agent_large_non_agressif"]):
-    
+                #bots = [random_agent, agent_outs().choix,agent_SA().action, agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif],
+                #bots_noms = ["random_agent", "agent_out", "agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur", "agent_serre_non_agressif", "agent_large_non_agressif"]):
+                bots = [random_agent,agent_outs().choix, agent_SA().action, agent_naif, agent_allIn, choix_MCTS],
+                bots_noms = ["random_agent","agent_out","agent_serre_agressif", "agent_naif", "agent_allIn", "MCTS"]
+                ):
     joueurs_bots = {}
     joueurs_bots_noms = {}
     deja_all_in = False
@@ -333,6 +337,8 @@ def get_stat_tournoi(nmax = 1000, buyin=1000, big_blind=20, save=False, path='./
                 current_bot = joueurs_bots[game.current_player]
                 if(current_bot==agent_comportement):
                     action, total = current_bot(game,pred,game.current_player,agent_outs_comportement)
+                elif (current_bot == choix_MCTS):
+                    action, total = choix_MCTS(100,deepcopy(game), game.current_player)
                 else:
                     #print("action")
                     action, total = current_bot(game)

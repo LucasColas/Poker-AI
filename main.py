@@ -1,4 +1,4 @@
-#TexasHoldEm
+ #TexasHoldEm
 from time import sleep
 from texasholdem.game.game import TexasHoldEm
 from texasholdem.agents.basic import random_agent, call_agent
@@ -21,6 +21,10 @@ def main():
     #tournoi_avec_humain()
     #plot_gagnant_from_csv(filename = "./data_gagnant.csv" )
     
+    get_stat_tournoi(nmax = 100, buyin=1000, big_blind=200, save=False, path='./res', plot=True, poolrandom = True, max_players=6, verbose=False)
+
+
+
     buyin = 1000
     big_blind = 150
     small_blind = 75

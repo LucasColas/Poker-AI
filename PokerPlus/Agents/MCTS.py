@@ -69,8 +69,8 @@ def simulation(game : TexasHoldEm, num_MCTS : int, next_action : any, gui=False)
             if ok and game.current_player == num_MCTS:
                 action_type, total = next_action
                 ok = False
-                if action_type == ActionType.RAISE:
-                    print(f"on joue l'action choisi pour cett simu {next_action}")
+                #if action_type == ActionType.RAISE:
+                    #print(f"on joue l'action choisi pour cett simu {next_action}")
 
             else:
                 action_type, total = random_agent(game)
