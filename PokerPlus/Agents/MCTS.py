@@ -27,273 +27,37 @@ from texasholdem.game.history import (
 )
 
 
-def generate_game(history, blinds, gui=False):
-    
-    num_players = len(history.prehand.player_chips)
-    game = TexasHoldEm(
-            buyin=1,
-            big_blind=history.prehand.big_blind,
-            small_blind=history.prehand.small_blind,
-            max_players=num_players,
-        )
+
+
+def simulation(game : TexasHoldEm, num_MCTS : int) -> float:
     
     gui = TextGUI(game=game)
-
-        # button placed right before 0
-    game.btn_loc = num_players - 1
-
-    # read chips
-    
-
-    # stack deck
-    deck = Deck()
-    if history.settle:
-        deck.cards = list(history.settle.new_cards)
-
-
-    # player actions in a stack
-    player_actions  = []
-    for bet_round in (history.river, history.turn, history.flop, history.preflop):
-        if bet_round:
-            deck.cards = bet_round.new_cards + deck.cards
-            for action in reversed(bet_round.actions):
-                player_actions.insert(
-                    0, (action.player_id, action.action_type, action.total)
-                )
-
-    # start hand (deck will deal)
-    game.start_hand()
-
-    # give players old cards
-    for i in game.player_iter():
-        game.hands[i] = history.prehand.player_cards[i]
-
-    game.pots = [Pot()]
-
-    for i in game.player_iter(0):
-        game.players[i].chips = history.prehand.player_chips[i]
-        game.players[i].state = PlayerState.IN
-        game.players[i].last_pot = 0
-
-
-
-    game.btn_loc = history.prehand.btn_loc
-    game.sb_loc = blinds[0]
-    game.bb_loc = blinds[1]
-    game._player_post(game.sb_loc, history.prehand.small_blind)
-    game._player_post(game.bb_loc, history.prehand.big_blind)
-    game.current_player = next(game.in_pot_iter(loc=game.bb_loc + 1))
-    print("current_player : ", game.current_player)
-    print("pot iter : ", next(game.in_pot_iter(loc=game.bb_loc + 1)))
-
-        # swap decks
-    game._deck = deck
-
-    while game.is_hand_running():
-        print("current_player : ", game.current_player)
-        gui.display_state()
-        gui.wait_until_prompted()
-        try:
-            print("game current player : ",game.current_player)
-            player_id, action_type, total = player_actions.pop(0)
-            game.current_player = player_id
-            if action_type == ActionType.CALL and game.players[player_id].state == PlayerState.IN:
-                game.players[player_id].state = PlayerState.TO_CALL
-
-            if game.players[player_id].state != PlayerState.TO_CALL:
-                game.players[player_id].state = PlayerState.TO_CALL
-            print("player iter", next(game.player_iter(game.current_player)))
-            game.take_action(action_type=action_type, total=total)
-            print("action : ", action_type, total)
-            #print("current_player : ", game.current_player)
-            print("player iter", next(game.player_iter(game.current_player)))
-            if len(player_actions) == 0:
-                game.current_player = game.current_player+1 if game.current_player+1 < num_players else 0
-            print("game current player : ",game.current_player)
-        except Exception as e:
-            print(e)
-            print("random action")
-            action, total = random_agent(game)
-            game.take_action(action_type=action, total=total)
-            print("player iter", next(game.player_iter(game.current_player)))
-
-        gui.display_action()
-
-    gui.display_win()
-    
-
-    
-    
-            
-
-
-def cloneTexasHoldem(actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS):
-    game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
-    num_partie = 0
-    gui = TextGUI(game=game)
-    
-
     while game.is_game_running():
-        num_partie += 1
-        game.start_hand()
-        game.hands = mains_player[num_partie]
-        game.sb_loc = Blinds[num_partie][0]
-        game.bb_loc = Blinds[num_partie][1]
-        num_action = 0
-        while game.is_hand_running():
-
-            action_type, total = actions[num_partie][num_action][0], actions[num_partie][num_action][1]
-            game.take_action(action_type=action_type, total=total)
-            num_action += 1
-
-            #Terminer la partie avec du random
-            
-            #mains_player[num_partie] = (game.current_player, game.hands[game.current_player])
-            if len(game.board) != 0:
-                game.board = cards_boards[num_partie][0:len(game.board)]
-
-
-        #Score : 
-        #Nombre de jetons gagné 
-        #Et ensuite return le score à la fin de la main
-
-
-
-def cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS, btn_loc, next_action):
-    #TODO virer le gui
-    game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
-
-    while (game.btn_loc != btn_loc): #Pour avoir le même croupier
-        game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
-    
-    num_partie = 0
-    #gui = TextGUI(game=game)
-
-    # on regarde cb de partie on a dans actions
-    num_partie_save = len(actions)
-    print(f" on  a {num_partie_save} parties")
-    ok = True
-    while game.is_game_running():
-        num_partie += 1
-
-        game.start_hand()
-
-        #TODO : vérifier que les cartes du tableau ou du joueur MCTS ne sont pas distribuées
-        if num_partie == num_partie_save:
-            game.sb_loc = Blinds[num_partie][0]
-            game.bb_loc = Blinds[num_partie][1]
-            print("game hands", game.hands)
-            print("num partie : ", num_partie)
-             
-            for id in game.hands:
-                print("id :", id)
-                
-                while num_partie in cards_boards and (game.hands[id][0] in cards_boards[num_partie] or game.hands[id][1] in cards_boards[num_partie]):
-                    #Changer la carte 
-
-                    
-                    if game.hands[id][0] in cards_boards[num_partie]:
-
-                        game.hands[id][0] = game._deck.draw(num=1)
-
-                    if game.hands[id][1] in cards_boards[num_partie]:
-                        game.hands[id][1] = game._deck.draw(num=1)
-
-                while game.hands[id][0] in mains_player[num_partie][num_MCTS] or game.hands[id][1] in mains_player[num_partie][num_MCTS]:
-                    #Changer la carte 
-                    
-                    if game.hands[id][0] in mains_player[num_partie][num_MCTS]:
-
-                        game.hands[id][0] = game._deck.draw(num=1)
-
-                    if game.hands[id][1] in mains_player[num_partie][num_MCTS]:
-                        game.hands[id][1] = game._deck.draw(num=1)
-
-            game.hands[num_MCTS] = mains_player[num_partie][num_MCTS]
-            index = 0
-            for hand in game._deck.cards:
-                if hand in game.hands[num_MCTS]:
-                    game.hands[num_MCTS][0] = hand 
-                    game._deck.cards.remove(hand)
-                    index += 1
-
-            print("game hands : ", game.hands)
-            
-
-
-        if num_partie < num_partie_save:
-            
-            game.hands = mains_player[num_partie]
-            game.sb_loc = Blinds[num_partie][0]
-            game.bb_loc = Blinds[num_partie][1]
-        num_action = 0
-        while game.is_hand_running():
-            #gui.display_state()
-            #gui.wait_until_prompted()
-            print("state :", game.hand_phase)
-
-            #Problème : évaluation causé par l'évaluation des bits
-            # Remplacer les cartes stockées par les "même" cartes venant du deck.
-            for id in game.hands:
-                if game.hands[id][0] in game.board or game.hands[id][1] in game.board:
-                    
-                    print("erreur. cartes : ", game.hands[id])
-
-                if game.hands[id][0] in game.board or game.hands[id][1] in game.board:
-                    print("erreur. cartes : ", game.hands[id])
-
-                
-
-                #print("evaluate : ", evaluate(game.hands[id], game.board))
-
-            
-
-            #print("deck  : ", game._deck)
-            print("game hands : ", game.hands)
-            #print("cards boards : ", cards_boards)
-            #print("game board : ", game.board)
-
-           
-
-
-            #on refait la game 
-            #print(f"num_p = {num_partie}, num_a = {num_action}")
-            if num_partie in actions.keys() and num_action in actions[num_partie].keys():
-                action_type, total = actions[num_partie][num_action][0], actions[num_partie][num_action][1]
-                game.take_action(action_type=action_type, total=total)
-                num_action += 1
-                if len(game.board) != 0:
-                    print("ecrase tableau")
-                    game.board = cards_boards[num_partie][0:len(game.board)]
-
-            #Terminer la partie avec du random
-            elif ok == True:
-                action_type, total = next_action
-                game.take_action(action_type=action_type, total=total)
-                ok = False
-            else:
-                #
-                action, total = game.get_available_moves().sample()
-                #print(f"action : {action}")
-                game.take_action(action_type=action, total=total)
-            #mains_player[num_partie] = (game.current_player, game.hands[game.current_player])
-            
-
-            #gui.display_action()
-
-        #gui.display_win()
 
         
+        while game.is_hand_running():
+            gui.display_state()
+            gui.wait_until_prompted()
+            if game.current_player == num_MCTS:
+                #Pour test je joue random
+                action_type, total = random_agent(game)
 
-        #Score : 
-        #Nombre de jetons gagné a la fin de la partie
-        if ok ==False:
-            for p in game.players:
-                if p.player_id == num_MCTS:
-                    print(f"fin de la partie simule avec le coup {next_action}, on retourne {p.chips}")
-                    return p.chips
+            else:
+                action_type, total = random_agent(game)
 
-        #Et ensuite return le score à la fin de la main
+            game.take_action(action_type=action_type, total=total)
+            gui.display_action()
+
+        gui.display_win()
+
+        #TODO : renvoyer les chips qu'a gagné le joueur en sachant que s'il gagne les 
+        #jetons ne sont pas encore dans sa poche, donc il faut regarder dans le pot
+        #et pas que que l'attribut chips.
+        for id in range(len(game.players)):
+            if id == num_MCTS:
+                return game.players[id].chips
+
+        
 
 def choix_MCTS(nbr_de_simu_par_action,game, actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS, btn_loc):
     bet_amount = game.player_bet_amount(game.current_player)
@@ -325,10 +89,11 @@ def choix_MCTS(nbr_de_simu_par_action,game, actions, Blinds, mains_player, cards
             print(f"        simu : {i} |action : {action[0]}, total : {action[1]}")
             next_action = action
             if next_action not in score.keys():
-                score[next_action] = [cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS, btn_loc,next_action)]
-            score[next_action].append(cloneTexasHoldem2(actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS, btn_loc,next_action))
+                pass
+                #score[next_action] = 
+            #score[next_action].append()
             #print(f"        score : {score}")
-    print(f"\n\nscore : {score}")
+    #print(f"\n\nscore : {score}")
     dico_moy = {}
     for action in score.keys():
         dico_moy[action] = sum(score[action])/len(score[action])
@@ -346,120 +111,41 @@ def choix_MCTS(nbr_de_simu_par_action,game, actions, Blinds, mains_player, cards
 def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS):
     game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
     gui = TextGUI(game=game, visible_players=[])
-    actions = {} #Dictionnaire qui contiendra pour chaque partie un dictionnaire avec les infos sur les actions des joueurs. La clé sera le num de la main / partie. La valeur un dictionnaire des actions. Pour chaque action, la clé sera l'ordre de l'action. La valeur sera un tuple avec l'action, le total puis le joueur.
-    Blinds = {} #Dictionnaire pour stocker les blinds. La clé sera le num de la main/partie. Et la valeur sera un tuple avec les joueurs ayant payé les blinds.
-    mains_player = {} #Dictionnaire pour stocker les mains des joueurs. La clé sera le num de la main/partie. Et la valeur sera un dictionnaire avec les joueurs et leurs mains.
-    cards_boards = {} #Dictionnaire pour stocker les boards. La clé sera le num de la main/partie. Et la valeur sera un tuple avec les cartes.
     
-    num_partie = 0
     
     while game.is_game_running():
-        num_partie += 1
         game.start_hand()
-        num_action = 0
-        Blinds[num_partie] = (game.sb_loc, game.bb_loc)
-        actions[num_partie] = {}
-        print("mains player", mains_player)
-        print("game hands :", game.hands)
-        mains_player[num_partie] = {i:game.hands[i] for i in game.hands}
+
+
         while game.is_hand_running():
             gui.display_state()
             gui.wait_until_prompted()
             if game.current_player == num_MCTS:
-                pass
-
-                #MCTS joue
+                #Test de 1 simulation
+                res = simulation(deepcopy(game), num_MCTS)
+                print(f"res : {res}")
+                return 
             else:
                 action_type, total = random_agent(game)
 
-            actions[num_partie][num_action] = (action_type, total, game.current_player)
+
             
             game.take_action(action_type=action_type, total=total)
-            num_action += 1
             
             #mains_player[num_partie] = (game.current_player, game.hands[game.current_player])
-            if len(game.board) != 0:
-                cards_boards[num_partie] = game.board
 
-            print("actions : ", actions)
-            print("Blinds : ", Blinds)
-            print("mains_player : ", mains_player)
-            print("cards_boards : ", cards_boards)
             
             gui.display_action()
         gui.display_win()
-        return actions, Blinds, mains_player, cards_boards
 
-def MainGame2(buyin,big_blind, small_blind, nb_players, num_MCTS, nbr_parties):
-    game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
-    gui = TextGUI(game=game)
-    actions = {} #Dictionnaire qui contiendra pour chaque partie un dictionnaire avec les infos sur les actions des joueurs. La clé sera le num de la main / partie. La valeur un dictionnaire des actions. Pour chaque action, la clé sera l'ordre de l'action. La valeur sera un tuple avec l'action, le total puis le joueur.
-    Blinds = {} #Dictionnaire pour stocker les blinds. La clé sera le num de la main/partie. Et la valeur sera un tuple avec les joueurs ayant payé les blinds.
-    mains_player = {} #Dictionnaire pour stocker les mains des joueurs. La clé sera le num de la main/partie. Et la valeur sera un dictionnaire avec les joueurs et leurs mains.
-    cards_boards = {} #Dictionnaire pour stocker les boards. La clé sera le num de la main/partie. Et la valeur sera un tuple avec les cartes.
-    btn_loc = game.btn_loc
-    num_partie = 0
-    
-    while game.is_game_running():
-        num_partie += 1
-        game.start_hand()
-        num_action = 0
-        Blinds[num_partie] = (game.sb_loc, game.bb_loc)
-        print("Blinds : ", Blinds)
-        actions[num_partie] = {}
-        #print("mains player", mains_player)
-        #print("game hands :", game.hands)
-        mains_player[num_partie] = {i:game.hands[i] for i in game.hands}
-        while game.is_hand_running():
-            gui.display_state()
-            gui.wait_until_prompted()
-            if game.current_player == num_MCTS:
-                #TODO temp
-                #return actions, Blinds, mains_player, cards_boards, btn_loc
-                print("Fin partie")
-                
-                return game.hand_history, [game.sb_loc, game.bb_loc]
-        
-                action_type, total = random_agent(game)
-                #cloneTexasHoldem3(game.hand_history, None)
-                #return
-                #action_type, total = choix_MCTS(20,game, actions, Blinds, mains_player, cards_boards, buyin, big_blind, small_blind, nb_players, num_MCTS, btn_loc)
-                #action_type, total = ActionType.FOLD, None
-                print(f"MCTS joue : {action_type} {total}")
-                #return actions, Blinds, mains_player, cards_boards, btn_loc
 
-                #MCTS joue
-            else:
-                action_type, total = random_agent(game)
-
-            actions[num_partie][num_action] = (action_type, total, game.current_player)
-            
-            game.take_action(action_type=action_type, total=total)
-            num_action += 1
-            
-            #mains_player[num_partie] = (game.current_player, game.hands[game.current_player])
-            if len(game.board) != 0:
-                cards_boards[num_partie] = game.board
-
-            #print("actions : ", actions)
-            #print("Blinds : ", Blinds)
-            #print("mains_player : ", mains_player)
-            #print("cards_boards : ", cards_boards)
-            
-            gui.display_action()
-        gui.display_win()
-    
-        
-        return game.hand_history
-
-    
     
 
 class Node:
     def __init__(self, state : dict):
         #print("State : ", state)
         #Deepcopy à faire manuellement
-        self.state = state
+        self.state = deepcopy(state)
         #print("State : ", self.state)
         self.parent = None
         self.children = []
