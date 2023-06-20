@@ -33,26 +33,31 @@ def simulation(game : TexasHoldEm, num_MCTS : int, next_action : any, gui=False)
     if gui:
         gui = TextGUI(game=game)
     ok = True
-    #TODO MARCHE PAS
-    """
-    print(f"\nhands 1: {game.hands}")
+    
+    #print(f"\nhands 1: {game.hands}")
 
     # On remet les mains des joueurs dans la pioche 
     for p in game.players:
         if p.player_id != num_MCTS:
             
-            game._deck.cards.append(game.hands[p.player_id])
+            game._deck.cards.extend(game.hands[p.player_id])
             game.hands[p.player_id] = []
     #on melange
     game._deck.shuffle()
 
-    # On pioche 2 carte pour tt le monde sauf MCTS
+    # On pioche 2 carte pour tout le monde sauf MCTS
     for p in game.players:
         if p.player_id != num_MCTS:
-            game.hands[p.player_id] += game._deck.draw(2)
+            if len(game.hands[p.player_id]) != 0:
+                print("erreur")
+                game.hands[p.player_id] = []
+            
+            game.hands[p.player_id] = game._deck.draw(2)
 
-    print(f"\nhands 2: {game.hands}")
-    """
+            #print("game hands : ", game.hands[p.player_id])
+
+    #print(f"\nhands 2: {game.hands}")
+    
     while game.is_game_running():
 
         
@@ -78,9 +83,7 @@ def simulation(game : TexasHoldEm, num_MCTS : int, next_action : any, gui=False)
         if gui:
             gui.display_win()
 
-        #TODO : renvoyer les chips qu'a gagné le joueur en sachant que s'il gagne les 
-        #jetons ne sont pas encore dans sa poche, donc il faut regarder dans le pot
-        #et pas que que l'attribut chips.
+        
         for p in game.players:
             if p.player_id == num_MCTS:
                 #print(f"chips : {p.chips}")
