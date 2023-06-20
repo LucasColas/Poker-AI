@@ -103,12 +103,12 @@ def choix_MCTS(nbr_de_simu_par_action,game, num_MCTS):
         action_ok  += random.sample(available_moves_raise, 10)
     elif len(available_moves_raise) > 0:
         action_ok += random.sample(available_moves_raise, 1)
-    print(f"\n\ntaille action_ok : {len(action_ok)}")
+    #print(f"\n\ntaille action_ok : {len(action_ok)}")
     action_ok +=[a for a in available_moves if a[0] != ActionType.RAISE]
 
     for i in range(nbr_de_simu_par_action):
         for action in action_ok:
-            print(f"        simu : {i} |action : {action[0]}, total : {action[1]}")
+            #print(f"        simu : {i} |action : {action[0]}, total : {action[1]}")
             if action not in score.keys():
                 score[action] = [simulation(deepcopy(game), num_MCTS, action, gui=False) ]
             else:
@@ -118,7 +118,7 @@ def choix_MCTS(nbr_de_simu_par_action,game, num_MCTS):
     dico_moy = {}
     for action in score.keys():
         dico_moy[action] = sum(score[action])/len(score[action])
-    print(f"dico_moy : {dico_moy}")
+    #print(f"dico_moy : {dico_moy}")
 
     #on prend le max
     max = 0
@@ -129,7 +129,7 @@ def choix_MCTS(nbr_de_simu_par_action,game, num_MCTS):
     return action_max
 
 
-def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS, nbr_de_simu_par_action = 1000):
+def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS, nbr_de_simu_par_action = 10000):
     game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
     gui = TextGUI(game=game)
     
