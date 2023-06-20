@@ -47,7 +47,7 @@ def simulation(game : TexasHoldEm, num_MCTS : int, next_action : any, gui=False)
 
     # On pioche 2 carte pour tout le monde sauf MCTS
     for p in game.players:
-        if p.player_id != num_MCTS:
+        if p.player_id != num_MCTS and p.player_id in game.hands.keys():
             if len(game.hands[p.player_id]) != 0:
                 print("erreur")
                 game.hands[p.player_id] = []
