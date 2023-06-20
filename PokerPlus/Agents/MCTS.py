@@ -29,15 +29,16 @@ from texasholdem.game.history import (
 
 
 
-def simulation(game : TexasHoldEm, num_MCTS : int) -> float:
-    
-    gui = TextGUI(game=game)
+def simulation(game : TexasHoldEm, num_MCTS : int, gui=False) -> float:
+    if gui:
+        gui = TextGUI(game=game)
     while game.is_game_running():
 
         
         while game.is_hand_running():
-            gui.display_state()
-            gui.wait_until_prompted()
+            if gui:
+                gui.display_state()
+                gui.wait_until_prompted()
             if game.current_player == num_MCTS:
                 #Pour test je joue random
                 action_type, total = random_agent(game)
@@ -46,9 +47,11 @@ def simulation(game : TexasHoldEm, num_MCTS : int) -> float:
                 action_type, total = random_agent(game)
 
             game.take_action(action_type=action_type, total=total)
-            gui.display_action()
+            if gui:
+                gui.display_action()
 
-        gui.display_win()
+        if gui:
+            gui.display_win()
 
         #TODO : renvoyer les chips qu'a gagné le joueur en sachant que s'il gagne les 
         #jetons ne sont pas encore dans sa poche, donc il faut regarder dans le pot
@@ -110,7 +113,7 @@ def choix_MCTS(nbr_de_simu_par_action,game, actions, Blinds, mains_player, cards
 
 def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS):
     game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
-    gui = TextGUI(game=game, visible_players=[])
+    gui = TextGUI(game=game)
     
     
     while game.is_game_running():
@@ -122,7 +125,7 @@ def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS):
             gui.wait_until_prompted()
             if game.current_player == num_MCTS:
                 #Test de 1 simulation
-                res = simulation(deepcopy(game), num_MCTS)
+                res = simulation(deepcopy(game), num_MCTS, True)
                 print(f"res : {res}")
                 return 
             else:
