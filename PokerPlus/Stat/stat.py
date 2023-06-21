@@ -100,6 +100,7 @@ def plot_stat_tournois(stats, n, joueurs_bots_noms):
 
     # pour les autres stats on afiche au hasard 1 stats de tournois
     # Générer 5 indices aléatoires distincts
+    """
     indices_t = random.sample(range(n), 1)
     print(indices_t)
     for i in indices_t:
@@ -114,6 +115,7 @@ def plot_stat_tournois(stats, n, joueurs_bots_noms):
             print(f"Position partie {k}:{stats['position'][f'tournoi {i}'][f'partie {k}']}")
             print(f"nbr de call partie {k} :{stats['nbrCall_p'][f'tournoi {i}'][f'partie {k}']}")
         print()
+    """
 
 
 
