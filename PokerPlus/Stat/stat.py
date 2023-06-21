@@ -393,7 +393,7 @@ def get_stat_tournoi(nmax = 1000, buyin=1000, big_blind=20, save=False, path='./
             last_gagnant = str(game.hand_history.settle)[7]
             last_gagnant = int(last_gagnant)
             stats["nbrWin partie"][f"tournoi {nbr_tournoi}"][last_gagnant] += 1
-            print(f"tournoi {nbr_tournoi}: partie {nbr_partie}")
+            print(f"tournoi num : {nbr_tournoi}", end='\r' )
             
 
 

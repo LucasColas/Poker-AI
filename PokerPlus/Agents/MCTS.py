@@ -96,11 +96,27 @@ def choix_MCTS(nbr_de_simu_par_action,game, num_MCTS):
     score = {}
     available_moves = game.get_available_moves()
     action_ok = []
-     # je veux choisir 10 actions au hasard parmi les actions possible qui raise:
+    # je veux choisir 10 actions au hasard parmi les actions possible qui raise:
     available_moves_raise = [a for a in available_moves if a[0] == ActionType.RAISE and a[1] !=None]
+    #on recupere le min raise en triant le tableau available_move par rapport a son 2 argument pour chaque tuple
+    
+    available_moves_raise = sorted(available_moves_raise, key=lambda x: x[1])
+    #print(f"available_moves_raise : {available_moves_raise}")
+
+
     if len(available_moves_raise) > 10:
-        # jen prend 10 au hasard
-        action_ok  += random.sample(available_moves_raise, 10)
+        
+        min = available_moves_raise[0][1]
+        max = available_moves_raise[-1][1]
+        # on divise nos raises possibles en 10 et on prend le raise 1*h, 2*h, 3*h, 4*h, 5*h, 6*h, 7*h, 8*h, 9*h, 10*h
+        h = (max-min)//game.big_blind
+        #print(f"min : {min}, max : {max}, h : {h}, big_blind : {game.big_blind}")
+        action_ok += [(ActionType.RAISE, min)]
+        action_ok += [(ActionType.RAISE, max)]
+        for i in range(1,h):
+            action_ok += [(ActionType.RAISE, min + i*game.big_blind)]
+            #print(f"action_ok : {action_ok}") 
+        
     elif len(available_moves_raise) > 0:
         action_ok += random.sample(available_moves_raise, 1)
     #print(f"\n\ntaille action_ok : {len(action_ok)}")
@@ -142,6 +158,10 @@ def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS, nbr_de_simu_par
             gui.display_state()
             gui.wait_until_prompted()
             if game.current_player == num_MCTS:
+                mctss = MCTS(deepcopy(game), 10, num_MCTS)
+                mctss.search(deepcopy(game),num_MCTS)
+                return mctss
+
                 #Test de 1 simulation
                 action_type, total = choix_MCTS(nbr_de_simu_par_action,deepcopy(game), num_MCTS)
                 print(f"action_type : {action_type}") 
@@ -169,13 +189,14 @@ class Node:
         self.children = []
         self.visits = 0
         self.wins = 0
+        self.games_played = 0
+        self.action = None,None
 
 class MCTS:
-    def __init__(self, state, num_iterations : int, num_player : int):
+    def __init__(self, state : TexasHoldEm, num_iterations : int, num_player : int):
         self.num_iterations = num_iterations
         self.num_player = num_player #Pour savoir quel joueur est MCTS
-        self.state = state #Dictionnaire avec toutes les actions, blinds, mains, cartes du joueur MCTS, buyin, big blind, small blind, nb_players de chaque partie du tournoi
-
+        self.state = state # Game
 
     def select(self, node):
         while not node.state.is_hand_running():
@@ -187,9 +208,12 @@ class MCTS:
 
     def expand(self, node):
         possible_actions = node.state.get_available_moves()
-        for action in possible_actions:
+        # TODO changer
+        # on choisi un nombre d'action visité au hasard
+        for action in random.sample(possible_actions, 10):
             new_node = Node(node.state)
             print("Action : ", action)
+            new_node.action = action
             new_node.state.take_action(*action)
             #new_node = Node(new_state)
             new_node.parent = node
@@ -210,8 +234,7 @@ class MCTS:
         return selected_node
 
     def simulate(self, node):
-        current_state = cloneTexasHoldem(node.state["actions"], node.state["Blinds"], node.state["mains_player"], node.state["cards_boards"])
-        print("Current state : ", current_state)
+        current_state = deepcopy(node.state)
         while current_state.is_hand_running():
             print("hand running")
             action, total = current_state.get_available_moves().sample()
@@ -227,13 +250,13 @@ class MCTS:
             return 1
         return -1
 
-    def backpropagate(self, node, result):
+    def backpropagate(self, node : Node, result):
         while node is not None:
             node.visits += 1
             if result == 1:
                 node.wins += 1
-            node = node.parent
-
+            self.backpropagate(node.parent, result)
+    
     def get_best_action(self, node):
         best_child = None
         best_wins = float("-inf")
@@ -243,7 +266,7 @@ class MCTS:
                 best_child = child
                 best_wins = child.wins
 
-        return best_child.state._action
+        return best_child.state.action
 
     def search(self, initial_state, num_player : int):
         root_node = Node(initial_state)
