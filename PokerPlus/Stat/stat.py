@@ -393,7 +393,7 @@ def get_stat_tournoi(nmax = 1000, buyin=1000, big_blind=20, save=False, path='./
             last_gagnant = str(game.hand_history.settle)[7]
             last_gagnant = int(last_gagnant)
             stats["nbrWin partie"][f"tournoi {nbr_tournoi}"][last_gagnant] += 1
-            print("nbr partie : ", nbr_partie, end="\r")
+            print(f"tournoi {nbr_tournoi}: partie {nbr_partie}")
             
 
 
@@ -403,7 +403,7 @@ def get_stat_tournoi(nmax = 1000, buyin=1000, big_blind=20, save=False, path='./
             print(f"tournoi {nbr_tournoi} de {nbr_partie} parties gagné par joueur{last_gagnant} ({joueurs_bots_noms[last_gagnant]})")
             print(f"eliminé : {stats['elimine'][f'tournoi {nbr_tournoi}']}\n")
             print("fold :", stats["nbrFold"][f"tournoi {nbr_tournoi}"])
-        print(f"tournoi num : {nbr_tournoi}", end='\r' )
+        #print(f"tournoi num : {nbr_tournoi}", end='\r' )
         nbr_tournoi+=1
 
     if plot:
