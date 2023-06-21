@@ -148,8 +148,7 @@ def choix_MCTS(nbr_de_simu_par_action,game, num_MCTS):
 def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS, nbr_de_simu_par_action = 10000):
     game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
     gui = TextGUI(game=game)
-    
-    
+    mctss = MCTS(deepcopy(game), 5, num_MCTS)
     while game.is_game_running():
         game.start_hand()
 
@@ -158,13 +157,17 @@ def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS, nbr_de_simu_par
             gui.display_state()
             gui.wait_until_prompted()
             if game.current_player == num_MCTS:
-                mctss = MCTS(deepcopy(game), 10, num_MCTS)
-                mctss.search(deepcopy(game),num_MCTS)
-                return mctss
+                action = mctss.search(deepcopy(game),num_MCTS)
+                print(f"action de MCTS: {action}")
+                if type(action) == tuple:
+                    action_type, total = action
+                if type(action) == list:
+                    action_type, total = action.pop(0)
+                
 
                 #Test de 1 simulation
-                action_type, total = choix_MCTS(nbr_de_simu_par_action,deepcopy(game), num_MCTS)
-                print(f"action_type : {action_type}") 
+                #action_type, total = choix_MCTS(nbr_de_simu_par_action,deepcopy(game), num_MCTS)
+                #print(f"action_type : {action_type}") 
             else:
                 action_type, total = random_agent(game)
 
@@ -190,7 +193,7 @@ class Node:
         self.visits = 0
         self.wins = 0
         self.games_played = 0
-        self.action = None,None
+        self.action = None
 
 class MCTS:
     def __init__(self, state : TexasHoldEm, num_iterations : int, num_player : int):
@@ -199,25 +202,39 @@ class MCTS:
         self.state = state # Game
 
     def select(self, node):
-        while not node.state.is_hand_running():
+        while  node.state.is_hand_running():
             if len(node.children) == 0:
                 return self.expand(node)
             else:
+                   
                 node = self.uct_select(node)
         return node
 
     def expand(self, node):
         possible_actions = node.state.get_available_moves()
+        print("EXPAND:")
         # TODO changer
         # on choisi un nombre d'action visité au hasard
-        for action in random.sample(possible_actions, 10):
+        if len(possible_actions) > 10:
+            for action in random.sample(possible_actions, 10):
+                new_node = Node(node.state)
+                node.children.append(new_node)
+                #print (f" enfants : {node.children}")
+                #print("     Action : ", action)
+                new_node.action = action
+                new_node.state.take_action(*action)
+                #new_node = Node(new_state)
+                new_node.parent = node
+        else:
+            action = random.sample(possible_actions, 1)
             new_node = Node(node.state)
-            print("Action : ", action)
+            node.children.append(new_node)
+            #print (f" enfants : {node.children}")
+            #print("     Action : ", action)
             new_node.action = action
             new_node.state.take_action(*action)
             #new_node = Node(new_state)
             new_node.parent = node
-            node.children.append(new_node)
         return random.choice(node.children)
 
     def uct_select(self, node):
@@ -235,14 +252,15 @@ class MCTS:
 
     def simulate(self, node):
         current_state = deepcopy(node.state)
+        print("SIMULATE : ")
         while current_state.is_hand_running():
-            print("hand running")
+            #print("     hand running")
             action, total = current_state.get_available_moves().sample()
-            print("action : ", action, "total : ", total)
+            #print("     action : ", action, "total : ", total)
             current_state.take_action(action_type=action, total=total)
-            print("Current state : ", current_state)
+            #print("     Current state : ", current_state)
         
-        print("Settle : ", current_state.hand_history.settle)
+        #print("     Settle : ", current_state.hand_history.settle)
 
         gagnant = str(current_state.hand_history.settle)[7]
         gagnant = int(gagnant)
@@ -255,7 +273,8 @@ class MCTS:
             node.visits += 1
             if result == 1:
                 node.wins += 1
-            self.backpropagate(node.parent, result)
+            node = node.parent
+            #self.backpropagate(node.parent, result)
     
     def get_best_action(self, node):
         best_child = None
@@ -266,17 +285,21 @@ class MCTS:
                 best_child = child
                 best_wins = child.wins
 
-        return best_child.state.action
+        return best_child.action
 
     def search(self, initial_state, num_player : int):
         root_node = Node(initial_state)
         self.num_player = num_player
 
-        for _ in range(self.num_iterations):
+        for i in range(self.num_iterations):
+            print("Iteration : ", i)
             selected_node = self.select(root_node)
             simulation_result = self.simulate(selected_node)
+            #print("Simulation result : ", simulation_result)
             self.backpropagate(selected_node, simulation_result)
 
+        #on affiche tt les infos du noeud root
+        print(f"root_node : {self.num_iterations} {root_node.children}, {root_node.visits}, {root_node.wins} ")
         return self.get_best_action(root_node)
 
 
