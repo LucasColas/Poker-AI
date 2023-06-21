@@ -146,7 +146,7 @@ class agent_outs:
             elif (self.__max_raise > self.__min_raise) and (self.__game.players[self.__game.current_player].state == PlayerState.TO_CALL) and chance >= pot_odd :
                 #print("call, p =" ,p, "p_win=",p_win)
                 action_type = ActionType.RAISE
-                if (self.__game.big_blind*3) > self.__min_raise:
+                if 0.5*self.__max_raise > self.__min_raise:
                     self.__total = random.randint(self.__min_raise, int(0.5*self.__max_raise))
                 else:
                     self.__total = random.randint(self.__min_raise, self.__max_raise)
