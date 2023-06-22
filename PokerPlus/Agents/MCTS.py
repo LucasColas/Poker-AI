@@ -213,8 +213,8 @@ class MCTS:
     def expand(self, node):
         possible_actions = node.state.get_available_moves()
         print("EXPAND:")
-        # TODO changer
-        # on choisi un nombre d'action visité au hasard
+        # TODO : ne prendre qu'une seule action à chaque fois
+        # faire attention que ça ne soit pas que des raise
         if len(possible_actions) > 10:
             for action in random.sample(possible_actions, 10):
                 new_node = Node(node.state)
