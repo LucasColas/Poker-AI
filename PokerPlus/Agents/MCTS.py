@@ -282,7 +282,7 @@ class MCTS:
             current_state.take_action(action_type=action, total=total)
             #print("     Current state : ", current_state)
         
-        print("     Settle : ", current_state.hand_history.settle)
+        #print("     Settle : ", current_state.hand_history.settle)
 
         if current_state.hand_history.settle == None:
             return 0
