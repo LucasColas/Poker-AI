@@ -145,10 +145,10 @@ def choix_MCTS(nbr_de_simu_par_action,game, num_MCTS):
     return action_max
 
 
-def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS, nbr_de_simu_par_action = 10000):
+def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS, num_iterations = 100, nbr_de_simu_par_action = 100):
     game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
     gui = TextGUI(game=game)
-    mctss = MCTS(deepcopy(game), 5, 2, num_MCTS)
+    mctss = MCTS(deepcopy(game), num_iterations, nbr_de_simu_par_action, num_MCTS)
     while game.is_game_running():
         game.start_hand()
 
@@ -225,12 +225,12 @@ class MCTS:
         # faire attention que ça ne soit pas que des raise
         raises = [a for a in actions if a[0] == ActionType.RAISE and a[1] !=None]
                 
-        print("     raises : ", raises)
+        #print("     raises : ", raises)
         
         possible_actions = [a for a in actions if a[0] != ActionType.RAISE]
         if len(raises) > 10:
             possible_actions += random.sample(raises, 10)
-            print("     possible_actions : ", possible_actions)
+            #print("     possible_actions : ", possible_actions)
             
             for action in possible_actions:
                 new_node = Node(node.state)
@@ -284,7 +284,7 @@ class MCTS:
         
         #print("     Settle : ", current_state.hand_history.settle)
 
-        if current_state.hand_history.settle == None:
+        if current_state.hand_history == None:
             return 0
         gagnant = str(current_state.hand_history.settle)[7]
         gagnant = int(gagnant)
@@ -326,6 +326,7 @@ class MCTS:
         for i in range(self.num_iterations):
             print("Iteration : ", i)
             selected_node = self.select(root_node)
+            print("Selected node : ", selected_node)
             for i in range(self.nb_simu):
                 print("Simulation : ", i)
                 simulation_result = self.simulate(selected_node)
