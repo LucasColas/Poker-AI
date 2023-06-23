@@ -223,7 +223,8 @@ class MCTS:
         print("     actions : ", actions)
         # TODO : ne prendre qu'une seule action à chaque fois
         # faire attention que ça ne soit pas que des raise
-        raises = [a for a in actions if a[0] == ActionType.RAISE]
+        raises = [a for a in actions if a[0] == ActionType.RAISE and a[1] !=None]
+                
         print("     raises : ", raises)
         
         possible_actions = [a for a in actions if a[0] != ActionType.RAISE]
