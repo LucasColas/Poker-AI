@@ -218,13 +218,18 @@ class MCTS:
             Phase 2 : Expansion
         """
         actions = node.state.get_available_moves()
+
         print("EXPAND:")
+        print("     actions : ", actions)
         # TODO : ne prendre qu'une seule action à chaque fois
         # faire attention que ça ne soit pas que des raise
         raises = [a for a in actions if a[0] == ActionType.RAISE]
+        print("     raises : ", raises)
+        
         possible_actions = [a for a in actions if a[0] != ActionType.RAISE]
         if len(raises) > 10:
             possible_actions += random.sample(raises, 10)
+            print("     possible_actions : ", possible_actions)
             
             for action in possible_actions:
                 new_node = Node(node.state)
@@ -232,11 +237,13 @@ class MCTS:
                 #print (f" enfants : {node.children}")
                 #print("     Action : ", action)
                 new_node.action = action
+                
                 new_node.state.take_action(*action)
                 #new_node = Node(new_state)
                 new_node.parent = node
         else:
             possible_actions += raises
+            print("     possible_actions : ", possible_actions)
             for action in possible_actions:
                 new_node = Node(node.state)
                 node.children.append(new_node)
