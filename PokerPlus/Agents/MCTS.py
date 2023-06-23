@@ -283,6 +283,8 @@ class MCTS:
         
         print("     Settle : ", current_state.hand_history.settle)
 
+        if current_state.hand_history.settle == None:
+            return 0
         gagnant = str(current_state.hand_history.settle)[7]
         gagnant = int(gagnant)
         if gagnant == self.num_player:
