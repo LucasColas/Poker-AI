@@ -200,6 +200,7 @@ class MCTS:
         self.num_iterations = num_iterations
         self.num_player = num_player #Pour savoir quel joueur est MCTS
         self.state = state # Game
+        self.root_node = Node(state)
         self.nb_simu = nb_simu
 
     def select(self, node):
@@ -208,6 +209,7 @@ class MCTS:
         """
         while node:
             if len(node.children) == 0:
+                print(node.state.get_available_moves())
                 return self.expand(node)
             else:
                 node = self.uct_select(node)
@@ -217,7 +219,9 @@ class MCTS:
         """
             Phase 2 : Expansion
         """
+        print("actions : ")
         actions = node.state.get_available_moves()
+        print("actions : ",actions)
 
         print("EXPAND:")
         print("     actions : ", actions)
@@ -230,7 +234,7 @@ class MCTS:
         possible_actions = [a for a in actions if a[0] != ActionType.RAISE]
         if len(raises) > 10:
             possible_actions += random.sample(raises, 10)
-            #print("     possible_actions : ", possible_actions)
+            print("     possible_actions : ", possible_actions)
             
             for action in possible_actions:
                 new_node = Node(node.state)
@@ -259,10 +263,11 @@ class MCTS:
     def uct_select(self, node):
         selected_node = None
         best_uct = float("-inf")
-        total_visits = math.log(node.visits or 1)  # Avoid division by zero
+        total_visits = math.log(node.visits) 
+        c = math.sqrt(2)
 
         for child in node.children:
-            uct_value = (child.wins / (child.visits or 1)) + 1.4 * math.sqrt(total_visits / (child.visits or 1))
+            uct_value = (child.wins / (child.visits or 1)) + c * math.sqrt(total_visits / (child.visits or 1))
             if uct_value > best_uct:
                 selected_node = child
                 best_uct = uct_value
@@ -297,13 +302,19 @@ class MCTS:
             Phase 4 : Backpropagation
         """
         
-        while node is not None:
-            node.visits += 1
-            if result == 1:
-                node.wins += 1
-            node = node.parent
-            #self.backpropagate(node.parent, result)
-    
+        if not node:
+            return
+        
+        if node.parent is None:
+            node.visits += 1 if result == 1 else 0
+            node.wins += result
+            
+            return
+        
+        node.visits += 1
+        node.wins += 1 if result == 1 else 0
+        self.backpropagate(node.parent, result)
+
     def get_best_action(self, node):
         best_child = None
         best_wins = float("-inf")
@@ -315,27 +326,30 @@ class MCTS:
 
         return best_child.action
 
-    def search(self, initial_state, num_player : int):
+    def search(self, new_state, num_player : int):
         """
         
+            search
         
         """
-        root_node = Node(initial_state)
+        self.root_node = Node(new_state)
         self.num_player = num_player
 
         for i in range(self.num_iterations):
             print("Iteration : ", i)
-            selected_node = self.select(root_node)
+            print("Root node : ", self.root_node.state.get_available_moves())
+            selected_node = self.select(self.root_node)
             print("Selected node : ", selected_node)
             for i in range(self.nb_simu):
                 print("Simulation : ", i)
                 simulation_result = self.simulate(selected_node)
                 print("Simulation result : ", simulation_result)
                 self.backpropagate(selected_node, simulation_result)
+                print("Backpropagate : ", selected_node)
 
         #on affiche toutes les infos du noeud root
-        print(f"root_node : {self.num_iterations} {root_node.children}, {root_node.visits}, {root_node.wins} ")
-        return self.get_best_action(root_node)
+        print(f"root_node : {self.num_iterations} {self.root_node.children}, {self.root_node.visits}, {self.root_node.wins} ")
+        return self.get_best_action(self.root_node)
 
 
 
