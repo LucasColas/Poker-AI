@@ -206,6 +206,8 @@ class MCTS:
     def select(self, node):
         """
             Phase 1 : Selection
+            TODO : prendre en compte qu'on peut atteindre une feuille avec état terminal (main terminée).
+            Cela ne sert à rien de prendre ce noeud ni d'essayer d'ajouter des enfants.
         """
         while node:
             if len(node.children) == 0:
@@ -219,6 +221,7 @@ class MCTS:
         """
             Phase 2 : Expansion
         """
+        
         print("actions : ")
         actions = node.state.get_available_moves()
         print("actions : ",actions)
@@ -283,6 +286,7 @@ class MCTS:
             Phase 3 : Simulation
         """
         current_state = deepcopy(node.state)
+        #TODO : changer les cartes des joueurs
         #print("SIMULATE : ")
         while current_state.is_hand_running():
             #print("     hand running")
