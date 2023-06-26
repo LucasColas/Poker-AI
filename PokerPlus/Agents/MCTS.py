@@ -145,7 +145,7 @@ def choix_MCTS(nbr_de_simu_par_action,game, num_MCTS):
     return action_max
 
 
-def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS, num_iterations = 100, nbr_de_simu_par_action = 100):
+def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS, num_iterations = 20, nbr_de_simu_par_action = 50):
     game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
     gui = TextGUI(game=game)
     mctss = MCTS(deepcopy(game), num_iterations, nbr_de_simu_par_action, num_MCTS)
@@ -238,32 +238,36 @@ class MCTS:
             
             for action in possible_actions:
                 new_node = Node(node.state)
-                node.children.append(new_node)
+                
                 #print (f" enfants : {node.children}")
                 #print("     Action : ", action)
                 new_node.action = action
-                
+                print("state : ", new_node.state.hand_phase)
                 new_node.state.take_action(*action)
                 #new_node = Node(new_state)
+                node.children.append(new_node)
                 new_node.parent = node
         else:
             possible_actions += raises
             print("     possible_actions : ", possible_actions)
             for action in possible_actions:
                 new_node = Node(node.state)
-                node.children.append(new_node)
+                
                 #print (f" enfants : {node.children}")
                 #print("     Action : ", action)
                 new_node.action = action
+                print("state : ", new_node.state.hand_phase)
                 new_node.state.take_action(*action)
                 #new_node = Node(new_state)
+
+                node.children.append(new_node)
                 new_node.parent = node
         return random.choice(node.children)
 
     def uct_select(self, node):
         selected_node = None
         best_uct = float("-inf")
-        total_visits = math.log(node.visits) 
+        total_visits = math.log(node.visits or 1) 
         c = math.sqrt(2)
 
         for child in node.children:
@@ -279,7 +283,7 @@ class MCTS:
             Phase 3 : Simulation
         """
         current_state = deepcopy(node.state)
-        print("SIMULATE : ")
+        #print("SIMULATE : ")
         while current_state.is_hand_running():
             #print("     hand running")
             action, total = current_state.get_available_moves().sample()
@@ -336,16 +340,18 @@ class MCTS:
         self.num_player = num_player
 
         for i in range(self.num_iterations):
-            print("Iteration : ", i)
-            print("Root node : ", self.root_node.state.get_available_moves())
+            #print("Iteration : ", i)
+            #print("Root node : ", self.root_node.state.get_available_moves())
             selected_node = self.select(self.root_node)
-            print("Selected node : ", selected_node)
+            #print("Selected node : ", selected_node)
+            for action_child in self.root_node.children:
+                print("Action child : ", action_child.action)
             for i in range(self.nb_simu):
-                print("Simulation : ", i)
+                #print("Simulation : ", i)
                 simulation_result = self.simulate(selected_node)
-                print("Simulation result : ", simulation_result)
+                #print("Simulation result : ", simulation_result)
                 self.backpropagate(selected_node, simulation_result)
-                print("Backpropagate : ", selected_node)
+                #print("Backpropagate : ", selected_node)
 
         #on affiche toutes les infos du noeud root
         print(f"root_node : {self.num_iterations} {self.root_node.children}, {self.root_node.visits}, {self.root_node.wins} ")

@@ -18,20 +18,24 @@ from PokerPlus.Agents.MCTS import MainGame
 import time
 
 def main():
-    
+    start = time.time()
     #tournoi_avec_humain()
     #plot_gagnant_from_csv(filename = "./data_gagnant.csv" )
-    start = time.time()
+    
     #get_stat_tournoi(nmax = 5, buyin=1000, big_blind=100, save=False, path='./res', plot=True, poolrandom = True, max_players=6, verbose=False)
 
-
+    
+    
+    
     buyin = 1000
     big_blind = 150
     small_blind = 75
     nb_players = 6
     num_MCTS = 3
-    #actions, Blinds, mains_player, cards_boards, btn_loc = MainGame2(buyin, big_blind, small_blind, nb_players, num_MCTS,1)
+    
+    
     MainGame(buyin, big_blind, small_blind, nb_players, num_MCTS)
+    
     end = time.time()
     print(f"Temps d'execution : {end-start} secondes")
     
