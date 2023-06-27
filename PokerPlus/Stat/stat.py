@@ -155,8 +155,8 @@ def pool_1(max_players,
 
 def get_stat(nmax=500, save=False, cles = ["nbrCall", "nbrCheck", "nbrRaise", "nbrFold", "nbrWin", "nbrAllin","nbrAction", "profit"], path='./res', plot=False, poolrandom = False):
 
-    max_players = 5
-    big_blind = 300
+    max_players = 8
+    big_blind = 200
     small_blind = big_blind // 2
     buyin = 1000
     # Définir les statistiques à suivre
