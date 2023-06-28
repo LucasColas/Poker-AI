@@ -320,12 +320,12 @@ class MCTS:
             return
         
         if node.parent is None:
-            node.visits += self.nb_simu
+            node.visits += 1
             node.wins += 1 if result == 1 else 0
             
             return
         
-        node.visits += self.nb_simu
+        node.visits += 1
         node.wins += 1 if result == 1 else 0
         self.backpropagate(node.parent, result)
 
