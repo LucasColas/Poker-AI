@@ -320,7 +320,7 @@ def plot_gagnant_from_csv(filename = "./data_gagnant.csv" ):
 
     plt.bar(nbr_win.keys(), nbr_win.values(), color=cmap(norm(list(nbr_win.values()))))
     
-    plt.title(f"Nombre de partie gagné pour chaque type de joueur\n{filename}")
+    plt.title(f"Nombre de tournois gagné pour chaque type de joueur\n{filename}")
     plt.xlabel("Joueurs")
     plt.ylabel("Nombre de victoires")
     plt.show()
@@ -329,15 +329,15 @@ def plot_gagnant_from_csv(filename = "./data_gagnant.csv" ):
 
     norm = mpl.colors.Normalize(min(list(nbr_partie_joue.values())), max(list(nbr_partie_joue.values())))
     plt.bar(nbr_partie_joue.keys(), nbr_partie_joue.values(), color=cmap(norm(list(nbr_win.values()))))
-    plt.title(f"Nombre de partie joué pour chaque type de joueur\n{filename}")
+    plt.title(f"Nombre de tournois joué pour chaque type de joueur\n{filename}")
     plt.xlabel("Joueurs")
-    plt.ylabel("Nombre de parties jouées")
+    plt.ylabel("Nombre de tournois jouées")
     plt.show()
 
     nbr_partie_win_sur_nbr_partie_joue = {i: nbr_win[i]/nbr_partie_joue[i] for i in nbr_win.keys()}
     plt.bar(nbr_partie_win_sur_nbr_partie_joue.keys(), nbr_partie_win_sur_nbr_partie_joue.values())
-    plt.title(f"Nombre de partie gagné sur le nombre de partie joué pour chaque type de joueur\n{filename}")
+    plt.title(f"Nombre de tournois gagné sur le nombre de tournois joué pour chaque type de joueur\n{filename}")
     plt.xlabel("Joueurs")
-    plt.ylabel("Nombre de victoires sur le nombre de parties jouées")
+    plt.ylabel("Nombre de victoires sur le nombre de tournois jouées")
     plt.show()
 
