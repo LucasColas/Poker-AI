@@ -144,8 +144,8 @@ def pool_random(max_players,
 def pool_1(max_players,
             #bots = [random_agent,agent_outs().choix,agent_comportement, agent_SA().action, agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif],
             #bots_noms = ["random_agent","agent_out","agent_comportement","agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur", "agent_serre_non_agressif", "agent_large_non_agressif"],
-            bots = [random_agent,agent_outs().choix, agent_naif,agent_serre_non_agressif, random_agent , None],
-            bots_noms = ["random_agent","agent_out","agent_naif","agent_serre_non_agressif","random_agent", "MCTS"]
+            bots = [random_agent,agent_outs().choix, agent_naif,choix_MCTS, random_agent , None],
+            bots_noms = ["random_agent","agent_out","agent_naif","choix_MCTS","random_agent", "MCTS"]
            ):
     #pour chaque joueur, on lui attribue le bot avec le numéro de joueur
     joueurs_bots = {}
@@ -342,15 +342,17 @@ def get_stat_tournoi(nmax = 1000, buyin=1000, big_blind=20, save=False, path='./
             while game.is_hand_running():
                 #print("hand running")
                 current_bot = joueurs_bots[game.current_player]
-                
-                if(current_bot==agent_comportement):
+                if nbr_partie > 100:
+                    action, total = game.get_available_moves().sample()
+
+                elif(current_bot==agent_comportement):
                     action, total = current_bot(game,pred,game.current_player,agent_outs_comportement)
                 elif (current_bot == None):
                     """
                     nbp = 0
                     for k in game.in_pot_iter():
                         nbp +=1
-                    if nbp >2 :
+                    if nbp >2 or len(game.board) != 0:
                         action, total = mctss.search(deepcopy(game),game.current_player)
                         print(f"action de MCTS: {action}")
                     else:
@@ -359,6 +361,9 @@ def get_stat_tournoi(nmax = 1000, buyin=1000, big_blind=20, save=False, path='./
                     """
                     action, total = mctss.search(deepcopy(game),game.current_player)
                     print(f"action de MCTS: {action}")
+                elif (current_bot == choix_MCTS):
+                    action, total = choix_MCTS(50,deepcopy(game), game.current_player)
+                    
                 else:
                     #print("action")
                     action, total = current_bot(game)

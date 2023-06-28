@@ -23,7 +23,7 @@ def main():
 
     #plot_gagnant_from_csv(filename = "./data_gagnant.csv" )
     
-    get_stat_tournoi(nmax = 50, buyin=1000, big_blind=100, save=False, path='./res', plot=True, poolrandom = False, max_players=6, verbose=False)
+    get_stat_tournoi(nmax = 100, buyin=1000, big_blind=100, save=False, path='./res', plot=True, poolrandom = False, max_players=6, verbose=False)
 
     
     
