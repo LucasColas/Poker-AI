@@ -145,7 +145,7 @@ def choix_MCTS(nbr_de_simu_par_action,game, num_MCTS):
     return action_max
 
 
-def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS, num_iterations = 20, nbr_de_simu_par_action = 50):
+def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS, num_iterations = 50, nbr_de_simu_par_action = 50):
     game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
     gui = TextGUI(game=game)
     mctss = MCTS(deepcopy(game), num_iterations, nbr_de_simu_par_action, num_MCTS)
@@ -211,10 +211,15 @@ class MCTS:
         """
         while node:
             if len(node.children) == 0:
-                print(node.state.get_available_moves())
+                
                 return self.expand(node)
             else:
-                node = self.uct_select(node)
+                new_node = self.uct_select(node)
+                if not new_node:
+                    return node
+                node = new_node
+                
+        
         return node
 
     def expand(self, node):
@@ -228,15 +233,15 @@ class MCTS:
 
         print("EXPAND:")
         print("     actions : ", actions)
-        # TODO : ne prendre qu'une seule action à chaque fois
-        # faire attention que ça ne soit pas que des raise
+        
         raises = [a for a in actions if a[0] == ActionType.RAISE and a[1] !=None]
                 
         #print("     raises : ", raises)
         
         possible_actions = [a for a in actions if a[0] != ActionType.RAISE]
         if len(raises) > 10:
-            possible_actions += random.sample(raises, 10)
+            raises.sort(key=lambda x: x[1])
+            possible_actions += raises[0:10]
             print("     possible_actions : ", possible_actions)
             
             for action in possible_actions:
@@ -275,7 +280,8 @@ class MCTS:
 
         for child in node.children:
             uct_value = (child.wins / (child.visits or 1)) + c * math.sqrt(total_visits / (child.visits or 1))
-            if uct_value > best_uct:
+            #print("hand running in this child : ", child.state.is_hand_running())
+            if uct_value > best_uct and child.state.is_hand_running():
                 selected_node = child
                 best_uct = uct_value
 
@@ -333,6 +339,15 @@ class MCTS:
                 best_wins = child.wins
 
         return best_child.action
+    
+    def PrintTree(self, node):
+        """
+            Depth First Search
+        """
+        if node:
+            print("info node : " ,"node visits : ", node.visits," node wins : " ,node.wins, node.action)
+            for child in node.children:
+                self.PrintTree(child)
 
     def search(self, new_state, num_player : int):
         """
@@ -348,8 +363,8 @@ class MCTS:
             #print("Root node : ", self.root_node.state.get_available_moves())
             selected_node = self.select(self.root_node)
             #print("Selected node : ", selected_node)
-            for action_child in self.root_node.children:
-                print("Action child : ", action_child.action)
+            #for action_child in self.root_node.children:
+                #print("Action child : ", action_child.action)
             for i in range(self.nb_simu):
                 #print("Simulation : ", i)
                 simulation_result = self.simulate(selected_node)
@@ -359,6 +374,7 @@ class MCTS:
 
         #on affiche toutes les infos du noeud root
         print(f"root_node : {self.num_iterations} {self.root_node.children}, {self.root_node.visits}, {self.root_node.wins} ")
+        self.PrintTree(self.root_node)
         return self.get_best_action(self.root_node)
 
 
