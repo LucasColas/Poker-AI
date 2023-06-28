@@ -71,8 +71,8 @@ def simu_bots_humains():
 
 
 def pool_bots_min_max(nummin,maxplayer, 
-                      bots = [agent_comportement,random_agent, agent_outs().choix,agent_SA().action, agent_naif, agent_allIn, agent_saboteur], 
-                      bots_noms = ["agent_comportement","random_agent", "agent_out", "agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur"]): 
+                      bots = [random_agent, agent_outs().choix,agent_SA().action, agent_naif, agent_allIn, agent_saboteur], 
+                      bots_noms = ["random_agent", "agent_out", "agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur"]): 
     """
     Crée un pool de bots aléatoires de taille nummin à maxplayer.
     """

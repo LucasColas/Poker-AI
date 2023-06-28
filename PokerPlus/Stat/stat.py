@@ -122,7 +122,7 @@ def plot_stat_tournois(stats, n, joueurs_bots_noms):
 def pool_random(max_players,
                 #bots = [random_agent, agent_outs().choix,agent_SA().action, agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif],
                 #bots_noms = ["random_agent", "agent_out", "agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur", "agent_serre_non_agressif", "agent_large_non_agressif"]):
-                bots = [random_agent,agent_outs().choix, agent_SA().action, agent_naif, agent_allIn, choix_MCTS],
+                bots = [random_agent,agent_outs().choix, agent_SA().action, agent_naif, agent_allIn, None],
                 bots_noms = ["random_agent","agent_out","agent_serre_agressif", "agent_naif", "agent_allIn", "MCTS"]
                 ):
     joueurs_bots = {}
@@ -142,8 +142,10 @@ def pool_random(max_players,
     return joueurs_bots, joueurs_bots_noms
 
 def pool_1(max_players,
-            bots = [random_agent,agent_outs().choix,agent_comportement, agent_SA().action, agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif],
-            bots_noms = ["random_agent","agent_out","agent_comportement","agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur", "agent_serre_non_agressif", "agent_large_non_agressif"],
+            #bots = [random_agent,agent_outs().choix,agent_comportement, agent_SA().action, agent_naif, agent_allIn, agent_saboteur, agent_serre_non_agressif, agent_large_non_agressif],
+            #bots_noms = ["random_agent","agent_out","agent_comportement","agent_serre_agressif", "agent_naif", "agent_allIn", "agent_saboteur", "agent_serre_non_agressif", "agent_large_non_agressif"],
+            bots = [random_agent,agent_outs().choix, agent_naif,agent_serre_non_agressif, random_agent , None],
+            bots_noms = ["random_agent","agent_out","agent_naif","agent_serre_non_agressif","random_agent", "MCTS"]
            ):
     #pour chaque joueur, on lui attribue le bot avec le numéro de joueur
     joueurs_bots = {}
@@ -296,6 +298,9 @@ def get_stat_tournoi(nmax = 1000, buyin=1000, big_blind=20, save=False, path='./
         while game.is_game_running():
             #print("hand")
             game.start_hand()
+            for num, val in joueurs_bots_noms.items():
+                if val == "MCTS":
+                    mctss = MCTS(deepcopy(game), 10, 50, num)
             nbr_partie+=1
             
             
@@ -333,14 +338,27 @@ def get_stat_tournoi(nmax = 1000, buyin=1000, big_blind=20, save=False, path='./
             stats["nbrRaise_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in range(max_players)}
             stats["nbrAction_p"][f"tournoi {nbr_tournoi}"][f"partie {nbr_partie}"]={i:0 for i in range(max_players)}
             
-                
+        
             while game.is_hand_running():
                 #print("hand running")
                 current_bot = joueurs_bots[game.current_player]
+                
                 if(current_bot==agent_comportement):
                     action, total = current_bot(game,pred,game.current_player,agent_outs_comportement)
-                elif (current_bot == choix_MCTS):
-                    action, total = choix_MCTS(100,deepcopy(game), game.current_player)
+                elif (current_bot == None):
+                    """
+                    nbp = 0
+                    for k in game.in_pot_iter():
+                        nbp +=1
+                    if nbp >2 :
+                        action, total = mctss.search(deepcopy(game),game.current_player)
+                        print(f"action de MCTS: {action}")
+                    else:
+                        action, total = random_agent(game)
+                        print(f"action de random: {action}")
+                    """
+                    action, total = mctss.search(deepcopy(game),game.current_player)
+                    print(f"action de MCTS: {action}")
                 else:
                     #print("action")
                     action, total = current_bot(game)
@@ -393,7 +411,7 @@ def get_stat_tournoi(nmax = 1000, buyin=1000, big_blind=20, save=False, path='./
             last_gagnant = str(game.hand_history.settle)[7]
             last_gagnant = int(last_gagnant)
             stats["nbrWin partie"][f"tournoi {nbr_tournoi}"][last_gagnant] += 1
-            print(f"tournoi num : {nbr_tournoi}", end='\r' )
+            print(f"tournoi num : {nbr_tournoi}: {nbr_partie}")
             
 
 

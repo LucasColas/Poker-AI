@@ -227,12 +227,12 @@ class MCTS:
             Phase 2 : Expansion
         """
         
-        print("actions : ")
+        #print("actions : ")
         actions = node.state.get_available_moves()
-        print("actions : ",actions)
+        #print("actions : ",actions)
 
-        print("EXPAND:")
-        print("     actions : ", actions)
+        #print("EXPAND:")
+        #print("     actions : ", actions)
         
         raises = [a for a in actions if a[0] == ActionType.RAISE and a[1] !=None]
                 
@@ -242,7 +242,7 @@ class MCTS:
         if len(raises) > 10:
             raises.sort(key=lambda x: x[1])
             possible_actions += raises[0:10]
-            print("     possible_actions : ", possible_actions)
+            #print("     possible_actions : ", possible_actions)
             
             for action in possible_actions:
                 new_node = Node(node.state)
@@ -250,21 +250,21 @@ class MCTS:
                 #print (f" enfants : {node.children}")
                 #print("     Action : ", action)
                 new_node.action = action
-                print("state : ", new_node.state.hand_phase)
+                #print("state : ", new_node.state.hand_phase)
                 new_node.state.take_action(*action)
                 #new_node = Node(new_state)
                 node.children.append(new_node)
                 new_node.parent = node
         else:
             possible_actions += raises
-            print("     possible_actions : ", possible_actions)
+            #print("     possible_actions : ", possible_actions)
             for action in possible_actions:
                 new_node = Node(node.state)
                 
                 #print (f" enfants : {node.children}")
                 #print("     Action : ", action)
                 new_node.action = action
-                print("state : ", new_node.state.hand_phase)
+                #print("state : ", new_node.state.hand_phase)
                 new_node.state.take_action(*action)
                 #new_node = Node(new_state)
 
@@ -337,7 +337,6 @@ class MCTS:
             if child.wins > best_wins:
                 best_child = child
                 best_wins = child.wins
-
         return best_child.action
     
     def PrintTree(self, node):
@@ -373,8 +372,8 @@ class MCTS:
                 #print("Backpropagate : ", selected_node)
 
         #on affiche toutes les infos du noeud root
-        print(f"root_node : {self.num_iterations} {self.root_node.children}, {self.root_node.visits}, {self.root_node.wins} ")
-        self.PrintTree(self.root_node)
+        #print(f"root_node : {self.num_iterations} {self.root_node.children}, {self.root_node.visits}, {self.root_node.wins} ")
+        #self.PrintTree(self.root_node)
         return self.get_best_action(self.root_node)
 
 
