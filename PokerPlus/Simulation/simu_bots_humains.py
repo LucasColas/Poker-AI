@@ -22,10 +22,7 @@ from PokerPlus.Agents.MCTS import MCTS
 import matplotlib as mpl
 
 def simu_bots_humains():
-    #Mettre menu pour choisir les agents, et nombre de personnes
-    #Stats pour avoir Nb Fold / Nb Parties et VPIP.
-    #Stocker dans un fichier les comportements des joueurs.
-    #Stocker dans un autre fichier vainqueurs des tournois.
+    
     max_players = 2
     big_blind = 50
     small_blind = big_blind // 2

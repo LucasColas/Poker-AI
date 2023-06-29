@@ -19,7 +19,11 @@ import time
 
 def main():
     start = time.time()
-    #tournoi_avec_humain()
+    tournoi_avec_humain()
+
+
+
+    
 
     #plot_gagnant_from_csv(filename = "./data_gagnant.csv" )
     
@@ -35,7 +39,7 @@ def main():
     num_MCTS = 3
     
     
-    MainGame(buyin, big_blind, small_blind, nb_players, num_MCTS)
+    #MainGame(buyin, big_blind, small_blind, nb_players, num_MCTS)
     
     end = time.time()
     print(f"Temps d'execution : {end-start} secondes")
