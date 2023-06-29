@@ -23,11 +23,11 @@ def main():
 
     #plot_gagnant_from_csv(filename = "./data_gagnant.csv" )
     
-    get_stat_tournoi(nmax = 100, buyin=1000, big_blind=100, save=False, path='./res', plot=True, poolrandom = False, max_players=6, verbose=False)
+    #get_stat_tournoi(nmax = 100, buyin=1000, big_blind=100, save=False, path='./res', plot=True, poolrandom = False, max_players=6, verbose=False)
 
     
     
-    """
+    
     buyin = 1000
     big_blind = 150
     small_blind = 75
@@ -36,7 +36,7 @@ def main():
     
     
     MainGame(buyin, big_blind, small_blind, nb_players, num_MCTS)
-    """
+    
     end = time.time()
     print(f"Temps d'execution : {end-start} secondes")
     

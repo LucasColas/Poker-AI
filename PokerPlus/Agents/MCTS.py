@@ -145,7 +145,7 @@ def choix_MCTS(nbr_de_simu_par_action,game, num_MCTS):
     return action_max
 
 
-def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS, num_iterations = 50, nbr_de_simu_par_action = 50):
+def MainGame(buyin,big_blind, small_blind, nb_players, num_MCTS, num_iterations = 3000, nbr_de_simu_par_action = 5):
     game = TexasHoldEm(buyin, big_blind, small_blind, nb_players)
     gui = TextGUI(game=game)
     mctss = MCTS(deepcopy(game), num_iterations, nbr_de_simu_par_action, num_MCTS)
@@ -203,7 +203,7 @@ class MCTS:
         self.root_node = Node(state)
         self.nb_simu = nb_simu
 
-    def select(self, node):
+    def select(self, node : Node):
         """
             Phase 1 : Selection
             TODO : prendre en compte qu'on peut atteindre une feuille avec état terminal (main terminée).
@@ -222,7 +222,7 @@ class MCTS:
         
         return node
 
-    def expand(self, node):
+    def expand(self, node : Node):
         """
             Phase 2 : Expansion
         """
@@ -272,7 +272,7 @@ class MCTS:
                 new_node.parent = node
         return random.choice(node.children)
 
-    def uct_select(self, node):
+    def uct_select(self, node : Node):
         selected_node = None
         best_uct = float("-inf")
         total_visits = math.log(node.visits or 1) 
@@ -287,12 +287,12 @@ class MCTS:
 
         return selected_node
 
-    def simulate(self, node):
+    def simulate(self, node : Node):
         """
             Phase 3 : Simulation
         """
         current_state = deepcopy(node.state)
-        #TODO : changer les cartes des joueurs
+        
         #print("SIMULATE : ")
         while current_state.is_hand_running():
             #print("     hand running")
@@ -307,7 +307,9 @@ class MCTS:
             return 0
         gagnant = str(current_state.hand_history.settle)[7]
         gagnant = int(gagnant)
+        #print("     gagnant : ", gagnant)
         if gagnant == self.num_player:
+            print("gagnee : ", gagnant)
             return 1
         return -1
 
@@ -334,17 +336,16 @@ class MCTS:
         best_wins = float("-inf")
 
         for child in node.children:
-            if child.wins > best_wins:
+            if child.wins >= best_wins:
                 best_child = child
                 best_wins = child.wins
         return best_child.action
     
-    def PrintTree(self, node):
-        """
-            Depth First Search
-        """
+    def PrintTree(self, node : Node):
+        
+        
         if node:
-            print("info node : " ,"node visits : ", node.visits," node wins : " ,node.wins, node.action)
+            print("info node : " ,"node visits : ", node.visits," node wins : ", node.wins, node.action)
             for child in node.children:
                 self.PrintTree(child)
 
@@ -373,7 +374,12 @@ class MCTS:
 
         #on affiche toutes les infos du noeud root
         #print(f"root_node : {self.num_iterations} {self.root_node.children}, {self.root_node.visits}, {self.root_node.wins} ")
-        #self.PrintTree(self.root_node)
+        print("Print Tree : ")
+        self.PrintTree(self.root_node)
+        print("children of root_node : ")
+        print("node root :", self.root_node)
+        for child in self.root_node.children:
+            print("child : ", child.action, child.visits, child.wins, child.parent)
         return self.get_best_action(self.root_node)
 
 
