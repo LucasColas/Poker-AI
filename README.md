@@ -1,7 +1,31 @@
 # Poker-AI
-Package (texasholdem) : https://github.com/SirRender00/texasholdem
 
+Poker Project with agents that can play Texas Hold'em No Limit.
+There's also a clustering to get the types of Poker Players around the table.
+
+We use texasholdem library
+Package (texasholdem) : https://github.com/SirRender00/texasholdem
 Doc texasholdem : https://texasholdem.readthedocs.io/en/0.10/getting_started.html
 
-Codi md : https://md.picasoft.net/_19RCqxlTuC1ubnZ_z2v-A#
+# Install
+
+
+```bash
+git clone git@github.com:LucasColas/Poker-AI.git
+```
+
+```bash
+cd Poker-AI
+```
+
+Install the requirements : 
+just run : 
+```bash
+pip install -r requirements.txt
+```
+
+Run :
+```py
+main.py
+```
 
