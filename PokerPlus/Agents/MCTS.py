@@ -194,14 +194,16 @@ class Node:
         self.wins = 0
         self.games_played = 0
         self.action = None
+        self.chips = 0
 
 class MCTS:
-    def __init__(self, state : TexasHoldEm, num_iterations : int, nb_simu : int, num_player : int):
+    def __init__(self, state : TexasHoldEm, num_iterations : int, nb_simu : int, num_player : int, time : int = 10):
         self.num_iterations = num_iterations
         self.num_player = num_player #Pour savoir quel joueur est MCTS
         self.state = state # Game
         self.root_node = Node(state)
         self.nb_simu = nb_simu
+        self.time = time
 
     def select(self, node : Node):
         """
@@ -304,39 +306,45 @@ class MCTS:
         #print("     Settle : ", current_state.hand_history.settle)
 
         if current_state.hand_history == None:
-            return 0
+            return 0, 0
         gagnant = str(current_state.hand_history.settle)[7]
         gagnant = int(gagnant)
-        #print("     gagnant : ", gagnant)
-        if gagnant == self.num_player:
-            print("gagnee : ", gagnant)
-            return 1
-        return -1
+
+                
+        for p in node.state.players:
+                if p.player_id == self.num_player:
+                    if gagnant == self.num_player:
+                        return 1, p.chips
+                    return -1, p.chips
 
     def backpropagate(self, node : Node, result):
         """
             Phase 4 : Backpropagation
         """
+        print("result : ", result)
         
         if not node:
             return
         
         if node.parent is None:
             node.visits += 1
-            node.wins += 1 if result == 1 else 0
+            node.wins += 1 if result[0] == 1 else 0
+            node.chips += result[1]
             
             return
         
         node.visits += 1
-        node.wins += 1 if result == 1 else 0
+        node.wins += 1 if result[0] == 1 else 0
+        node.chips += result[1]
         self.backpropagate(node.parent, result)
 
     def get_best_action(self, node):
         best_child = None
         best_wins = float("-inf")
+        best_chips = float("-inf")
 
         for child in node.children:
-            if child.wins >= best_wins:
+            if child.chips > best_chips:
                 best_child = child
                 best_wins = child.wins
         return best_child.action
@@ -345,7 +353,7 @@ class MCTS:
         
         
         if node:
-            print("info node : " ,"node visits : ", node.visits," node wins : ", node.wins, node.action)
+            print("info node : " ,"node visits : ", node.visits," node wins : ", node.wins, "node chips : ", node.chips, node.action)
             for child in node.children:
                 self.PrintTree(child)
 
@@ -357,8 +365,8 @@ class MCTS:
         """
         self.root_node = Node(new_state)
         self.num_player = num_player
-
-        for i in range(self.num_iterations):
+        start_time = time.process_time()
+        while time.process_time() - start_time < self.time:
             #print("Iteration : ", i)
             #print("Root node : ", self.root_node.state.get_available_moves())
             selected_node = self.select(self.root_node)
