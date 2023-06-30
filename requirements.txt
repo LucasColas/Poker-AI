@@ -1,0 +1,5 @@
+numpy
+pandas
+matplotlib
+scikit-learn
+texasholdem>=0.10a1
