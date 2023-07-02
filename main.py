@@ -15,9 +15,11 @@ from PokerPlus.Stat.data import get_data, write_data
 from PokerPlus.Simulation.simu_bots_humains import simu_bots_humains, tournoi_avec_humain, plot_gagnant_from_csv
 from PokerPlus.Comportement.simu_comportement import simu_comportement, write_data_comportement, write_data_comportement2
 from PokerPlus.Agents.MCTS import MainGame
+from PokerPlus.Stat.odds_calculator import odds_calculator
 import time
 
 def main():
+    Odds_calculator = odds_calculator()
     start = time.time()
     #tournoi_avec_humain()
     print("Hello World !")
@@ -28,6 +30,7 @@ def main():
         print("1 : simulation")
         print("2 : winners of tournaments")
         print("3 : watch MCTS play")
+        print("4 : odds calculator")
         choice = int(input("What do you want to do ? "))
         if choice == 0:
             print("Bye !")
@@ -70,6 +73,10 @@ def main():
             nb_players = int(input("How many players ? "))
             num_MCTS = int(input("num of player MCTS ? "))
             MainGame(buyin, big_blind, small_blind, nb_players, num_MCTS)
+
+        elif choice == 4:
+            print("Odds calculator")
+            Odds_calculator.main_print()
 
     end = time.time()
     print(f"Time : {end-start} secondes")
