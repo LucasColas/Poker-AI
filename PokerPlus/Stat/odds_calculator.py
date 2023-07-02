@@ -61,7 +61,7 @@ class odds_calculator:
         #get odd_ration of betting and pot_size
         odd_ratio = pot_size/betting
         print("Odd pot ratio : ", odd_ratio)
-        print("odd pot : ", 1/(odd_ratio+1)*100, "%")
+        print("Odd pot : ", 1/(odd_ratio+1)*100, "%")
 
         if len(self.__board) == 3:
             outs_pairs, outs_hands_pairs = self.getOuts_2cards()
@@ -131,7 +131,7 @@ class odds_calculator:
         for card in self.__deck.cards:
             if card not in self.__hands and card not in self.__board:
                 cards = self.__hands + [card] + self.__board
-                print(cards)
+                #print(cards)
                 new_hand_rank = get_five_card_rank_percentage(evaluate(cards[:2], cards[2:]))
                 if new_hand_rank > actual_hand_rank:
                     outs += 1
