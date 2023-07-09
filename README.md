@@ -30,7 +30,7 @@ Just run :
 poetry install
 ```
 
-The, activate virtual environment : 
+Then, activate virtual environment : 
 ```bash
 poetry shell
 ```
@@ -40,7 +40,8 @@ You just need to run `main.py` :
 ```bash
 python main.py
 ```
-or ```bash
+or 
+```bash
 python .\main.py
 ```
 
