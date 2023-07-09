@@ -9,16 +9,32 @@ import random
 
 import numpy as np
 
+
 def conversion(game: TexasHoldEm):
-    #print("conversion")
-    Conversion = {'1':1, '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9,'T': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14}
+    # print("conversion")
+    Conversion = {
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "T": 10,
+        "J": 11,
+        "Q": 12,
+        "K": 13,
+        "A": 14,
+    }
     nbr1 = Conversion[str(game.hands[game.current_player])[7]]
-    
+
     coul1 = str(game.hands[game.current_player])[8]
     nbr2 = Conversion[str(game.hands[game.current_player])[19]]
 
     coul2 = str(game.hands[game.current_player])[20]
-    #print("fin conversion")
+    # print("fin conversion")
     return nbr1, coul1, nbr2, coul2
 
 
@@ -28,21 +44,22 @@ def obtenir_cote(game: TexasHoldEm):
     """
 
     id_last_pot = -1
-    #print("pot actuel",game.pots[id_last_pot].get_total_amount())
+    # print("pot actuel",game.pots[id_last_pot].get_total_amount())
     pot_actuel = game.pots[id_last_pot].get_total_amount()
     chips_to_call = game.pots[id_last_pot].chips_to_call(game.current_player)
-    #print("chips to call", chips_to_call)
+    # print("chips to call", chips_to_call)
     if chips_to_call != 0:
-        #print("cote actuelle : ", pot_actuel / chips_to_call)
+        # print("cote actuelle : ", pot_actuel / chips_to_call)
         return round(pot_actuel / chips_to_call, 2)
     return 1
+
 
 def cote_en_pourcentage(cote: int):
     """
     Fonction qui renvoie la cote en pourcentage.
 
     """
-    return (1/cote)*100
+    return (1 / cote) * 100
 
 
 def strategie_preflop1(game: TexasHoldEm):
@@ -60,16 +77,22 @@ def strategie_preflop1(game: TexasHoldEm):
 
     if game.players[game.current_player].state == PlayerState.IN:
         action_type = ActionType.CHECK
-    elif (game.players[game.current_player].state == PlayerState.TO_CALL):
-        if (nbr1==nbr2) or (coul1==coul2) or (abs(nbr1-nbr2)==1) or (abs(nbr1-nbr2)==12):
+    elif game.players[game.current_player].state == PlayerState.TO_CALL:
+        if (
+            (nbr1 == nbr2)
+            or (coul1 == coul2)
+            or (abs(nbr1 - nbr2) == 1)
+            or (abs(nbr1 - nbr2) == 12)
+        ):
             action_type = ActionType.CALL
 
         else:
             action_type = ActionType.FOLD
-    else :
+    else:
         action_type = ActionType.FOLD
 
     return (action_type, total)
+
 
 def strategie_preflop_raise(game: TexasHoldEm):
     """
@@ -86,10 +109,9 @@ def strategie_preflop_raise(game: TexasHoldEm):
 
     if game.players[game.current_player].state == PlayerState.IN:
         action_type = ActionType.CHECK
-    elif (game.players[game.current_player].state == PlayerState.TO_CALL):
-        if (nbr1==nbr2) or (coul1==coul2) or (abs(nbr1-nbr2)==1):
+    elif game.players[game.current_player].state == PlayerState.TO_CALL:
+        if (nbr1 == nbr2) or (coul1 == coul2) or (abs(nbr1 - nbr2) == 1):
             if (max_raise > min_raise) and random.random() > 0.5:
-
                 action_type = ActionType.RAISE
                 total = min_raise
             else:
@@ -97,14 +119,15 @@ def strategie_preflop_raise(game: TexasHoldEm):
 
         else:
             action_type = ActionType.FOLD
-    else :
+    else:
         action_type = ActionType.FOLD
 
     return (action_type, total)
 
-def generer_combinaisons(k : int, elements : List[Card]):
 
+def generer_combinaisons(k: int, elements: List[Card]):
     return list(itertools.combinations(elements, k))
+
 
 def best_possible_hand():
     pass
