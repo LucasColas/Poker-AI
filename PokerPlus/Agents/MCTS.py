@@ -321,7 +321,7 @@ class MCTS:
         """
             Phase 4 : Backpropagation
         """
-        print("result : ", result)
+        #print("result : ", result)
         
         if not node:
             return
