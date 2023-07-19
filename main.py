@@ -12,7 +12,10 @@ from PokerPlus.Stat.stat import get_stat_tournoi
 from PokerPlus.Simulation.simu_bots_humains import plot_gagnant_from_csv, tournoi_avec_humain
 from PokerPlus.Agents.MCTS import MainGame
 from PokerPlus.Stat.odds_calculator import odds_calculator
+
+from Variants.NLHP.nlhp import NLHP
 import time
+
 
 
 def main():
@@ -29,6 +32,7 @@ def main():
         print("3 : watch MCTS play")
         print("4 : odds calculator")
         print("5 : tournament with agents")
+        print("6 : heads-up hold’em poker")
         choice = int(input("What do you want to do ? "))
         if choice == 0:
             print("Bye !")
@@ -87,6 +91,12 @@ def main():
 
         elif choice == 5:
             tournoi_avec_humain()
+
+        elif choice == 6:
+            new_nlhp = NLHP(buyin=1000, small_blind=10, big_blind=20, gui=False)
+            new_nlhp.create_game()
+            new_nlhp.play()
+
 
 
     end = time.time()
