@@ -194,32 +194,39 @@ $$/        $$$$$$/  $$/   $$/  $$$$$$$/ $$/       $$/       $$/  $$$$$$/  $$$$$$
     # Demande le nombre de joueurs
     while True:
         print(
-            f"Veuillez choisir le nombre de joueurs (entre {min_players} et {max_players}) : "
+            f"Number of players (between {min_players} and {max_players}) : "
         )
         max_players_input = int(input())
         if min_players <= max_players_input <= max_players:
+            
             break
-        print("Nombre de joueurs invalide. Veuillez réessayer.")
+
+        print("That's not a correct number.")
+        
 
     # Demande le nombre d'humains participants
     while True:
         print(
-            f"Veuillez choisir le nombre d'humains qui joueront dans ce tournoi (entre 1 et {max_players_input}) : "
+            f"How many humans will play (between 1 and {max_players_input}) : "
         )
         nb_humains = int(input())
         if 0 <= nb_humains <= max_players_input:
+            
             break
-        print("Nombre d'humains invalide. Veuillez réessayer.")
+
+        print("Error, not a good number.")
+        
 
     # Affiche les choix
     print(
-        f"Vous avez choisi un tournoi avec {max_players_input} joueurs, dont {nb_humains} humains."
+        f"There will be {max_players_input} players, including {nb_humains} humans."
     )
     sleep(1)
 
-    big_blind = 200
+    buyin = int(input("Buyin ? "))
+    big_blind = int(input("Big blind ? "))
     small_blind = big_blind // 2
-    buyin = 1000
+    
 
     # Choix des agents
     joueurs_bots, joueurs_bots_noms = pool_bots_min_max(

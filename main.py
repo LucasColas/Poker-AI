@@ -9,7 +9,7 @@ from texasholdem.game.action_type import ActionType
 
 # PokerPlus
 from PokerPlus.Stat.stat import get_stat_tournoi
-from PokerPlus.Simulation.simu_bots_humains import plot_gagnant_from_csv
+from PokerPlus.Simulation.simu_bots_humains import plot_gagnant_from_csv, tournoi_avec_humain
 from PokerPlus.Agents.MCTS import MainGame
 from PokerPlus.Stat.odds_calculator import odds_calculator
 import time
@@ -18,7 +18,7 @@ import time
 def main():
     Odds_calculator = odds_calculator()
     start = time.time()
-    # tournoi_avec_humain()
+   
     print("Hello World !")
     choice = 999
 
@@ -28,6 +28,7 @@ def main():
         print("2 : winners of tournaments")
         print("3 : watch MCTS play")
         print("4 : odds calculator")
+        print("5 : tournament with agents")
         choice = int(input("What do you want to do ? "))
         if choice == 0:
             print("Bye !")
@@ -83,6 +84,10 @@ def main():
         elif choice == 4:
             print("Odds calculator")
             Odds_calculator.main_print()
+
+        elif choice == 5:
+            tournoi_avec_humain()
+
 
     end = time.time()
     print(f"Time : {end-start} secondes")
