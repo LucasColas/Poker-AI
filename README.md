@@ -9,10 +9,9 @@ We use texasholdem library :
 
 # Install
 
-First, install [poetry](https://python-poetry.org/).
 You need Python 3.11 (or newer version).
 
-Then git clone this repository : 
+Then git clone this repository (enther that command in a command prompt) : 
 
 ```bash
 git clone git@github.com:LucasColas/Poker-AI.git
@@ -25,7 +24,13 @@ cd Poker-AI
 ```
 
 Now, you need to install the dependencies. 
-Just run : 
+
+You can either use requirements file or Poetry to install dependencies. 
+
+## With Poetry
+If you want to instal dependencies with Poetry. First, install [poetry](https://python-poetry.org/).
+
+Then, just run : 
 ```bash
 poetry install
 ```
@@ -43,5 +48,12 @@ python main.py
 or 
 ```bash
 python .\main.py
+```
+
+## With requirements.txt
+Create a virtual environment (or not, it's up to you).
+Then run the command : 
+```
+pip install -r requirements.txt
 ```
 
