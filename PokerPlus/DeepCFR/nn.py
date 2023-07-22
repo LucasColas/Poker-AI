@@ -19,8 +19,9 @@ class CardEmbedding(nn.Module):
         return embs.view(B, num_cards, -1).sum(1)
 
 class DeepCFRModel(nn.Module):
-    def __init__(self, n_card_types, n_bets, n_actions, dim=256):
+    def __init__(self, n_card_types, n_bets, max_bet=100000, n_actions=3, dim=256):
         super(DeepCFRModel, self).__init__()
+        self.max_bet = max_bet
         self.card_embeddings = nn.ModuleList([CardEmbedding(dim) for _ in range(n_card_types)])
         self.card1 = nn.Linear(dim * n_card_types, dim)
         self.card2 = nn.Linear(dim, dim)
@@ -31,6 +32,7 @@ class DeepCFRModel(nn.Module):
         self.comb2 = nn.Linear(dim, dim)
         self.comb3 = nn.Linear(dim, dim)
         self.action_head = nn.Linear(dim, n_actions)
+
 
     def forward(self, cards, bets):
         """
@@ -48,7 +50,7 @@ class DeepCFRModel(nn.Module):
         x = F.relu(self.card3(x))
 
         # 2. bet branch
-        bet_size = bets.clamp(0, 1e6)
+        bet_size = bets.clamp(0, self.max_bet)
         bet_occurred = bets.ge(0)
         bet_feats = torch.cat([bet_size, bet_occurred.float()], dim=1)
         y = F.relu(self.bet1(bet_feats))
