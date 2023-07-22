@@ -9,7 +9,10 @@ from texasholdem.game.action_type import ActionType
 
 # PokerPlus
 from PokerPlus.Stat.stat import get_stat_tournoi
-from PokerPlus.Simulation.simu_bots_humains import plot_gagnant_from_csv, tournoi_avec_humain
+from PokerPlus.Simulation.simu_bots_humains import (
+    plot_gagnant_from_csv,
+    tournoi_avec_humain,
+)
 from PokerPlus.Agents.MCTS import MainGame
 from PokerPlus.Stat.odds_calculator import odds_calculator
 
@@ -17,11 +20,10 @@ from Variants.NLHP.nlhp import NLHP
 import time
 
 
-
 def main():
     Odds_calculator = odds_calculator()
     start = time.time()
-   
+
     print("Hello World !")
     choice = 999
 
@@ -96,8 +98,6 @@ def main():
             new_nlhp = NLHP(buyin=1000, small_blind=10, big_blind=20, gui=False)
             new_nlhp.create_game()
             new_nlhp.play()
-
-
 
     end = time.time()
     print(f"Time : {end-start} secondes")

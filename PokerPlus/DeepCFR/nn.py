@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class CardEmbedding(nn.Module):
     def __init__(self, dim):
         super(CardEmbedding, self).__init__()
@@ -18,11 +19,14 @@ class CardEmbedding(nn.Module):
         embs = embs * valid.unsqueeze(1)  # zero out 'no card' embeddings
         return embs.view(B, num_cards, -1).sum(1)
 
+
 class DeepCFRModel(nn.Module):
     def __init__(self, n_card_types, n_bets, max_bet=100000, n_actions=3, dim=256):
         super(DeepCFRModel, self).__init__()
         self.max_bet = max_bet
-        self.card_embeddings = nn.ModuleList([CardEmbedding(dim) for _ in range(n_card_types)])
+        self.card_embeddings = nn.ModuleList(
+            [CardEmbedding(dim) for _ in range(n_card_types)]
+        )
         self.card1 = nn.Linear(dim * n_card_types, dim)
         self.card2 = nn.Linear(dim, dim)
         self.card3 = nn.Linear(dim, dim)
@@ -32,7 +36,6 @@ class DeepCFRModel(nn.Module):
         self.comb2 = nn.Linear(dim, dim)
         self.comb3 = nn.Linear(dim, dim)
         self.action_head = nn.Linear(dim, n_actions)
-
 
     def forward(self, cards, bets):
         """

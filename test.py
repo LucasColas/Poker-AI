@@ -4,6 +4,7 @@ from texasholdem.gui.text_gui import TextGUI
 game = TexasHoldEm(buyin=500, big_blind=5, small_blind=2, max_players=2)
 gui = TextGUI(game=game)
 
+
 def main():
     print("Hello World !")
     choice = 999
@@ -24,5 +25,6 @@ def main():
                     gui.run_step()
 
             print("end")
+
 
 main()
