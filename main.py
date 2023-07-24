@@ -1,10 +1,8 @@
 # TexasHoldEm
 from time import sleep
-from texasholdem.game.game import TexasHoldEm
 from texasholdem.agents.basic import random_agent, call_agent
 from texasholdem.evaluator.evaluator import *
-from texasholdem.gui.text_gui import TextGUI
-from texasholdem.game.action_type import ActionType
+
 
 
 # PokerPlus

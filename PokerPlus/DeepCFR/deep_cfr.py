@@ -9,7 +9,7 @@ n_actions = 3
 
 
 def cfr_iteration(model, data):
-    # Data is a list of (state, action, payoff) tuples collected during game tree traversal
+   
     regrets = {player: torch.zeros(len(actions)) for player, actions in data["actions"]}
     strategy = {
         player: torch.ones(len(actions)) / len(actions)
