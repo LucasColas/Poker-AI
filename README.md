@@ -57,3 +57,13 @@ Then run the command :
 pip install -r requirements.txt
 ```
 
+Finally, you can run the code.
+You just need to run `main.py` :
+```bash
+python main.py
+```
+or 
+```bash
+python .\main.py
+```
+
