@@ -30,15 +30,22 @@ You can either use requirements file or Poetry to install dependencies.
 ## With Poetry
 If you want to instal dependencies with Poetry. First, install [poetry](https://python-poetry.org/).
 
-Then, just run : 
+Create virtual environment :
 ```bash
-poetry install
+poetry env use python
 ```
 
 Then, activate virtual environment : 
 ```bash
 poetry shell
 ```
+
+Then, just run : 
+```bash
+poetry install
+```
+
+
 
 Finally, you can run the code.
 You just need to run `main.py` :
