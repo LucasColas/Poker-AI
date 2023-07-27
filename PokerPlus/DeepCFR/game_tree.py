@@ -32,7 +32,7 @@ def game_tree_traversal(
 
     """
 
-    for iteration in range(num_iterations):
+    for _ in range(num_iterations):
         # Initialize a trajectory list to store states, actions, and payoffs
         trajectory = []
         state = current_state
@@ -42,15 +42,17 @@ def game_tree_traversal(
             legal_actions = state.get_available_moves()
             player = state.current_player
 
-            # TODO : Get the cards of the board and bets for the current state
-            cards, bets = state.get_cards_and_bets()
+
+            cards = state.board
+            # bets
+            bets = [val_bet for val_bet in state._get_last_pot().player_amounts.values()]
             cards = [torch.tensor(c, dtype=torch.long) for c in cards]
             bets = torch.tensor(bets, dtype=torch.float32)
 
+            # Get action probabilities from strategy network
             action_probs = (
                 F.softmax(strategy_net(cards, bets), dim=1).squeeze().detach().numpy()
             )
-            # Get action probabilities from strategy network
 
             # Sample an action based on the action probabilities
             action = np.random.choice(legal_actions, p=action_probs)
