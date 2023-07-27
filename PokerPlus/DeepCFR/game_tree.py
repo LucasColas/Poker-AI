@@ -42,10 +42,11 @@ def game_tree_traversal(
             legal_actions = state.get_available_moves()
             player = state.current_player
 
-
             cards = state.board
             # bets
-            bets = [val_bet for val_bet in state._get_last_pot().player_amounts.values()]
+            bets = [
+                val_bet for val_bet in state._get_last_pot().player_amounts.values()
+            ]
             cards = [torch.tensor(c, dtype=torch.long) for c in cards]
             bets = torch.tensor(bets, dtype=torch.float32)
 
