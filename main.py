@@ -4,7 +4,6 @@ from texasholdem.agents.basic import random_agent, call_agent
 from texasholdem.evaluator.evaluator import *
 
 
-
 # PokerPlus
 from PokerPlus.Stat.stat import get_stat_tournoi
 from PokerPlus.Simulation.simu_bots_humains import (

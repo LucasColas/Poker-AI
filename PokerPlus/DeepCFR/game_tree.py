@@ -1,37 +1,86 @@
-from texasholdem.game.game import TexasHoldEm
 from copy import deepcopy
+
+from texasholdem.game.game import TexasHoldEm
+from PokerPlus.DeepCFR.nn import DeepCFRModel
+import numpy as np
+import torch
+import torch.nn.functional as F
+
 
 class Node:
     """
 
-        Node for GameTree.
-    
+    Node for GameTree.
+
     """
 
-    def __init__(self, state : TexasHoldEm) -> None:
-        self.state = deepcopy(state)
+    def __init__(self, state: TexasHoldEm) -> None:
+        self.state = deepcopy(state)  # State is a TexasHoldEm object
         self.parent = None
         self.children = {}
 
-class GameTree():
+
+def game_tree_traversal(
+    current_state: TexasHoldEm,
+    ai_player: int,
+    strategy_net: DeepCFRModel,
+    num_iterations: int,
+):
     """
-    
-        GameTree for Head's up Texas Hold'em No Limit.
-        This game tree is used to compute the Nash equilibrium with Deep CFR.
-        We have a traversal function to collect data for the CFR algorithm.
-    
+
+    Function used to perform game tree traversal and update cumulative regrets.
+
     """
 
-    def __init__(self, state : TexasHoldEm) -> None:
-        self.root = Node(state)
+    for iteration in range(num_iterations):
+        # Initialize a trajectory list to store states, actions, and payoffs
+        trajectory = []
+        state = current_state
 
-    def add_node(self, action : int, state : TexasHoldEm) -> None:
-        """
-        
-            Add a node to the tree.
-        
-        """
-        pass
+        # Perform the game tree traversal until a terminal state is reached
+        while state.is_hand_running():
+            legal_actions = state.get_available_moves()
+            player = state.current_player
 
+            # TODO : Get the cards of the board and bets for the current state
+            cards, bets = state.get_cards_and_bets()
+            cards = [torch.tensor(c, dtype=torch.long) for c in cards]
+            bets = torch.tensor(bets, dtype=torch.float32)
 
+            action_probs = (
+                F.softmax(strategy_net(cards, bets), dim=1).squeeze().detach().numpy()
+            )
+            # Get action probabilities from strategy network
 
+            # Sample an action based on the action probabilities
+            action = np.random.choice(legal_actions, p=action_probs)
+
+            # Transition to the next state based on the selected action
+            state.take_action(action)
+
+            # Record the current state, action, player's, player's payoff
+            trajectory.append((deepcopy(state), player, action, None))
+
+        # Handle terminal state to compute payoffs and record in the trajectory list
+        if state.is_hand_running():
+            # payoffs
+            gagnant = int(str(state.hand_history.settle)[7])
+            for player in state.players:
+                if player.id == ai_player and ai_player == gagnant:
+                    payoffs = state.pots[-1]
+                    break
+
+            else:
+                payoffs = -state.pots[-1]
+
+            trajectory.append((deepcopy(state), None, None, payoffs))
+
+        # Backpropagate the trajectory and update cumulative regrets
+        for _, (state_i, player_i, action_i, payoffs_i) in enumerate(trajectory):
+            if player_i is not None and action_i is not None:
+                counterfactual_regret = (
+                    payoffs_i[player_i] - trajectory[-1][3][player_i]
+                )
+                strategy_net.update_regret(
+                    state_i, player_i, action_i, counterfactual_regret
+                )
