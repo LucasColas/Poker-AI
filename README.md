@@ -10,8 +10,8 @@ We use texasholdem library :
 # Install
 
 You need Python 3.11 (or newer version).
-
-Then git clone this repository (enther that command in a command prompt) : 
+Open a powershell or a command prompt.
+Then git clone this repository (enther those commands in a command prompt) : 
 
 ```bash
 git clone git@github.com:LucasColas/Poker-AI.git
