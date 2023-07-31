@@ -42,7 +42,9 @@ def game_tree_traversal(
             legal_actions = state.get_available_moves()
             player = state.current_player
 
-            cards = state.board
+            cards_board = state.board
+            hole = state.get_hand(player)
+            cards = hole + cards_board
             # bets
             bets = [
                 val_bet for val_bet in state._get_last_pot().player_amounts.values()
