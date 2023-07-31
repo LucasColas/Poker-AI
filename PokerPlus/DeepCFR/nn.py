@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
 
 
 class CardEmbedding(nn.Module):
@@ -66,3 +67,57 @@ class DeepCFRModel(nn.Module):
         z = F.relu(self.comb3(z) + z)
         z = F.normalize(z, p=2, dim=1)  # (z - mean) / std
         return self.action_head(z)
+
+    def update_regret(self, state, player, action, counterfactual_regret):
+        """
+        Update the cumulative regrets for the specified action at the given information set.
+
+        Args:
+            state (TexasHoldEm): The current state of the game.
+            player (int): The player for whom to update the cumulative regrets.
+            action (int): The action taken by the player.
+            counterfactual_regret (float): The counterfactual regret for the action.
+
+        """
+        cards = state.board
+        # bets
+        bets = [val_bet for val_bet in state._get_last_pot().player_amounts.values()]
+        cards = [torch.tensor(c, dtype=torch.long) for c in cards]
+        bets = torch.tensor(bets, dtype=torch.float32)
+
+        with torch.no_grad():
+            # Get the action probabilities from the current strategy network
+            action_probs = (
+                F.softmax(self(cards, bets), dim=1).squeeze().detach().numpy()
+            )
+
+        # Compute the cumulative regrets for each action at the information set
+        cumulative_regrets = np.zeros(self.action_head.out_features)
+        for a in state.get_available_moves():
+            cumulative_regrets[a] = max(action_probs[a] + counterfactual_regret, 0)
+
+        # Update the strategy network with the updated cumulative regrets
+        self.update_strategy(cards, bets, cumulative_regrets)
+
+    def update_strategy(self, cards, bets, cumulative_regrets):
+        """
+        Update the strategy network with the updated cumulative regrets.
+
+        Args:
+            cards: ((Nx2), (Nx3) [, (Nx1), (Nx1)]) # (hole, board, [turn, river])
+            bets: Nx n_bet_feats
+            cumulative_regrets (numpy array): The updated cumulative regrets for each action.
+
+        """
+        cards = [c.view(1, -1) for c in cards]
+        bets = bets.view(1, -1)
+        cumulative_regrets = torch.tensor(cumulative_regrets, dtype=torch.float32)
+        # Compute the new action probabilities using regret-matching
+        action_probs = F.softmax(cumulative_regrets, dim=0)
+
+        # Perform a single optimization step to update the strategy network
+        optimizer = torch.optim.SGD(self.parameters(), lr=0.01)
+        optimizer.zero_grad()
+        loss = F.mse_loss(self(cards, bets), action_probs)
+        loss.backward()
+        optimizer.step()
