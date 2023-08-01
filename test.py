@@ -1,11 +1,12 @@
 from texasholdem.game.game import TexasHoldEm
 from texasholdem.gui.text_gui import TextGUI
+from PokerPlus.DeepCFR.game_tree import print_card_mapping
 
 game = TexasHoldEm(buyin=500, big_blind=5, small_blind=2, max_players=2)
 gui = TextGUI(game=game)
 
 
-def main():
+def heads_up():
     print("Hello World !")
     choice = 999
 
@@ -27,4 +28,10 @@ def main():
             print("end")
 
 
-main()
+def main():
+    print_card_mapping()
+
+
+if __name__ == "__main__":
+    main()
+

@@ -2,9 +2,12 @@ from copy import deepcopy
 
 from texasholdem.game.game import TexasHoldEm
 from PokerPlus.DeepCFR.nn import DeepCFRModel
+from PokerPlus.DeepCFR.utils import card_to_int, int_to_card
+
 import numpy as np
 import torch
 import torch.nn.functional as F
+
 
 
 class Node:
@@ -37,13 +40,16 @@ def game_tree_traversal(
         trajectory = []
         state = current_state
 
+
+
         # Perform the game tree traversal until a terminal state is reached
         while state.is_hand_running():
             legal_actions = state.get_available_moves()
             player = state.current_player
 
-            cards_board = state.board
+            cards_board = [card_to_int[card.__str__()] for card in state.board]
             hole = state.get_hand(player)
+            hole = [card_to_int[card.__str__()] for card in hole]
             cards = hole + cards_board
             # bets
             bets = [
@@ -89,3 +95,9 @@ def game_tree_traversal(
                 strategy_net.update_regret(
                     state_i, player_i, action_i, counterfactual_regret
                 )
+
+
+def print_card_mapping():
+    print(card_to_int)
+    print()
+    print(int_to_card)
