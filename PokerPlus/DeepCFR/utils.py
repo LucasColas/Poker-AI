@@ -11,4 +11,3 @@ for card in d.cards:
     card_to_int[card_str] = count
     int_to_card[count] = card
     count += 1
-
