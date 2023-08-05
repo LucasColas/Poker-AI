@@ -182,8 +182,3 @@ def traverse(h: TexasHoldEm, p: int, theta1, theta2, MV, M_PI, t):
         )  # Sample action according to opponent's strategy
         return traverse(h.result(a), p, theta1, theta2, MV, M_PI, t)
 
-
-def print_card_mapping():
-    print(card_to_int)
-    print()
-    print(int_to_card)
