@@ -1,6 +1,6 @@
 class AdvantageMemory:
     def __init__(self):
-        self.data = []  # List to store (infoset_key, t, regrets) tuples
+        self.data = set()  # List to store (infoset_key, t, regrets) tuples
     
     def insert(self, infoset_key, t, regrets):
         self.data.append((infoset_key, t, regrets))

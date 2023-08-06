@@ -139,13 +139,13 @@ def get_payoff(h: TexasHoldEm, p: int):
 
 
 def get_info_set(h: TexasHoldEm, p: int):
-    cards_board = [card_to_int[card.__str__()] for card in h.board]
+    cards_board = {card_to_int[card.__str__()] for card in h.board}
     hole = h.get_hand(p)
-    hole = [card_to_int[card.__str__()] for card in hole]
+    hole = {card_to_int[card.__str__()] for card in hole}
     cards = hole + cards_board
     # bets
-    bets = [val_bet for val_bet in h._get_last_pot().player_amounts.values()]
-    cards = [torch.tensor(c, dtype=torch.long) for c in cards]
+    bets = (val_bet for val_bet in h._get_last_pot().player_amounts.values())
+    cards = {torch.tensor(c, dtype=torch.long) for c in cards}
     bets = torch.tensor(bets, dtype=torch.float32)
 
     return cards, bets

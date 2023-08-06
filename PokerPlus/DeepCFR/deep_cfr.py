@@ -27,8 +27,8 @@ def deep_cfr(T : int, nb_players : int, K : int, game : TexasHoldEm, n_actions :
     advantage_net = DeepCFRModel(n_card_types, n_bets, n_actions)
     advantage_net.zero_grad()
     # Initialize reservoir-sampled advantage memories MV,1, MV,2 and strategy memory MΠ.
-    advantage_memories = [torch.zeros(1, 1) for _ in range(nb_players)]
-    strategy_memory = torch.zeros(1, 1)
+    advantage_memories = [AdvantageMemory() for _ in range(nb_players)]
+    strategy_memory = [StrategyMemory() for _ in range(nb_players)]
     # Initialize the optimizer
     optimizer = optim.Adam(advantage_net.parameters(), lr=0.001)
 
