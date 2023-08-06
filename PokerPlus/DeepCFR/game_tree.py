@@ -145,8 +145,6 @@ def get_info_set(h: TexasHoldEm, p: int):
     cards = hole + cards_board
     # bets
     bets = (val_bet for val_bet in h._get_last_pot().player_amounts.values())
-    cards = {torch.tensor(c, dtype=torch.long) for c in cards}
-    bets = torch.tensor(bets, dtype=torch.float32)
 
     return cards, bets
 
@@ -157,28 +155,30 @@ def traverse(h: TexasHoldEm, p: int, theta1, theta2, MV, M_PI, t):
 
     elif h.current_player == p:
         sigma_t = compute_strategy(
-            deepcopy(h), theta1
+            h, theta1
         )  # Compute strategy using regret matching
 
         action_values = np.zeros(len(h.get_available_moves()))
         for idx, a in enumerate(h.get_available_moves()):
+            h_copy = deepcopy(h)
+            h_copy.take_action(a)
             action_values[idx] = traverse(
-                h.take_action(a), p, theta1, theta2, MV, M_PI, t
+                deepcopy(h_copy), p, theta1, theta2, MV, M_PI, t
             )
 
             regrets = action_values - np.sum(sigma_t * action_values)
-        MV.insert(deepcopy(h), t, regrets)  # Insert infoset and its action advantages
-
+        MV.insert(get_info_set(h_copy, p), t, regrets)  # Insert infoset and its action advantages
         return np.max(action_values)  # Return the value of the best action
     else:
-        sigma_t = compute_strategy(deepcopy(h), theta2)  # Compute opponent's strategy
+        sigma_t = compute_strategy(get_info_set(h, p), theta2)  # Compute opponent's strategy
 
         M_PI.insert(
-            deepcopy(h), t, sigma_t
+            get_info_set(h, p), t, sigma_t
         )  # Insert infoset and its action probabilities
 
         a = np.random.choice(
             h.get_legal_actions(), p=sigma_t
         )  # Sample action according to opponent's strategy
-        return traverse(h.result(a), p, theta1, theta2, MV, M_PI, t)
+        h.take_action(a)
+        return traverse(deepcopy(h), p, theta1, theta2, MV, M_PI, t)
 
