@@ -24,8 +24,8 @@ def deep_cfr(T : int, nb_players : int, K : int, game : TexasHoldEm, n_actions :
     
     """
     # Initialize each player’s advantage network V (I, a|θp) with parameters θp so that it returns 0 for all inputs.
-    advantage_net = DeepCFRModel(n_card_types, n_bets, n_actions)
-    advantage_net.zero_grad()
+    advantage_net = [DeepCFRModel(n_card_types, n_bets, n_actions) for _ in range(nb_players)]
+    #advantage_net.zero_grad()
     # Initialize reservoir-sampled advantage memories MV,1, MV,2 and strategy memory MΠ.
     advantage_memories = [AdvantageMemory() for _ in range(nb_players)]
     strategy_memory = [StrategyMemory() for _ in range(nb_players)]
@@ -33,10 +33,10 @@ def deep_cfr(T : int, nb_players : int, K : int, game : TexasHoldEm, n_actions :
     optimizer = optim.Adam(advantage_net.parameters(), lr=0.001)
 
     for _ in range(T):
-        for _ in range(nb_players):
+        for p in range(nb_players):
             for _ in range(K):
                 # Traverse the game tree
-                traverse(deepcopy(game), advantage_net, advantage_memories, strategy_memory)
+                traverse(deepcopy(game), advantage_net[p], advantage_memories[p], strategy_memory[p])
 
             
 
