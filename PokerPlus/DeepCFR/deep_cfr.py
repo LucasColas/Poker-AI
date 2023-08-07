@@ -3,6 +3,7 @@ from copy import deepcopy
 
 import torch
 import torch.optim as optim
+import torch.nn.functional as F
 
 from PokerPlus.DeepCFR.nn import DeepCFRModel
 from PokerPlus.DeepCFR.game_tree import traverse
@@ -37,7 +38,40 @@ def deep_cfr(T : int, nb_players : int, K : int, game : TexasHoldEm, n_actions :
             for _ in range(K):
                 # Traverse the game tree
                 traverse(deepcopy(game), advantage_net[p], advantage_memories[p], strategy_memory[p])
+            
+            # Train 
+            train_advantage_network(advantage_net[p], advantage_memories[p])
+
 
             
 
 
+def train_advantage_network(net, MV):
+    optimizer = optim.Adam(net.parameters(), lr=0.001, clip_value=1.0)
+    batch_size = 10000
+    
+    for epoch in range(4000):
+        total_loss = 0.0
+        num_batches = len(MV) // batch_size
+        
+        for _ in range(num_batches):
+            batch = MV.sample(batch_size)
+            losses = []
+            
+            for info, _, regrets in batch:
+                cards, bets = info
+                regrets_tensor = torch.tensor(regrets, dtype=torch.float32)
+                
+                action_probs = net(cards, bets)
+                loss = F.mse_loss(action_probs, regrets_tensor)
+                losses.append(loss)
+            
+            batch_loss = sum(losses) / len(losses)
+            total_loss += batch_loss
+            
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+        
+        avg_loss = total_loss / num_batches
+        print(f"Epoch [{epoch+1}/4000], Avg Loss: {avg_loss:.4f}")

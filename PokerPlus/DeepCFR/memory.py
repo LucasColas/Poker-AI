@@ -1,3 +1,6 @@
+
+import random
+
 class AdvantageMemory:
     def __init__(self):
         self.data = set()  # List to store (infoset_key, t, regrets) tuples
@@ -7,6 +10,9 @@ class AdvantageMemory:
     
     def get_data(self):
         return self.data
+    
+    def sample(self, batch_size):
+        return random.sample(self.data, batch_size)
 
 
 class StrategyMemory:
