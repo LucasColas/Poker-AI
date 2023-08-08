@@ -1,3 +1,10 @@
+"""
+
+Main code for the game tree CFR Traversal with External Sampling
+
+"""
+
+
 from copy import deepcopy
 
 from texasholdem.game.game import TexasHoldEm

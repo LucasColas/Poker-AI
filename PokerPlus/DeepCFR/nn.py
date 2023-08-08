@@ -1,3 +1,11 @@
+"""
+
+Architecture of the neural network for the Deep CFR model.
+
+
+"""
+
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
