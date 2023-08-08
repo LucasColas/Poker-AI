@@ -26,12 +26,12 @@ def deep_cfr(T : int, nb_players : int, K : int, game : TexasHoldEm, n_actions :
     """
     # Initialize each player’s advantage network V (I, a|θp) with parameters θp so that it returns 0 for all inputs.
     advantage_net = [DeepCFRModel(n_card_types, n_bets, n_actions) for _ in range(nb_players)]
-    #advantage_net.zero_grad()
+    # advantage_net.zero_grad()
     # Initialize reservoir-sampled advantage memories MV,1, MV,2 and strategy memory MΠ.
     advantage_memories = [AdvantageMemory() for _ in range(nb_players)]
     strategy_memory = StrategyMemory()
     # Initialize the optimizer
-    optimizer = optim.Adam(advantage_net.parameters(), lr=0.001)
+    
 
     for _ in range(T):
         for p in range(nb_players):
@@ -65,6 +65,7 @@ def train_advantage_network(net, MV):
             losses = []
             
             for info, _, regrets in batch:
+                optimizer.zero_grad()
                 cards, bets = info
                 regrets_tensor = torch.tensor(regrets, dtype=torch.float32)
                 
@@ -78,11 +79,11 @@ def train_advantage_network(net, MV):
             batch_loss = sum(losses) / len(losses)
             total_loss += batch_loss
             
-            optimizer.zero_grad()
+            
             
         
         avg_loss = total_loss / num_batches
-        print(f"Epoch [{epoch+1}/4000], Avg Loss: {avg_loss:.4f}")
+        print(f"Epoch [{epoch+1}], Avg Loss: {avg_loss:.4f}")
 
 
 def train_strategy_network(net, M_PI):
@@ -113,6 +114,5 @@ def train_strategy_network(net, M_PI):
             optimizer.zero_grad()
             
             
-
         avg_loss = total_loss / num_batches
-        print(f"Epoch [{epoch+1}/4000], Avg Loss: {avg_loss:.4f}")
+        print(f"Epoch [{epoch+1}], Avg Loss: {avg_loss:.4f}")
