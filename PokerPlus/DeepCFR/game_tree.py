@@ -161,9 +161,7 @@ def traverse(h: TexasHoldEm, p: int, theta1, theta2, MV, M_PI, t):
         return get_payoff(h, p)
 
     elif h.current_player == p:
-        sigma_t = compute_strategy(
-            h, theta1
-        )  # Compute strategy using regret matching
+        sigma_t = compute_strategy(h, theta1)  # Compute strategy using regret matching
 
         action_values = np.zeros(len(h.get_available_moves()))
         for idx, a in enumerate(h.get_available_moves()):
@@ -174,10 +172,14 @@ def traverse(h: TexasHoldEm, p: int, theta1, theta2, MV, M_PI, t):
             )
 
             regrets = action_values - np.sum(sigma_t * action_values)
-        MV.insert(get_info_set(h_copy, p), t, regrets)  # Insert infoset and its action advantages
+        MV.insert(
+            get_info_set(h_copy, p), t, regrets
+        )  # Insert infoset and its action advantages
         return np.max(action_values)  # Return the value of the best action
     else:
-        sigma_t = compute_strategy(get_info_set(h, p), theta2)  # Compute opponent's strategy
+        sigma_t = compute_strategy(
+            get_info_set(h, p), theta2
+        )  # Compute opponent's strategy
 
         M_PI.insert(
             get_info_set(h, p), t, sigma_t
@@ -188,4 +190,3 @@ def traverse(h: TexasHoldEm, p: int, theta1, theta2, MV, M_PI, t):
         )  # Sample action according to opponent's strategy
         h.take_action(a)
         return traverse(deepcopy(h), p, theta1, theta2, MV, M_PI, t)
-
