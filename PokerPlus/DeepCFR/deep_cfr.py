@@ -103,14 +103,16 @@ def train_strategy_network(net, M_PI):
 
                 action_probs = net(cards, bets)
                 loss = F.mse_loss(action_probs, sigma_t_tensor)
+                loss.backward()
+                optimizer.step()
                 losses.append(loss)
 
             batch_loss = sum(losses) / len(losses)
             total_loss += batch_loss
 
             optimizer.zero_grad()
-            batch_loss.backward()
-            optimizer.step()
+            
+            
 
         avg_loss = total_loss / num_batches
         print(f"Epoch [{epoch+1}/4000], Avg Loss: {avg_loss:.4f}")
