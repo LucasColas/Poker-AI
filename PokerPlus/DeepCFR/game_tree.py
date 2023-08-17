@@ -16,8 +16,6 @@ import torch
 import torch.nn.functional as F
 
 
-
-
 def compute_strategy(state: TexasHoldEm, strategy_net: DeepCFRModel):
     """
 
@@ -56,7 +54,6 @@ def get_payoff(h: TexasHoldEm, p: int):
     for player in h.players:
         if player.id == p and p == gagnant:
             return h.pots[-1]
-            
 
     return -h.pots[-1]
 
@@ -106,4 +103,3 @@ def traverse(h: TexasHoldEm, p: int, theta1, theta2, MV, M_PI, t):
         )  # Sample action according to opponent's strategy
         h.take_action(a)
         return traverse(deepcopy(h), p, theta1, theta2, MV, M_PI, t)
-

@@ -48,7 +48,6 @@ def deep_cfr(
     advantage_memories = [AdvantageMemory() for _ in range(nb_players)]
     strategy_memory = StrategyMemory()
 
-
     for _ in range(T):
         for p in range(nb_players):
             for _ in range(K):
