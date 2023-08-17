@@ -55,11 +55,10 @@ def get_payoff(h: TexasHoldEm, p: int):
     gagnant = int(str(h.hand_history.settle)[7])
     for player in h.players:
         if player.id == p and p == gagnant:
-            payoffs = h.pots[-1]
-            break
+            return h.pots[-1]
+            
 
-    else:
-        payoffs = -h.pots[-1]
+    return -h.pots[-1]
 
 
 def get_info_set(h: TexasHoldEm, p: int):

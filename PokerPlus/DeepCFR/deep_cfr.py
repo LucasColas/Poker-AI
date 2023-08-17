@@ -39,7 +39,7 @@ def deep_cfr(
     Initialize reservoir-sampled advantage memories MV,1, MV,2 and strategy memory MΠ.
 
     """
-    # Initialize each player’s advantage network V (I, a|θp) with parameters θp so that it returns 0 for all inputs.
+    # Initialize each player’s advantage network
     advantage_net = [
         DeepCFRModel(n_card_types, n_bets, n_actions) for _ in range(nb_players)
     ]
