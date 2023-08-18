@@ -26,9 +26,9 @@ n_actions = 3
 
 
 def deep_cfr(
-    T: int,
+    nb_iterations: int,
     nb_players: int,
-    K: int,
+    nb_game_tree_traversals: int,
     game: TexasHoldEm,
     n_actions: int,
     n_card_types: int,
@@ -50,9 +50,9 @@ def deep_cfr(
     advantage_memories = [AdvantageMemory() for _ in range(nb_players)]
     strategy_memory = StrategyMemory()
 
-    for _ in range(T):
+    for _ in range(nb_iterations):
         for p in range(nb_players):
-            for _ in range(K):
+            for _ in range(nb_game_tree_traversals):
                 # Traverse the game tree
                 traverse(
                     deepcopy(game),
@@ -130,3 +130,8 @@ def train_strategy_network(net, M_PI):
 
         avg_loss = total_loss / num_batches
         print(f"Epoch [{epoch+1}], Avg Loss: {avg_loss:.4f}")
+
+def save_deep_cfr(path : str, name : str, nb_iterations : int, nb_players : int, nb_game_tree_traversals : int, game : TexasHoldEm, n_actions : int, n_card_types : int, n_bets : int):
+    strategy_net = deep_cfr(nb_iterations, nb_players, nb_game_tree_traversals, game, n_actions, n_card_types, n_bets)
+    torch.save(strategy_net.state_dict(), path + "/" + name + ".pth")
+

@@ -2,6 +2,7 @@
 from time import sleep
 from texasholdem.agents.basic import random_agent, call_agent
 from texasholdem.evaluator.evaluator import *
+from texasholdem.game.game import TexasHoldEm
 
 
 # PokerPlus
@@ -12,17 +13,24 @@ from PokerPlus.Simulation.simu_bots_humains import (
 )
 from PokerPlus.Agents.MCTS import MainGame
 from PokerPlus.Stat.odds_calculator import odds_calculator
-
+from PokerPlus.DeepCFR.deep_cfr import deep_cfr, save_deep_cfr
 from Variants.NLHP.nlhp import NLHP
 import time
 
 
 def main():
+    nb_players = 2
+    nb_iterations = 1000
+    nb_game_tree_traversals = 100
+    n_actions, n_card_types, n_bets = 3, 4, 2
+
     Odds_calculator = odds_calculator()
     start = time.time()
 
     print("Hello World !")
     choice = 999
+
+
 
     while choice != 0:
         print("0 : leave")
@@ -32,6 +40,8 @@ def main():
         print("4 : odds calculator")
         print("5 : tournament with agents")
         print("6 : heads-up hold’em poker")
+        print("7 : Train Deep CFR")
+        print("8 : Play against Deep CFR in Heads-up hold’em poker")
         choice = int(input("What do you want to do ? "))
         if choice == 0:
             print("Bye !")
@@ -95,6 +105,16 @@ def main():
             new_nlhp = NLHP(buyin=1000, small_blind=10, big_blind=20, gui=False)
             new_nlhp.create_game()
             new_nlhp.play()
+
+        elif choice == 7:
+            # Train Deep CFR
+            game = TexasHoldEm(1500, 80, 40, nb_players)
+            save_deep_cfr("", "DeepCFR", nb_iterations, nb_players, nb_game_tree_traversals, game, n_actions, n_card_types, n_bets)
+            pass
+
+        elif choice == 8:
+            # heads-up hold’em poker with Deep CFR
+            pass
 
     end = time.time()
     print(f"Time : {end-start} secondes")
