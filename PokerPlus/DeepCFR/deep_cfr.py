@@ -17,10 +17,12 @@ from PokerPlus.DeepCFR.game_tree import traverse
 from PokerPlus.DeepCFR.memory import AdvantageMemory, StrategyMemory
 from texasholdem.game.game import TexasHoldEm
 
-
+"""
 n_card_types = 4
 n_bets = 2
 n_actions = 3
+"""
+
 
 
 def deep_cfr(
