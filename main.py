@@ -1,8 +1,12 @@
 # TexasHoldEm
 from time import sleep
+from copy import deepcopy
+
+
 from texasholdem.agents.basic import random_agent, call_agent
 from texasholdem.evaluator.evaluator import *
 from texasholdem.game.game import TexasHoldEm
+
 
 
 # PokerPlus
@@ -114,7 +118,7 @@ def main():
                 nb_iterations=nb_iterations,
                 nb_players=nb_players,
                 nb_game_tree_traversals=nb_game_tree_traversals,
-                game=game,
+                game=deepcopy(game),
                 n_actions=n_actions,
                 n_card_types=n_card_types,
                 n_bets=n_bets,

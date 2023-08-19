@@ -50,18 +50,18 @@ def deep_cfr(
     strategy_memory = StrategyMemory()
 
     for _ in range(nb_iterations):
-        for p in range(nb_players):
+        for player in range(nb_players):
             for _ in range(nb_game_tree_traversals):
                 # Traverse the game tree
                 traverse(
                     deepcopy(game),
-                    advantage_net[p],
-                    advantage_memories[p],
+                    advantage_net[player],
+                    advantage_memories[player],
                     strategy_memory,
                 )
 
             # Train
-            train_advantage_network(advantage_net[p], advantage_memories[p])
+            train_advantage_network(advantage_net[player], advantage_memories[player])
 
     # Train the strategy network
     strategy_net = DeepCFRModel(n_card_types, n_bets, n_actions)
@@ -70,11 +70,11 @@ def deep_cfr(
     return strategy_net
 
 
-def train_advantage_network(net, MV):
-    optimizer = optim.Adam(net.parameters(), lr=0.001, clip_value=1.0)
-    batch_size = 10000
+def train_advantage_network(net, MV, lr=0.001, batch_size=10000, nb_epochs=4000):
+    optimizer = optim.Adam(net.parameters(), lr=lr, clip_value=1.0)
 
-    for epoch in range(4000):
+
+    for epoch in range(nb_epochs):
         total_loss = 0.0
         num_batches = len(MV) // batch_size
 
@@ -100,11 +100,11 @@ def train_advantage_network(net, MV):
         print(f"Epoch [{epoch+1}], Avg Loss: {avg_loss:.4f}")
 
 
-def train_strategy_network(net, M_PI):
-    optimizer = optim.Adam(net.parameters(), lr=0.001)
-    batch_size = 10000
+def train_strategy_network(net, M_PI, lr=0.001, batch_size=10000, nb_epochs=4000):
+    optimizer = optim.Adam(net.parameters(), lr=lr)
 
-    for epoch in range(4000):
+
+    for epoch in range(nb_epochs):
         total_loss = 0.0
         num_batches = len(M_PI) // batch_size
 

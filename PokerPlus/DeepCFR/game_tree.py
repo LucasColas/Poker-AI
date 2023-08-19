@@ -68,25 +68,43 @@ def get_info_set(h: TexasHoldEm, player: int):
 
     return cards, bets
 
-def get_opponent_player_num(actual_player : int):
+
+def get_opponent_player_num(actual_player: int):
     if actual_player == 1:
         return 0
     else:
         return 1
 
-def traverse(game: TexasHoldEm, actual_player_to_compute_strategy: int, theta1, theta2, MV, M_PI, t):
+
+def traverse(
+    game: TexasHoldEm,
+    actual_player_to_compute_strategy: int,
+    theta1,
+    theta2,
+    MV,
+    M_PI,
+    t,
+):
     if not game.is_hand_running():
         return get_payoff(game, actual_player_to_compute_strategy)
 
     elif game.current_player == actual_player_to_compute_strategy:
-        sigma_t = compute_strategy(game, theta1)  # Compute strategy using regret matching
+        sigma_t = compute_strategy(
+            game, theta1
+        )  # Compute strategy using regret matching
 
         action_values = np.zeros(len(game.get_available_moves()))
         for idx, a in enumerate(game.get_available_moves()[:5]):
             h_copy = deepcopy(game)
             h_copy.take_action(a)
             action_values[idx] = traverse(
-                deepcopy(h_copy), actual_player_to_compute_strategy, theta1, theta2, MV, M_PI, t
+                deepcopy(h_copy),
+                actual_player_to_compute_strategy,
+                theta1,
+                theta2,
+                MV,
+                M_PI,
+                t,
             )
 
             regrets = action_values - np.sum(sigma_t * action_values)
