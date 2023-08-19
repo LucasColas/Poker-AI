@@ -107,6 +107,7 @@ def main():
         elif choice == 7:
             # Train Deep CFR
             game = TexasHoldEm(buyin=1500, big_blind=80, small_blind=40, max_players=2)
+            game.start_hand()
             save_deep_cfr(
                 path="",
                 name_file="DeepCFR",

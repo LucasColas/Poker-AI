@@ -45,7 +45,7 @@ def deep_cfr(
         DeepCFRModel(n_card_types, n_bets, n_actions) for _ in range(nb_players)
     ]
 
-    # Initialize reservoir-sampled advantage memories MV,1, MV,2 and strategy memory MΠ.
+    # Initialize reservoir-sampled advantage memories MV_1, MV_2 and strategy memory MΠ.
     advantage_memories = [AdvantageMemory() for _ in range(nb_players)]
     strategy_memory = StrategyMemory()
 

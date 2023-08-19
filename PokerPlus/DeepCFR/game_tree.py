@@ -58,9 +58,9 @@ def get_payoff(h: TexasHoldEm, p: int):
     return -h.pots[-1]
 
 
-def get_info_set(h: TexasHoldEm, p: int):
+def get_info_set(h: TexasHoldEm, player: int):
     cards_board = {card_to_int[card.__str__()] for card in h.board}
-    hole = h.get_hand(p)
+    hole = h.get_hand(player)
     hole = {card_to_int[card.__str__()] for card in hole}
     cards = hole + cards_board
     # bets
@@ -68,38 +68,44 @@ def get_info_set(h: TexasHoldEm, p: int):
 
     return cards, bets
 
+def get_opponent_player_num(actual_player : int):
+    if actual_player == 1:
+        return 0
+    else:
+        return 1
 
-def traverse(h: TexasHoldEm, p: int, theta1, theta2, MV, M_PI, t):
+def traverse(h: TexasHoldEm, actual_player_to_compute_strategy: int, theta1, theta2, MV, M_PI, t):
     if not h.is_hand_running():
-        return get_payoff(h, p)
+        return get_payoff(h, actual_player_to_compute_strategy)
 
-    elif h.current_player == p:
+    elif h.current_player == actual_player_to_compute_strategy:
         sigma_t = compute_strategy(h, theta1)  # Compute strategy using regret matching
 
         action_values = np.zeros(len(h.get_available_moves()))
-        for idx, a in enumerate(h.get_available_moves()):
+        for idx, a in enumerate(h.get_available_moves()[:5]):
             h_copy = deepcopy(h)
             h_copy.take_action(a)
             action_values[idx] = traverse(
-                deepcopy(h_copy), p, theta1, theta2, MV, M_PI, t
+                deepcopy(h_copy), actual_player_to_compute_strategy, theta1, theta2, MV, M_PI, t
             )
 
             regrets = action_values - np.sum(sigma_t * action_values)
         MV.insert(
-            get_info_set(h_copy, p), t, regrets
+            get_info_set(h_copy, actual_player_to_compute_strategy), t, regrets
         )  # Insert infoset and its action advantages
         return np.max(action_values)  # Return the value of the best action
     else:
+        player_num = get_opponent_player_num(actual_player_to_compute_strategy)
         sigma_t = compute_strategy(
-            get_info_set(h, p), theta2
+            get_info_set(h, player_num), theta2
         )  # Compute opponent's strategy
 
         M_PI.insert(
-            get_info_set(h, p), t, sigma_t
+            get_info_set(h, player_num), t, sigma_t
         )  # Insert infoset and its action probabilities
 
         a = np.random.choice(
             h.get_legal_actions(), p=sigma_t
         )  # Sample action according to opponent's strategy
         h.take_action(a)
-        return traverse(deepcopy(h), p, theta1, theta2, MV, M_PI, t)
+        return traverse(deepcopy(h), player_num, theta1, theta2, MV, M_PI, t)
