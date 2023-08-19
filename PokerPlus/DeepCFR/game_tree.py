@@ -74,16 +74,16 @@ def get_opponent_player_num(actual_player : int):
     else:
         return 1
 
-def traverse(h: TexasHoldEm, actual_player_to_compute_strategy: int, theta1, theta2, MV, M_PI, t):
-    if not h.is_hand_running():
-        return get_payoff(h, actual_player_to_compute_strategy)
+def traverse(game: TexasHoldEm, actual_player_to_compute_strategy: int, theta1, theta2, MV, M_PI, t):
+    if not game.is_hand_running():
+        return get_payoff(game, actual_player_to_compute_strategy)
 
-    elif h.current_player == actual_player_to_compute_strategy:
-        sigma_t = compute_strategy(h, theta1)  # Compute strategy using regret matching
+    elif game.current_player == actual_player_to_compute_strategy:
+        sigma_t = compute_strategy(game, theta1)  # Compute strategy using regret matching
 
-        action_values = np.zeros(len(h.get_available_moves()))
-        for idx, a in enumerate(h.get_available_moves()[:5]):
-            h_copy = deepcopy(h)
+        action_values = np.zeros(len(game.get_available_moves()))
+        for idx, a in enumerate(game.get_available_moves()[:5]):
+            h_copy = deepcopy(game)
             h_copy.take_action(a)
             action_values[idx] = traverse(
                 deepcopy(h_copy), actual_player_to_compute_strategy, theta1, theta2, MV, M_PI, t
@@ -97,15 +97,15 @@ def traverse(h: TexasHoldEm, actual_player_to_compute_strategy: int, theta1, the
     else:
         player_num = get_opponent_player_num(actual_player_to_compute_strategy)
         sigma_t = compute_strategy(
-            get_info_set(h, player_num), theta2
+            get_info_set(game, player_num), theta2
         )  # Compute opponent's strategy
 
         M_PI.insert(
-            get_info_set(h, player_num), t, sigma_t
+            get_info_set(game, player_num), t, sigma_t
         )  # Insert infoset and its action probabilities
 
         a = np.random.choice(
-            h.get_legal_actions(), p=sigma_t
+            game.get_available_moves(), p=sigma_t
         )  # Sample action according to opponent's strategy
-        h.take_action(a)
-        return traverse(deepcopy(h), player_num, theta1, theta2, MV, M_PI, t)
+        game.take_action(a)
+        return traverse(deepcopy(game), player_num, theta1, theta2, MV, M_PI, t)
