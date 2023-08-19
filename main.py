@@ -30,8 +30,6 @@ def main():
     print("Hello World !")
     choice = 999
 
-
-
     while choice != 0:
         print("0 : leave")
         print("1 : simulation")
@@ -108,9 +106,18 @@ def main():
 
         elif choice == 7:
             # Train Deep CFR
-            game = TexasHoldEm(1500, 80, 40, nb_players)
-            save_deep_cfr("", "DeepCFR", nb_iterations, nb_players, nb_game_tree_traversals, game, n_actions, n_card_types, n_bets)
-            pass
+            game = TexasHoldEm(buyin=1500, big_blind=80, small_blind=40, max_players=2)
+            save_deep_cfr(
+                path="",
+                name_file="DeepCFR",
+                nb_iterations=nb_iterations,
+                nb_players=nb_players,
+                nb_game_tree_traversals=nb_game_tree_traversals,
+                game=game,
+                n_actions=n_actions,
+                n_card_types=n_card_types,
+                n_bets=n_bets,
+            )
 
         elif choice == 8:
             # heads-up hold’em poker with Deep CFR
