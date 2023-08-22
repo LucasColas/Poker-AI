@@ -6,6 +6,7 @@ from copy import deepcopy
 from texasholdem.agents.basic import random_agent, call_agent
 from texasholdem.evaluator.evaluator import *
 from texasholdem.game.game import TexasHoldEm
+from texasholdem.gui.text_gui import TextGUI
 
 
 
@@ -104,9 +105,15 @@ def main():
             tournoi_avec_humain()
 
         elif choice == 6:
-            new_nlhp = NLHP(buyin=1000, small_blind=10, big_blind=20, gui=False)
-            new_nlhp.create_game()
-            new_nlhp.play()
+            game = TexasHoldEm(buyin=1500, big_blind=80, small_blind=40, max_players=2)
+            gui = TextGUI(game=game)
+            while game.is_game_running():
+                game.start_hand()
+
+                while game.is_hand_running():
+                    gui.run_step()
+
+
 
         elif choice == 7:
             # Train Deep CFR

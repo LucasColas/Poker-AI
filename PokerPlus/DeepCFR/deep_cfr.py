@@ -31,7 +31,7 @@ def deep_cfr(
     game: TexasHoldEm=None,
     n_actions: int=3,
     n_card_types: int=4,
-    n_bets: int=2,
+    n_bets: int=20,
 ):
     """
 
