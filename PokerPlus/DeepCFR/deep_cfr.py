@@ -25,13 +25,13 @@ n_actions = 3
 
 
 def deep_cfr(
-    nb_iterations: int,
-    nb_players: int,
-    nb_game_tree_traversals: int,
-    game: TexasHoldEm,
-    n_actions: int,
-    n_card_types: int,
-    n_bets: int,
+    nb_iterations: int=10000,
+    nb_players: int=2,
+    nb_game_tree_traversals: int=200,
+    game: TexasHoldEm=None,
+    n_actions: int=3,
+    n_card_types: int=4,
+    n_bets: int=2,
 ):
     """
 
@@ -40,6 +40,9 @@ def deep_cfr(
     Initialize reservoir-sampled advantage memories MV,1, MV,2 and strategy memory MΠ.
 
     """
+    if not game:
+        game = TexasHoldEm(buyin=1500, big_blind=80, small_blind=40, max_players=2)
+        game.start_hand()
     # Initialize each player’s advantage network
     advantage_net = [
         DeepCFRModel(n_card_types, n_bets, n_actions) for _ in range(nb_players)
