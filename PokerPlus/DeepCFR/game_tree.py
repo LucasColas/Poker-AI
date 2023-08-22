@@ -7,13 +7,17 @@ Main code for the game tree CFR Traversal with External Sampling
 
 from copy import deepcopy
 
+import numpy as np
+import torch
+import torch.nn.functional as F
+
 from texasholdem.game.game import TexasHoldEm
 from PokerPlus.DeepCFR.nn import DeepCFRModel
 from PokerPlus.DeepCFR.utils import card_to_int, int_to_card
 
-import numpy as np
-import torch
-import torch.nn.functional as F
+from PokerPlus.DeepCFR.memory import AdvantageMemory, StrategyMemory
+
+
 
 
 def compute_strategy(state: TexasHoldEm, strategy_net: DeepCFRModel):
@@ -81,9 +85,9 @@ def traverse(
     actual_player_to_compute_strategy: int,
     theta1,
     theta2,
-    MV,
-    M_PI,
-    t,
+    AdvantageMemory : AdvantageMemory,
+    StrategyMemory : StrategyMemory,
+    iteration_t : int,
 ):
     if not game.is_hand_running():
         return get_payoff(game, actual_player_to_compute_strategy)
@@ -102,14 +106,14 @@ def traverse(
                 actual_player_to_compute_strategy,
                 theta1,
                 theta2,
-                MV,
-                M_PI,
-                t,
+                AdvantageMemory,
+                StrategyMemory,
+                iteration_t,
             )
 
             regrets = action_values - np.sum(sigma_t * action_values)
-        MV.insert(
-            get_info_set(h_copy, actual_player_to_compute_strategy), t, regrets
+        AdvantageMemory[actual_player_to_compute_strategy].insert(
+            get_info_set(h_copy, actual_player_to_compute_strategy), iteration_t, regrets
         )  # Insert infoset and its action advantages
         return np.max(action_values)  # Return the value of the best action
     else:
@@ -118,12 +122,12 @@ def traverse(
             get_info_set(game, player_num), theta2
         )  # Compute opponent's strategy
 
-        M_PI.insert(
-            get_info_set(game, player_num), t, sigma_t
+        StrategyMemory.insert(
+            get_info_set(game, player_num), iteration_t, sigma_t
         )  # Insert infoset and its action probabilities
 
         a = np.random.choice(
             game.get_available_moves(), p=sigma_t
         )  # Sample action according to opponent's strategy
         game.take_action(a)
-        return traverse(deepcopy(game), player_num, theta1, theta2, MV, M_PI, t)
+        return traverse(deepcopy(game), player_num, theta1, theta2, AdvantageMemory, StrategyMemory, iteration_t)
