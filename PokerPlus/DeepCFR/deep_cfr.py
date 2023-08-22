@@ -25,13 +25,13 @@ n_actions = 3
 
 
 def deep_cfr(
-    nb_iterations: int=10000,
-    nb_players: int=2,
-    nb_game_tree_traversals: int=200,
-    game: TexasHoldEm=None,
-    n_actions: int=3,
-    n_card_types: int=4,
-    n_bets: int=20,
+    nb_iterations: int = 10000,
+    nb_players: int = 2,
+    nb_game_tree_traversals: int = 200,
+    game: TexasHoldEm = None,
+    n_actions: int = 3,
+    n_card_types: int = 4,
+    n_bets: int = 20,
 ):
     """
 
@@ -56,7 +56,14 @@ def deep_cfr(
         for player in range(nb_players):
             for _ in range(nb_game_tree_traversals):
                 # Traverse the game tree
-                traverse(deepcopy(game), player, advantage_net, advantage_memories[player], strategy_memory, iteration_t)
+                traverse(
+                    deepcopy(game),
+                    player,
+                    advantage_net,
+                    advantage_memories[player],
+                    strategy_memory,
+                    iteration_t,
+                )
 
             # Train
             train_advantage_network(advantage_net[player], advantage_memories[player])
@@ -70,7 +77,6 @@ def deep_cfr(
 
 def train_advantage_network(net, MV, lr=0.001, batch_size=10000, nb_epochs=4000):
     optimizer = optim.Adam(net.parameters(), lr=lr, clip_value=1.0)
-
 
     for epoch in range(nb_epochs):
         total_loss = 0.0
@@ -100,7 +106,6 @@ def train_advantage_network(net, MV, lr=0.001, batch_size=10000, nb_epochs=4000)
 
 def train_strategy_network(net, M_PI, lr=0.001, batch_size=10000, nb_epochs=4000):
     optimizer = optim.Adam(net.parameters(), lr=lr)
-
 
     for epoch in range(nb_epochs):
         total_loss = 0.0

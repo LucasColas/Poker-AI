@@ -9,7 +9,6 @@ from texasholdem.game.game import TexasHoldEm
 from texasholdem.gui.text_gui import TextGUI
 
 
-
 # PokerPlus
 from PokerPlus.Stat.stat import get_stat_tournoi
 from PokerPlus.Simulation.simu_bots_humains import (
@@ -112,8 +111,6 @@ def main():
 
                 while game.is_hand_running():
                     gui.run_step()
-
-
 
         elif choice == 7:
             # Train Deep CFR

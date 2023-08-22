@@ -31,8 +31,6 @@ class NLHP:
             if self.__gui_:
                 self.__gui = TextGUI(self.__game)
 
-            
-
     def is_game_running(self):
         """
 
@@ -59,6 +57,6 @@ class NLHP:
                     self.__gui.display_state()
                     self.__gui.wait_until_prompted()
                     self.__gui.run_step()
-                #self.__game.take_action(*random_agent(self.__game))
+                # self.__game.take_action(*random_agent(self.__game))
 
         print("end")

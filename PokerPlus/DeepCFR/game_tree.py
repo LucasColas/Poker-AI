@@ -18,8 +18,6 @@ from PokerPlus.DeepCFR.utils import card_to_int, int_to_card
 from PokerPlus.DeepCFR.memory import AdvantageMemory, StrategyMemory
 
 
-
-
 def compute_strategy(state: TexasHoldEm, strategy_net: DeepCFRModel):
     """
 
@@ -85,9 +83,9 @@ def traverse(
     actual_player_to_compute_strategy: int,
     theta1,
     theta2,
-    AdvantageMemory : AdvantageMemory,
-    StrategyMemory : StrategyMemory,
-    iteration_t : int,
+    AdvantageMemory: AdvantageMemory,
+    StrategyMemory: StrategyMemory,
+    iteration_t: int,
 ):
     if not game.is_hand_running():
         return get_payoff(game, actual_player_to_compute_strategy)
@@ -113,7 +111,9 @@ def traverse(
 
             regrets = action_values - np.sum(sigma_t * action_values)
         AdvantageMemory[actual_player_to_compute_strategy].insert(
-            get_info_set(h_copy, actual_player_to_compute_strategy), iteration_t, regrets
+            get_info_set(h_copy, actual_player_to_compute_strategy),
+            iteration_t,
+            regrets,
         )  # Insert infoset and its action advantages
         return np.max(action_values)  # Return the value of the best action
     else:
@@ -130,4 +130,12 @@ def traverse(
             game.get_available_moves(), p=sigma_t
         )  # Sample action according to opponent's strategy
         game.take_action(a)
-        return traverse(deepcopy(game), player_num, theta1, theta2, AdvantageMemory, StrategyMemory, iteration_t)
+        return traverse(
+            deepcopy(game),
+            player_num,
+            theta1,
+            theta2,
+            AdvantageMemory,
+            StrategyMemory,
+            iteration_t,
+        )
