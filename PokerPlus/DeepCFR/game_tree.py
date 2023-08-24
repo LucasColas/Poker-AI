@@ -18,7 +18,7 @@ from PokerPlus.DeepCFR.utils import card_to_int, int_to_card
 from PokerPlus.DeepCFR.memory import AdvantageMemory, StrategyMemory
 
 
-def compute_strategy(state: TexasHoldEm, strategy_net: DeepCFRModel):
+def compute_strategy(state: TexasHoldEm, strategy_net: DeepCFRModel, nb_actions=5):
     """
 
     Function used to compute the strategy for a given state.
@@ -26,7 +26,7 @@ def compute_strategy(state: TexasHoldEm, strategy_net: DeepCFRModel):
     """
 
     # Get the available moves for the current player
-    legal_actions = state.get_available_moves()
+    legal_actions = state.get_available_moves()[:nb_actions]
     player = state.current_player
 
     cards_board = [card_to_int[card.__str__()] for card in state.board]
@@ -86,6 +86,7 @@ def traverse(
     AdvantageMemory: AdvantageMemory,
     StrategyMemory: StrategyMemory,
     iteration_t: int,
+    nb_actions=5,
 ):
     if not game.is_hand_running():
         return get_payoff(game, actual_player_to_compute_strategy)
@@ -95,8 +96,8 @@ def traverse(
             game, theta1
         )  # Compute strategy using regret matching
 
-        action_values = np.zeros(len(game.get_available_moves()))
-        for idx, a in enumerate(game.get_available_moves()[:5]):
+        action_values = np.zeros(len(game.get_available_moves()[:nb_actions]))
+        for idx, a in enumerate(game.get_available_moves()[:nb_actions]):
             h_copy = deepcopy(game)
             h_copy.take_action(a)
             action_values[idx] = traverse(
@@ -127,7 +128,7 @@ def traverse(
         )  # Insert infoset and its action probabilities
 
         a = np.random.choice(
-            game.get_available_moves(), p=sigma_t
+            game.get_available_moves()[:nb_actions], p=sigma_t
         )  # Sample action according to opponent's strategy
         game.take_action(a)
         return traverse(

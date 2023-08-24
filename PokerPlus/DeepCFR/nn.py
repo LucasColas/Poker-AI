@@ -30,7 +30,7 @@ class CardEmbedding(nn.Module):
 
 
 class DeepCFRModel(nn.Module):
-    def __init__(self, n_card_types, n_bets, max_bet=100000, n_actions=3, dim=256):
+    def __init__(self, n_card_types, n_bets, max_bet=100000, n_actions=5, dim=256):
         super(DeepCFRModel, self).__init__()
         self.max_bet = max_bet
         self.card_embeddings = nn.ModuleList(
