@@ -131,7 +131,7 @@ def traverse(
         )  # Insert infoset and its action probabilities
 
         a = np.random.choice(
-            game.get_available_moves()[:nb_actions], p=sigma_t
+            game.get_available_moves()[:nb_actions], p=list(sigma_t.values())
         )  # Sample action according to opponent's strategy
         game.take_action(a)
         return traverse(
