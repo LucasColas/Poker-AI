@@ -113,7 +113,7 @@ def traverse(
             )
 
 
-            regrets[idx] = action_values - np.sum(sigma_t * action_values)
+            regrets[idx] = action_values - np.sum(list(sigma_t.values()) * action_values)
         AdvantageMemory[actual_player_to_compute_strategy].insert(
             get_info_set(h_copy, actual_player_to_compute_strategy),
             iteration_t,
