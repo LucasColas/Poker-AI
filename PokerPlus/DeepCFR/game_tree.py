@@ -96,10 +96,12 @@ def traverse(
             game, theta1
         )  # Compute strategy using regret matching
 
+        regrets = np.zeros(len(game.get_available_moves()[:nb_actions]))
+
         action_values = np.zeros(len(game.get_available_moves()[:nb_actions]))
-        for idx, a in enumerate(game.get_available_moves()[:nb_actions]):
+        for idx, action in enumerate(game.get_available_moves()[:nb_actions]):
             h_copy = deepcopy(game)
-            h_copy.take_action(a)
+            h_copy.take_action(action)
             action_values[idx] = traverse(
                 deepcopy(h_copy),
                 actual_player_to_compute_strategy,
@@ -111,7 +113,7 @@ def traverse(
             )
 
 
-            regrets = action_values - np.sum(sigma_t * action_values)
+            regrets[idx] = action_values - np.sum(sigma_t * action_values)
         AdvantageMemory[actual_player_to_compute_strategy].insert(
             get_info_set(h_copy, actual_player_to_compute_strategy),
             iteration_t,
