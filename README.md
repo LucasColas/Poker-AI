@@ -3,6 +3,12 @@
 Poker Project with agents that can play Texas Hold'em No Limit.
 There's also a clustering to get the types of Poker Players around the table.
 
+Agents use different strategies : 
+* Stochastic probability
+* Monte Carlo
+* Outs
+* Deep CFR (neural network with counterfactual regret minimization)
+
 We use texasholdem library :
 * Code : https://github.com/SirRender00/texasholdem
 * Doc : https://texasholdem.readthedocs.io/en/0.10/getting_started.html
