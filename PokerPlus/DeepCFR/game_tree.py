@@ -93,17 +93,16 @@ def traverse(
 
     elif game.current_player == actual_player_to_compute_strategy:
         sigma_t = compute_strategy(
-            game, theta1
+            game, theta1, nb_actions
         )  # Compute strategy using regret matching
 
         regrets = np.zeros(len(game.get_available_moves()[:nb_actions]))
 
         action_values = np.zeros(len(game.get_available_moves()[:nb_actions]))
         for idx, action in enumerate(game.get_available_moves()[:nb_actions]):
-            h_copy = deepcopy(game)
-            h_copy.take_action(action)
+            game.take_action(action)
             action_values[idx] = traverse(
-                deepcopy(h_copy),
+                deepcopy(game),
                 actual_player_to_compute_strategy,
                 theta1,
                 theta2,
@@ -111,23 +110,21 @@ def traverse(
                 StrategyMemory,
                 iteration_t,
             )
-
-
             regrets[idx] = action_values - np.sum(list(sigma_t.values()) * action_values)
         AdvantageMemory[actual_player_to_compute_strategy].insert(
-            get_info_set(h_copy, actual_player_to_compute_strategy),
+            get_info_set(game, actual_player_to_compute_strategy),
             iteration_t,
             regrets,
         )  # Insert infoset and its action advantages
         return np.max(action_values)  # Return the value of the best action
     else:
-        player_num = get_opponent_player_num(actual_player_to_compute_strategy)
+        opponent_num = get_opponent_player_num(actual_player_to_compute_strategy)
         sigma_t = compute_strategy(
-            get_info_set(game, player_num), theta2
+            get_info_set(game, opponent_num), theta2, nb_actions
         )  # Compute opponent's strategy
 
         StrategyMemory.insert(
-            get_info_set(game, player_num), iteration_t, sigma_t
+            get_info_set(game, opponent_num), iteration_t, sigma_t
         )  # Insert infoset and its action probabilities
 
         a = np.random.choice(
@@ -136,7 +133,7 @@ def traverse(
         game.take_action(a)
         return traverse(
             deepcopy(game),
-            player_num,
+            opponent_num,
             theta1,
             theta2,
             AdvantageMemory,
