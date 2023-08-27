@@ -60,13 +60,13 @@ def get_payoff(game: TexasHoldEm, player: int):
     return -game.pots[-1]
 
 
-def get_info_set(h: TexasHoldEm, player: int):
-    cards_board = {card_to_int[card.__str__()] for card in h.board}
-    hole = h.get_hand(player)
+def get_info_set(game: TexasHoldEm, player: int):
+    cards_board = {card_to_int[card.__str__()] for card in game.board}
+    hole = game.get_hand(player)
     hole = {card_to_int[card.__str__()] for card in hole}
     cards = hole + cards_board
     # bets
-    bets = (val_bet for val_bet in h._get_last_pot().player_amounts.values())
+    bets = (val_bet for val_bet in game._get_last_pot().player_amounts.values())
 
     return cards, bets
 
@@ -110,7 +110,9 @@ def traverse(
                 StrategyMemory,
                 iteration_t,
             )
-            regrets[idx] = action_values - np.sum(list(sigma_t.values()) * action_values)
+            regrets[idx] = action_values - np.sum(
+                list(sigma_t.values()) * action_values
+            )
         AdvantageMemory[actual_player_to_compute_strategy].insert(
             get_info_set(game, actual_player_to_compute_strategy),
             iteration_t,

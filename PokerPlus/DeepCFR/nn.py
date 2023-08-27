@@ -46,7 +46,6 @@ class DeepCFRModel(nn.Module):
         self.comb3 = nn.Linear(dim, dim)
         self.action_head = nn.Linear(dim, n_actions)
 
-
     def forward(self, cards, bets):
         """
         cards: ((Nx2), (Nx3) [, (Nx1), (Nx1)]) # (hole, board, [turn, river])
