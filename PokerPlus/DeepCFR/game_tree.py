@@ -29,9 +29,9 @@ def compute_strategy(state: TexasHoldEm, strategy_net: DeepCFRModel, nb_actions=
     legal_actions = state.get_available_moves()[:nb_actions]
     player = state.current_player
 
-    cards_board = [card_to_int[card.__str__()] for card in state.board]
+    cards_board = [card_to_int[str(card)] for card in state.board]
     hole = state.get_hand(player)
-    hole = [card_to_int[card.__str__()] for card in hole]
+    hole = [card_to_int[str(card)] for card in hole]
     cards = hole + cards_board
     # bets
     bets = [val_bet for val_bet in state._get_last_pot().player_amounts.values()]
