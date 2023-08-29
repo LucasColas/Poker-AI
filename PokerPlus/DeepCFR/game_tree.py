@@ -61,9 +61,9 @@ def get_payoff(game: TexasHoldEm, player: int):
 
 
 def get_info_set(game: TexasHoldEm, player: int):
-    cards_board = {card_to_int[card.__str__()] for card in game.board}
+    cards_board = (card_to_int[card.__str__()] for card in game.board)
     hole = game.get_hand(player)
-    hole = {card_to_int[card.__str__()] for card in hole}
+    hole = (card_to_int[card.__str__()] for card in hole)
     cards = hole + cards_board
     # bets
     bets = (val_bet for val_bet in game._get_last_pot().player_amounts.values())
@@ -71,8 +71,8 @@ def get_info_set(game: TexasHoldEm, player: int):
     return cards, bets
 
 
-def get_opponent_player_num(actual_player: int):
-    if actual_player == 1:
+def get_opponent_player_num(current_player: int):
+    if current_player == 1:
         return 0
     else:
         return 1
@@ -80,7 +80,7 @@ def get_opponent_player_num(actual_player: int):
 
 def traverse(
     game: TexasHoldEm,
-    actual_player_to_compute_strategy: int,
+    current_player_to_compute_strategy: int,
     theta1,
     theta2,
     AdvantageMemory: AdvantageMemory,
@@ -89,9 +89,9 @@ def traverse(
     nb_actions=5,
 ):
     if not game.is_hand_running():
-        return get_payoff(game, actual_player_to_compute_strategy)
+        return get_payoff(game, current_player_to_compute_strategy)
 
-    elif game.current_player == actual_player_to_compute_strategy:
+    elif game.current_player == current_player_to_compute_strategy:
         sigma_t = compute_strategy(
             game, theta1, nb_actions
         )  # Compute strategy using regret matching
@@ -103,7 +103,7 @@ def traverse(
             game.take_action(action)
             action_values[idx] = traverse(
                 deepcopy(game),
-                actual_player_to_compute_strategy,
+                current_player_to_compute_strategy,
                 theta1,
                 theta2,
                 AdvantageMemory,
@@ -113,14 +113,14 @@ def traverse(
             regrets[idx] = action_values - np.sum(
                 list(sigma_t.values()) * action_values
             )
-        AdvantageMemory[actual_player_to_compute_strategy].insert(
-            get_info_set(game, actual_player_to_compute_strategy),
+        AdvantageMemory[current_player_to_compute_strategy].insert(
+            get_info_set(game, current_player_to_compute_strategy),
             iteration_t,
             regrets,
         )  # Insert infoset and its action advantages
         return np.max(action_values)  # Return the value of the best action
     else:
-        opponent_num = get_opponent_player_num(actual_player_to_compute_strategy)
+        opponent_num = get_opponent_player_num(current_player_to_compute_strategy)
         sigma_t = compute_strategy(
             get_info_set(game, opponent_num), theta2, nb_actions
         )  # Compute opponent's strategy
