@@ -43,7 +43,7 @@ def deep_cfr(
     if not game:
         game = TexasHoldEm(buyin=1500, big_blind=80, small_blind=40, max_players=2)
         game.start_hand()
-        
+
     # Initialize each player’s advantage network
     advantage_net = [
         DeepCFRModel(n_card_types, n_bets, n_actions) for _ in range(nb_players)

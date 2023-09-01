@@ -77,6 +77,7 @@ def get_opponent_player_num(current_player: int):
     else:
         return 1
 
+
 def traverse(
     game: TexasHoldEm,
     current_player_to_compute_strategy: int,
@@ -89,7 +90,6 @@ def traverse(
 ):
     if not game.is_hand_running():
         return get_payoff(game, current_player_to_compute_strategy)
-    
 
     elif game.current_player == current_player_to_compute_strategy:
         sigma_t = compute_strategy(
