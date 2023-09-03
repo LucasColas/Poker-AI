@@ -54,13 +54,14 @@ def deep_cfr(
     strategy_memory = StrategyMemory()
 
     for iteration_t in range(nb_iterations):
+        print("Iteration: ", iteration_t)
         for player in range(nb_players):
             for _ in range(nb_game_tree_traversals):
                 # Traverse the game tree
                 traverse(
                     deepcopy(game),
                     player,
-                    advantage_net,
+                    advantage_net[player],
                     advantage_memories[player],
                     strategy_memory,
                     iteration_t,

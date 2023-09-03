@@ -17,6 +17,8 @@ from PokerPlus.DeepCFR.utils import card_to_int, int_to_card
 
 from PokerPlus.DeepCFR.memory import AdvantageMemory, StrategyMemory
 
+from PokerPlus.DeepCFR.utils import get_opponent_player_num
+
 
 def compute_strategy(state: TexasHoldEm, strategy_net: DeepCFRModel, nb_actions=5):
     """
@@ -71,11 +73,7 @@ def get_info_set(game: TexasHoldEm, player: int):
     return cards, bets
 
 
-def get_opponent_player_num(current_player: int):
-    if current_player == 1:
-        return 0
-    else:
-        return 1
+
 
 
 def traverse(
