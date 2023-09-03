@@ -15,7 +15,10 @@ import torch.nn.functional as F
 from PokerPlus.DeepCFR.nn import DeepCFRModel
 from PokerPlus.DeepCFR.game_tree import traverse
 from PokerPlus.DeepCFR.memory import AdvantageMemory, StrategyMemory
+from PokerPlus.DeepCFR.utils import get_opponent_player_num
+
 from texasholdem.game.game import TexasHoldEm
+
 
 """
 n_card_types = 4
@@ -62,6 +65,7 @@ def deep_cfr(
                     deepcopy(game),
                     player,
                     advantage_net[player],
+                    advantage_net[get_opponent_player_num(player)],
                     advantage_memories[player],
                     strategy_memory,
                     iteration_t,

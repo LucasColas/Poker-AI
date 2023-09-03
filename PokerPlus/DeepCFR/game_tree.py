@@ -63,9 +63,9 @@ def get_payoff(game: TexasHoldEm, player: int):
 
 
 def get_info_set(game: TexasHoldEm, player: int):
-    cards_board = (card_to_int[card.__str__()] for card in game.board)
+    cards_board = [card_to_int[card.__str__()] for card in game.board]
     hole = game.get_hand(player)
-    hole = (card_to_int[card.__str__()] for card in hole)
+    hole = [card_to_int[card.__str__()] for card in hole]
     cards = hole + cards_board
     # bets
     bets = (val_bet for val_bet in game._get_last_pot().player_amounts.values())
@@ -73,6 +73,14 @@ def get_info_set(game: TexasHoldEm, player: int):
     return cards, bets
 
 
+def available_moves(game : TexasHoldEm, nb_actions : int):
+    actions = game.get_available_moves()
+    available_actions = []
+    for index, action in enumerate(actions):
+        if action[0] < nb_actions:
+            available_actions.append(action[1])
+        else:
+            return available_actions
 
 
 
@@ -87,6 +95,7 @@ def traverse(
     nb_actions=5,
 ):
     if not game.is_hand_running():
+        print("game : ", game)
         return get_payoff(game, current_player_to_compute_strategy)
 
     elif game.current_player == current_player_to_compute_strategy:
@@ -94,10 +103,11 @@ def traverse(
             game, theta1, nb_actions
         )  # Compute strategy using regret matching
 
-        regrets = np.zeros(len(game.get_available_moves()[:nb_actions]))
+        available_moves_ = available_moves(game, nb_actions)
+        regrets = np.zeros(len(available_moves_))
 
-        action_values = np.zeros(len(game.get_available_moves()[:nb_actions]))
-        for idx, action in enumerate(game.get_available_moves()[:nb_actions]):
+        action_values = np.zeros(len(available_moves_))
+        for idx, action in enumerate(available_moves_):
             game.take_action(action)
             action_values[idx] = traverse(
                 deepcopy(game),
@@ -128,7 +138,7 @@ def traverse(
         )  # Insert infoset and its action probabilities
 
         a = np.random.choice(
-            game.get_available_moves()[:nb_actions], p=list(sigma_t.values())
+            available_moves_, p=list(sigma_t.values())
         )  # Sample action according to opponent's strategy
         game.take_action(a)
         return traverse(
