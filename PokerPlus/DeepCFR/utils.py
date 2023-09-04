@@ -1,5 +1,6 @@
 from texasholdem.card.deck import Deck
 from texasholdem.card.card import Card
+from texasholdem.game.game import TexasHoldEm
 
 d = Deck()
 card_to_int = {}
@@ -18,3 +19,13 @@ def get_opponent_player_num(current_player: int):
         return 0
     else:
         return 1
+
+
+def available_moves(game: TexasHoldEm, nb_actions: int):
+    actions = game.get_available_moves()
+    available_actions = []
+    for index, action in enumerate(actions):
+        if index < nb_actions:
+            available_actions.append(action[1])
+        else:
+            return available_actions

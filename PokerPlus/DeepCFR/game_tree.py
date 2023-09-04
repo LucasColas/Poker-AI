@@ -17,7 +17,7 @@ from PokerPlus.DeepCFR.utils import card_to_int, int_to_card
 
 from PokerPlus.DeepCFR.memory import AdvantageMemory, StrategyMemory
 
-from PokerPlus.DeepCFR.utils import get_opponent_player_num
+from PokerPlus.DeepCFR.utils import get_opponent_player_num, available_moves
 
 
 def compute_strategy(state: TexasHoldEm, strategy_net: DeepCFRModel, nb_actions=5):
@@ -28,13 +28,22 @@ def compute_strategy(state: TexasHoldEm, strategy_net: DeepCFRModel, nb_actions=
     """
 
     # Get the available moves for the current player
-    legal_actions = state.get_available_moves()[:nb_actions]
+    print("state: ", state)
+    legal_actions = available_moves(state, nb_actions)
     player = state.current_player
 
     cards_board = [card_to_int[str(card)] for card in state.board]
+    flop = [card for card in cards_board[:3]]
+    turn = cards_board[3:4]
+    river = cards_board[4:5]
     hole = state.get_hand(player)
     hole = [card_to_int[str(card)] for card in hole]
-    cards = hole + cards_board
+    cards = [hole, flop]
+    if turn:
+        cards.extend([turn])
+
+    if river:
+        cards.extend([river])
     # bets
     bets = [val_bet for val_bet in state._get_last_pot().player_amounts.values()]
     cards = [torch.tensor(c, dtype=torch.long) for c in cards]
@@ -71,17 +80,6 @@ def get_info_set(game: TexasHoldEm, player: int):
     bets = (val_bet for val_bet in game._get_last_pot().player_amounts.values())
 
     return cards, bets
-
-
-def available_moves(game : TexasHoldEm, nb_actions : int):
-    actions = game.get_available_moves()
-    available_actions = []
-    for index, action in enumerate(actions):
-        if action[0] < nb_actions:
-            available_actions.append(action[1])
-        else:
-            return available_actions
-
 
 
 def traverse(
@@ -128,9 +126,10 @@ def traverse(
         )  # Insert infoset and its action advantages
         return np.max(action_values)  # Return the value of the best action
     else:
+        available_moves_ = available_moves(game, nb_actions)
         opponent_num = get_opponent_player_num(current_player_to_compute_strategy)
         sigma_t = compute_strategy(
-            get_info_set(game, opponent_num), theta2, nb_actions
+            game, theta2, nb_actions
         )  # Compute opponent's strategy
 
         StrategyMemory.insert(

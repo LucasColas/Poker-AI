@@ -13,5 +13,5 @@ while game.is_game_running():
         print("game available moves slicing : ", game.get_available_moves()[:5])
         for move in game.get_available_moves():
             print("move : ", move)
-            
+
         gui.run_step()

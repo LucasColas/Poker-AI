@@ -20,6 +20,8 @@ class CardEmbedding(nn.Module):
         self.card = nn.Embedding(52, dim)
 
     def forward(self, input):
+        print("forward of CardEmbedding")
+        print("input: ", input)
         B, num_cards = input.shape
         x = input.view(-1)
         valid = x.ge(0).float()  # -1 means 'no card'
@@ -54,8 +56,13 @@ class DeepCFRModel(nn.Module):
         # 1. card branch
         # embed hole, flop, and optionally turn and river
         card_embs = []
+        print("cards: ", cards)
+        print("bets: ", bets)
+
         for embedding, card_group in zip(self.card_embeddings, cards):
-            card_embs.append(embedding(card_group))
+            print("do embedding")
+            print("card_group: ", card_group)
+            card_embs.append(embedding(card_group.view(1, -1)))
         card_embs = torch.cat(card_embs, dim=1)
         x = F.relu(self.card1(card_embs))
         x = F.relu(self.card2(x))
