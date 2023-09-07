@@ -33,7 +33,7 @@ def deep_cfr(
     nb_game_tree_traversals: int = 200,
     game: TexasHoldEm = None,
     n_actions: int = 3,
-    n_card_types: int = 4,
+    n_card_types: int = 52,
     n_bets: int = 20,
 ):
     """

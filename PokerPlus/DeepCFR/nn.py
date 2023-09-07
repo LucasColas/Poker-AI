@@ -63,8 +63,11 @@ class DeepCFRModel(nn.Module):
             print("do embedding")
             print("card_group: ", card_group)
             if card_group.numel():
-                card_embs.append(embedding(card_group.view(1, -1)))
+                card_embs.append(embedding(card_group.view(-1, 1)))
+        
         card_embs = torch.cat(card_embs, dim=1)
+
+        print("cards embs shape : ", card_embs.shape)
         x = F.relu(self.card1(card_embs))
         x = F.relu(self.card2(x))
         x = F.relu(self.card3(x))
