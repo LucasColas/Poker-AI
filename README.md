@@ -7,7 +7,7 @@ Agents use different strategies :
 * Stochastic probability
 * Monte Carlo
 * Outs
-* Deep CFR (neural network with counterfactual regret minimization)
+* Deep CFR (neural network with counterfactual regret minimization) - still working on it
 
 We use texasholdem library :
 * Code : https://github.com/SirRender00/texasholdem
