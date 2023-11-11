@@ -5,7 +5,7 @@ There's also a clustering to get the types of Poker Players around the table.
 
 Agents use different strategies : 
 * Stochastic probability
-* Monte Carlo
+* Monte Carlo / Monte Carlo Tree Search
 * Outs
 * Deep CFR (neural network with counterfactual regret minimization) - still working on it
 
